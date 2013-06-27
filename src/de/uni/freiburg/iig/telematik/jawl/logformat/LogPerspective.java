@@ -1,4 +1,4 @@
-package logformat;
+package de.uni.freiburg.iig.telematik.jawl.logformat;
 
 public enum LogPerspective {
 	TRACE_PERSPECTIVE, 

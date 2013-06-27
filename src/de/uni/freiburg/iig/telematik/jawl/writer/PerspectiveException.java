@@ -1,4 +1,4 @@
-package writer;
+package de.uni.freiburg.iig.telematik.jawl.writer;
 
 public class PerspectiveException extends Exception {
 

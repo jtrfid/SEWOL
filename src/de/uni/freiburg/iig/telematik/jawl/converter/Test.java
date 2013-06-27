@@ -1,4 +1,4 @@
-package converter;
+package de.uni.freiburg.iig.telematik.jawl.converter;
 
 import java.io.RandomAccessFile;
 

@@ -1,4 +1,4 @@
-package converter;
+package de.uni.freiburg.iig.telematik.jawl.converter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -51,15 +51,15 @@ import de.invation.code.toval.graphic.diagrams.panels.AdjustableDiagramPanel;
 import de.invation.code.toval.graphic.diagrams.panels.DotChartPanel;
 import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
+import de.uni.freiburg.iig.telematik.jawl.log.DataAttribute;
+import de.uni.freiburg.iig.telematik.jawl.log.LockingException;
+import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
+import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
+import de.uni.freiburg.iig.telematik.jawl.logformat.LogFormat;
+import de.uni.freiburg.iig.telematik.jawl.logformat.MXMLLogFormat;
+import de.uni.freiburg.iig.telematik.jawl.writer.LogWriter;
+import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException;
 
-import log.DataAttribute;
-import log.LockingException;
-import log.LogEntry;
-import log.LogTrace;
-import logformat.LogFormat;
-import logformat.MXMLLogFormat;
-import writer.LogWriter;
-import writer.PerspectiveException;
 
 //VORSICHT: Probleme beim Zeitstempel-Handling, evtl. auch in LogWriter
 

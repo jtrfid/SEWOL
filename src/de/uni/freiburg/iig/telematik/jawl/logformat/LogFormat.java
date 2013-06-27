@@ -1,4 +1,4 @@
-package logformat;
+package de.uni.freiburg.iig.telematik.jawl.logformat;
 
 import java.nio.charset.Charset;
 import java.text.DateFormatSymbols;
@@ -8,11 +8,11 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.invation.code.toval.file.FileFormat;
+import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
+import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
+import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException;
+import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException.PerspectiveError;
 
-import log.LogEntry;
-import log.LogTrace;
-import writer.PerspectiveException;
-import writer.PerspectiveException.PerspectiveError;
 
 
 public abstract class LogFormat extends FileFormat{

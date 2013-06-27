@@ -1,14 +1,15 @@
-package logformat;
+package de.uni.freiburg.iig.telematik.jawl.logformat;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
 
-import log.DataAttribute;
-import log.LogEntry;
-import log.LogTrace;
-import writer.PerspectiveException;
+import de.uni.freiburg.iig.telematik.jawl.log.DataAttribute;
+import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
+import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
+import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException;
+
 
 /**
  * Weil die Zeilenumbrüche hardcoded in den String-Konstanten sind muss darauf geachtet werden,

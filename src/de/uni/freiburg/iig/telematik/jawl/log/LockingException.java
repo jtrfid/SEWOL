@@ -1,4 +1,4 @@
-package log;
+package de.uni.freiburg.iig.telematik.jawl.log;
 
 
 public class LockingException extends ModificationException {

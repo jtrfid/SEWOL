@@ -1,4 +1,4 @@
-package writer;
+package de.uni.freiburg.iig.telematik.jawl.writer;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -7,13 +7,13 @@ import de.invation.code.toval.file.EOLType;
 import de.invation.code.toval.file.FileWriter;
 import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
+import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
+import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
+import de.uni.freiburg.iig.telematik.jawl.logformat.LogFormat;
+import de.uni.freiburg.iig.telematik.jawl.logformat.LogPerspective;
+import de.uni.freiburg.iig.telematik.jawl.logformat.MXMLLogFormat;
+import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException.PerspectiveError;
 
-import log.LogEntry;
-import log.LogTrace;
-import logformat.LogFormat;
-import logformat.LogPerspective;
-import logformat.MXMLLogFormat;
-import writer.PerspectiveException.PerspectiveError;
 
 /**
  * LogWriter provides functionality for writing trace-oriented log files.

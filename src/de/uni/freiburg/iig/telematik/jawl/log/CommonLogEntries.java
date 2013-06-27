@@ -1,4 +1,4 @@
-package log;
+package de.uni.freiburg.iig.telematik.jawl.log;
 
 import java.util.HashMap;
 import java.util.HashSet;

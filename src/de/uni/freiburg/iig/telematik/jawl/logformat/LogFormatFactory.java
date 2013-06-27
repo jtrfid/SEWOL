@@ -1,6 +1,6 @@
-package logformat;
+package de.uni.freiburg.iig.telematik.jawl.logformat;
 
-import writer.PerspectiveException;
+import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException;
 
 public class LogFormatFactory {
 	
