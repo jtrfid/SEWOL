@@ -7,11 +7,12 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import de.invation.code.toval.file.FileFormat;
+
 import log.LogEntry;
 import log.LogTrace;
 import writer.PerspectiveException;
 import writer.PerspectiveException.PerspectiveError;
-import file.FileFormat;
 
 
 public abstract class LogFormat extends FileFormat{

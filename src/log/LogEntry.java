@@ -13,8 +13,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import types.DataUsage;
-import types.HashList;
+import de.invation.code.toval.types.DataUsage;
+import de.invation.code.toval.types.HashList;
+
 
 
 public class LogEntry implements Comparable<LogEntry>{

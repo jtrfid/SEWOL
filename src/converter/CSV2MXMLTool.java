@@ -1,7 +1,4 @@
 package converter;
-import graphic.diagrams.models.DotChartModel;
-import graphic.diagrams.panels.AdjustableDiagramPanel;
-import graphic.diagrams.panels.DotChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -49,14 +46,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
+import de.invation.code.toval.graphic.diagrams.models.DotChartModel;
+import de.invation.code.toval.graphic.diagrams.panels.AdjustableDiagramPanel;
+import de.invation.code.toval.graphic.diagrams.panels.DotChartPanel;
+import de.invation.code.toval.validate.CompatibilityException;
+import de.invation.code.toval.validate.ParameterException;
+
 import log.DataAttribute;
 import log.LockingException;
 import log.LogEntry;
 import log.LogTrace;
 import logformat.LogFormat;
 import logformat.MXMLLogFormat;
-import validate.CompatibilityException;
-import validate.ParameterException;
 import writer.LogWriter;
 import writer.PerspectiveException;
 

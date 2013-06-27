@@ -3,16 +3,17 @@ package writer;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import de.invation.code.toval.file.EOLType;
+import de.invation.code.toval.file.FileWriter;
+import de.invation.code.toval.validate.CompatibilityException;
+import de.invation.code.toval.validate.ParameterException;
+
 import log.LogEntry;
 import log.LogTrace;
 import logformat.LogFormat;
 import logformat.LogPerspective;
 import logformat.MXMLLogFormat;
-import validate.CompatibilityException;
-import validate.ParameterException;
 import writer.PerspectiveException.PerspectiveError;
-import file.EOLType;
-import file.FileWriter;
 
 /**
  * LogWriter provides functionality for writing trace-oriented log files.
