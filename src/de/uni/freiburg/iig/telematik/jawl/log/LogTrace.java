@@ -1,9 +1,10 @@
 package de.uni.freiburg.iig.telematik.jawl.log;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -89,44 +90,59 @@ public class LogTrace {
 		return result;
 	}
 	
-	public boolean removeEntry(LogEntry entry){
-		return removeEntry(entry, false);
+	public LogEntry getDirectSuccessor(LogEntry entry){
+		Integer index = null;
+		for(LogEntry traceEntry: logEntries){
+			if(traceEntry == entry){
+				index = logEntries.indexOf(traceEntry);
+				break;
+			}
+		}
+		if(index != null && index < logEntries.size()-1){
+			return logEntries.get(index + 1);
+		}
+		return null;
 	}
 	
-	public boolean removeEntry(LogEntry entry, boolean updateTimestamps){
-		int index = logEntries.indexOf(entry);
-		Date timestamp = entry.getTimestamp();
-		boolean lastElement = index ==logEntries.size()-1;
-		boolean removalSuccessful = logEntries.remove(entry);
-		if(!updateTimestamps || lastElement)
-			return removalSuccessful;
-		
-		if(removalSuccessful){
-			Date timestampNext = logEntries.get(index).getTimestamp();
-			long difference = timestampNext.getTime() - timestamp.getTime();
-			for(int i = index; i<logEntries.size(); i++){
-				LogEntry nextEntry = logEntries.get(i);
-				try {
-					nextEntry.setTimestamp(new Date(nextEntry.getTimestamp().getTime() + difference));
-				} catch (NullPointerException e) {
-					e.printStackTrace();
-				} catch (LockingException e) {
-					break;
-				}
+	public List<LogEntry> getPreceedingEntries(LogEntry entry){
+		List<LogEntry> result = new ArrayList<LogEntry>();
+		Integer index = null;
+		for(LogEntry traceEntry: logEntries){
+			if(traceEntry == entry){
+				index = logEntries.indexOf(traceEntry);
+				break;
 			}
-			return true;
 		}
-		return false;
+		if(index != null && index > 0){
+			for(int i=0; i<index; i++){
+				result.add(logEntries.get(i));
+			}
+		}
+		return result;
+	}
+	
+	public LogEntry getDirectPredecessor(LogEntry entry){
+		Integer index = null;
+		for(LogEntry traceEntry: logEntries){
+			if(traceEntry == entry){
+				index = logEntries.indexOf(traceEntry);
+				break;
+			}
+		}
+		if(index != null && index > 0){
+			return logEntries.get(index - 1);
+		}
+		return null;
+	}
+	
+	public boolean removeEntry(LogEntry entry){
+		return logEntries.remove(entry);
 	}
 	
 	public boolean removeAllEntries(Collection<LogEntry> entries){
-		return removeAllEntries(entries, false);
-	}
-	
-	public boolean removeAllEntries(Collection<LogEntry> entries, boolean updateTimestamps){
 		boolean entriesChanged = false;
 		for(LogEntry entry: entries){
-			if(removeEntry(entry, updateTimestamps))
+			if(removeEntry(entry))
 				entriesChanged = true;
 		}
 		return entriesChanged;
@@ -169,14 +185,18 @@ public class LogTrace {
 		return logEntries.toString();
 	}
 	
-	public static void main(String[] args) throws NullPointerException, LockingException {
+	public static void main(String[] args) throws NullPointerException, LockingException, ParseException {
 		LogEntry e1 = new LogEntry("a1");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+		e1.setTimestamp(sdf.parse("01.01.2013 06:00"));
 		LogEntry e2 = new LogEntry("a2");
+		e2.setTimestamp(sdf.parse("01.01.2013 12:00"));
 		LogEntry e3 = new LogEntry("a3");
+		e3.setTimestamp(sdf.parse("01.01.2013 18:00"));
 		LogTrace t = new LogTrace(1);
 		t.addEntry(e1);
 		t.addEntry(e2);
 		t.addEntry(e3);
-		System.out.println(t.getSucceedingEntries(e3));
+		System.out.println(t);
 	}
 }

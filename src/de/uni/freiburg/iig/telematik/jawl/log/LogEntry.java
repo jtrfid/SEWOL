@@ -3,6 +3,7 @@ package de.uni.freiburg.iig.telematik.jawl.log;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import de.invation.code.toval.time.TimeValue;
 import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.types.HashList;
 
@@ -125,7 +127,7 @@ public class LogEntry implements Comparable<LogEntry>{
 	 * @throws LockingException if the field TIME is locked and the given timestamp differs from the current value of {@link #timestamp}.
 	 */
 	public boolean setTimestamp(Date date) throws NullPointerException,LockingException {
-		if(date== null)
+		if(date == null)
 			throw new NullPointerException();
 		if(isFieldLocked(EntryField.TIME)){
 			if(!this.timestamp.equals(date))
@@ -135,6 +137,33 @@ public class LogEntry implements Comparable<LogEntry>{
 			this.timestamp = date;
 			return true;
 		}
+	}
+	
+	public boolean addTime(long milliseconds) throws NullPointerException, LockingException {
+		return modifyTime(milliseconds, TimeModification.ADD);
+	}
+	
+	public boolean subTime(long milliseconds) throws NullPointerException, LockingException {
+		return modifyTime(milliseconds, TimeModification.SUB);
+	}
+	
+	public boolean modifyTime(long milliseconds, TimeModification mod) throws NullPointerException, LockingException {
+		
+		long diff = milliseconds;
+		if(mod == TimeModification.SUB)
+			diff = (long) Math.copySign(diff, -1);
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(timestamp.getTime() + diff);
+		return setTimestamp(cal.getTime());
+	}
+	
+	public boolean addTimeValue(TimeValue timeValue) throws NullPointerException, LockingException {
+		return addTime(timeValue.getValueInMilliseconds().intValue());
+	}
+	
+	public boolean subTimeValue(TimeValue timeValue) throws NullPointerException, LockingException {
+		return subTime(timeValue.getValueInMilliseconds().intValue());
 	}
 	
 	/**
@@ -604,7 +633,8 @@ public class LogEntry implements Comparable<LogEntry>{
 
 	@Override
 	public String toString(){
-		return '['+sdf.format(this.timestamp)+'|'+this.getActivity()+'|'+this.getOriginator()+']';
+		String timestamp = (this.timestamp == null) ? "-" : sdf.format(this.timestamp);
+		return '['+ timestamp +'|'+this.getActivity()+'|'+this.getOriginator()+']';
 	}
 	
 	@Override
@@ -625,5 +655,20 @@ public class LogEntry implements Comparable<LogEntry>{
 				+ ((timestamp == null) ? 0 : timestamp.hashCode());
 		return result;
 	}
+	
+	private enum TimeModification {
+		ADD, SUB;
+	}
+	
+//	public static void main(String[] args) throws NullPointerException, LockingException, ParseException {
+//		LogEntry e = new LogEntry("Act1");
+//		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+//		e.setTimestamp(sdf.parse("04/10/2013 12:00:00"));
+//		System.out.println(e);
+//		e.addTime(1000*60*60);
+//		System.out.println(e);
+//		e.subTime(1000*60*60*2);
+//		System.out.println(e);
+//	}
 	
 }
