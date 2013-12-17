@@ -144,7 +144,6 @@ public class MXMLLogFormat extends LogFormat {
 			if (data != null)
 				for (DataAttribute input: data) {
 					dataFormat.append(ATTRIBUTE_FORMAT);
-					//formatArgs.add("IN");
 					formatArgs.add(input.name);
 					formatArgs.add(input.value);
 					formatArgs.add(SEPARATOR);
