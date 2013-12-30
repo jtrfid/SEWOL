@@ -14,15 +14,23 @@ import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 
+import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
+import de.uni.freiburg.iig.telematik.jawl.log.DataAttribute;
+import de.uni.freiburg.iig.telematik.jawl.log.EventType;
 import de.uni.freiburg.iig.telematik.jawl.log.LockingException;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 import de.uni.freiburg.iig.telematik.jawl.log.ModificationException;
 
 /**
- * TODO
+ * <p>
+ * A parser class for MXML and XES files for the JAWL log classes.
+ * </p>
+ * <p>
+ * The {@link XUniversalParser} from OpenXES is used, as it already converts MXML and XES files into an uniform format. Because of the transformation of the files to an OpenXES log format and the subsequent transformation to the JAWL log format, the complexity in time and space ends up in O(2n). An own implementation without the OpenXES classes could result in O(n).
+ * </p>
  * 
  * @author Adrian Lange
  */
@@ -31,19 +39,22 @@ public class Parser {
 	private static XUniversalParser parser = new XUniversalParser();
 
 	/**
-	 * Checks whether the given file can be parsed.
+	 * Checks whether the given file can be parsed by the file extension.
 	 */
 	public static boolean canParse(File file) {
 		return parser.canParse(file);
 	}
 
 	/**
-	 * TODO
+	 * Parses the specified log file path and returns a collection of processes.
 	 * 
 	 * @param filePath
-	 * @return
+	 *            Path to file to parse
+	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
 	 * @throws ParameterException
+	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
 	 * @throws IOException
+	 *             Gets thrown if the file under the given path can't be read, is a directory, or doesn't exist.
 	 */
 	public static Collection<Collection<LogTrace>> parse(String filePath) throws ParameterException, IOException {
 		Validate.notNull(filePath);
@@ -52,12 +63,15 @@ public class Parser {
 	}
 
 	/**
-	 * TODO
+	 * Parses the specified log file and returns a collection of processes.
 	 * 
 	 * @param file
-	 * @return
+	 *            File to parse
+	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
 	 * @throws ParameterException
+	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
 	 * @throws IOException
+	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
 	public static Collection<Collection<LogTrace>> parse(File file) throws ParameterException, IOException {
 		Validate.notNull(file);
@@ -94,7 +108,7 @@ public class Parser {
 							}
 						} else if (key.equals("org:resource")) {
 							if (value != null && value.length() > 0) {
-								if (logEntry.getOriginatorCandidates().contains(value) == false)
+								if (logEntry.getOriginatorCandidates().contains(value) == false) {
 									try {
 										logEntry.addOriginatorCandidate(value);
 									} catch (NullPointerException e) {
@@ -104,6 +118,7 @@ public class Parser {
 										// shouldn't happen
 										e.printStackTrace();
 									}
+								}
 								try {
 									logEntry.setOriginator(value);
 								} catch (NullPointerException e) {
@@ -115,6 +130,18 @@ public class Parser {
 								} catch (ModificationException e) {
 									// shouldn't happen
 									e.printStackTrace();
+								}
+							}
+						} else if (key.equals("lifecycle:transition")) {
+							if (value != null && value.length() > 0) {
+								EventType eventType = EventType.parse(value);
+								if (eventType != null) {
+									try {
+										logEntry.setEventType(eventType);
+									} catch (LockingException e) {
+										// shouldn't happen
+										e.printStackTrace();
+									}
 								}
 							}
 						} else if (key.equals("time:timestamp")) {
@@ -139,11 +166,23 @@ public class Parser {
 								// shouldn't happen
 								e.printStackTrace();
 							}
+						} else {
+							// If the key is unknown, a data attribute with the key and value pair is added
+							try {
+								// FIXME which data usage by default?
+								logEntry.addDataUsage(new DataAttribute(key, value), DataUsage.CREATE);
+							} catch (NullPointerException e) {
+								// shouldn't happen
+								e.printStackTrace();
+							} catch (LockingException e) {
+								// shouldn't happen
+								e.printStackTrace();
+							}
 						}
 					}
 					logTrace.addEntry(logEntry);
 				}
-				// TODO extensions
+				// TODO extensions?
 				logTraces.add(logTrace);
 				logTraceIndex++;
 			}
