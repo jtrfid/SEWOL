@@ -4,6 +4,6 @@
 	<classpathentry kind="src" output="bin/test" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/TOVAL"/>
-	<classpathentry kind="lib" path="lib/openxes/OpenXES.jar"/>
+	<classpathentry kind="lib" path="lib/openxes/OpenXES.jar" sourcepath="lib/openxes/xes_src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

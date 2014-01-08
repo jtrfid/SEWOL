@@ -95,6 +95,7 @@ public class Parser {
 			for (XTrace trace : log) {
 				LogTrace logTrace = new LogTrace(logTraceIndex);
 				for (XEvent event : trace) {
+					System.out.println(event.getExtensions());
 					LogEntry logEntry = new LogEntry();
 					for (Map.Entry<String, XAttribute> attribute : event.getAttributes().entrySet()) {
 						String key = attribute.getKey();
@@ -166,11 +167,14 @@ public class Parser {
 								// shouldn't happen
 								e.printStackTrace();
 							}
+						} else if (key.equals("dataUsage:dataUsage")) {
+							System.out.println(attribute.getValue().getAttributes());
 						} else {
 							// If the key is unknown, a data attribute with the key and value pair is added
 							try {
 								// FIXME which data usage by default?
 								logEntry.addDataUsage(new DataAttribute(key, value), DataUsage.CREATE);
+								System.out.println(key + ": " + value);
 							} catch (NullPointerException e) {
 								// shouldn't happen
 								e.printStackTrace();
@@ -190,5 +194,9 @@ public class Parser {
 		}
 
 		return logTracesCollection;
+	}
+	
+	public static void main(String[] args) throws ParameterException, IOException {
+		Parser.parse("/Users/stocker/Desktop/XESTest2.xes");
 	}
 }
