@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.deckfour.xes.in.XUniversalParser;
 import org.deckfour.xes.model.XAttribute;
@@ -34,7 +37,7 @@ import de.uni.freiburg.iig.telematik.jawl.log.ModificationException;
  * 
  * @author Adrian Lange
  */
-public class Parser {
+public class LogParser {
 
 	private static XUniversalParser parser = new XUniversalParser();
 
@@ -95,7 +98,6 @@ public class Parser {
 			for (XTrace trace : log) {
 				LogTrace logTrace = new LogTrace(logTraceIndex);
 				for (XEvent event : trace) {
-					System.out.println(event.getExtensions());
 					LogEntry logEntry = new LogEntry();
 					for (Map.Entry<String, XAttribute> attribute : event.getAttributes().entrySet()) {
 						String key = attribute.getKey();
@@ -168,25 +170,38 @@ public class Parser {
 								e.printStackTrace();
 							}
 						} else if (key.equals("dataUsage:dataUsage")) {
-							System.out.println(attribute.getValue().getAttributes());
-						} else {
-							// If the key is unknown, a data attribute with the key and value pair is added
-							try {
-								// FIXME which data usage by default?
-								logEntry.addDataUsage(new DataAttribute(key, value), DataUsage.CREATE);
-								System.out.println(key + ": " + value);
-							} catch (NullPointerException e) {
-								// shouldn't happen
-								e.printStackTrace();
-							} catch (LockingException e) {
-								// shouldn't happen
-								e.printStackTrace();
+							// Get sub-attributes
+							for (Map.Entry<String, XAttribute> xAttribute : attribute.getValue().getAttributes().entrySet()) {
+								String dataAttributeKey = xAttribute.getKey();
+								String dataAttributeValue = xAttribute.getValue().toString();
+								// FIXME all values as string?
+								DataAttribute dataAttribute = new DataAttribute(dataAttributeKey, dataAttributeValue);
+								String dataAttributeDataUsageString = null;
+								for (Map.Entry<String, XAttribute> dataUsage : xAttribute.getValue().getAttributes().entrySet()) {
+									if (dataUsage.getKey().equals("dataUsage")) {
+										dataAttributeDataUsageString = dataUsage.getValue().toString();
+									}
+								}
+								List<DataUsage> dataUsageList = parseDataUsageString(dataAttributeDataUsageString);
+								for (DataUsage d : dataUsageList) {
+									try {
+										logEntry.addDataUsage(dataAttribute, d);
+									} catch (NullPointerException e) {
+										// shouldn't happen
+										e.printStackTrace();
+									} catch (LockingException e) {
+										// shouldn't happen
+										e.printStackTrace();
+									}
+								}
 							}
+						} else {
+							// If the key is unknown, a meta attribute with the key/value pair is added
+							logEntry.addMetaAttribute(new DataAttribute(key, value));
 						}
 					}
 					logTrace.addEntry(logEntry);
 				}
-				// TODO extensions?
 				logTraces.add(logTrace);
 				logTraceIndex++;
 			}
@@ -195,8 +210,27 @@ public class Parser {
 
 		return logTracesCollection;
 	}
-	
+
+	/**
+	 * Takes a String containing {@link DataUsage} identifier separated by commas, removes every leading and training whitespace, and parses them into a {@link List}. TODO move to TOVAL into enum DataUsage?
+	 */
+	public static List<DataUsage> parseDataUsageString(String dataUsageString) {
+		List<String> dataUsageStrings = Arrays.asList(dataUsageString.split("\\s*,\\s*"));
+		List<DataUsage> dataUsageList = new Vector<DataUsage>(dataUsageStrings.size());
+		for (String d : dataUsageStrings) {
+			try {
+				DataUsage dataUsage = DataUsage.parse(d);
+				if (!dataUsageList.contains(dataUsage))
+					dataUsageList.add(dataUsage);
+			} catch (ParameterException e) {
+				// FIXME ignore exception if file contains invalid DataUsage strings?
+				// e.printStackTrace();
+			}
+		}
+		return dataUsageList;
+	}
+
 	public static void main(String[] args) throws ParameterException, IOException {
-		Parser.parse("/Users/stocker/Desktop/XESTest2.xes");
+		LogParser.parse("/Users/stocker/Desktop/XESTest2.xes");
 	}
 }
