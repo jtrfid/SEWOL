@@ -62,6 +62,8 @@ public class LogParser {
 	public static Collection<Collection<LogTrace>> parse(String filePath) throws ParameterException, IOException {
 		Validate.notNull(filePath);
 
+		//TODO: Throw ParserException
+		
 		return parse(new File(filePath));
 	}
 
@@ -84,6 +86,8 @@ public class LogParser {
 			throw new IOException("I/O Error on opening file: File is a directory!");
 		if (!file.canRead())
 			throw new IOException("I/O Error on opening file: Unable to read file!");
+		
+		// TODO: Throw ParserException
 
 		Collection<XLog> logs = null;
 		try {
@@ -175,6 +179,9 @@ public class LogParser {
 								String dataAttributeKey = xAttribute.getKey();
 								String dataAttributeValue = xAttribute.getValue().toString();
 								// FIXME all values as string?
+								// -> If xAttribute allows to identify the value type, then try to cast to appropriate class
+								//    Maybe in the extension of the attribute value?
+								// -> Data usage modes have to be cast into DataUsage
 								DataAttribute dataAttribute = new DataAttribute(dataAttributeKey, dataAttributeValue);
 								String dataAttributeDataUsageString = null;
 								for (Map.Entry<String, XAttribute> dataUsage : xAttribute.getValue().getAttributes().entrySet()) {
@@ -224,6 +231,11 @@ public class LogParser {
 					dataUsageList.add(dataUsage);
 			} catch (ParameterException e) {
 				// FIXME ignore exception if file contains invalid DataUsage strings?
+				// -> Throw exception!
+				// -> In this case the input file contains invalid content.
+				// -> Include line number of input file in exception if possible.
+				// -> Use Toval Parser Exception (inherit if necessary to include additional fields)
+				
 				// e.printStackTrace();
 			}
 		}
