@@ -17,6 +17,7 @@ import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 
+import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
@@ -25,7 +26,6 @@ import de.uni.freiburg.iig.telematik.jawl.log.EventType;
 import de.uni.freiburg.iig.telematik.jawl.log.LockingException;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
-import de.uni.freiburg.iig.telematik.jawl.log.ModificationException;
 
 /**
  * <p>
@@ -39,12 +39,16 @@ import de.uni.freiburg.iig.telematik.jawl.log.ModificationException;
  */
 public class LogParser {
 
-	private static XUniversalParser parser = new XUniversalParser();
+	private XUniversalParser parser = new XUniversalParser();
+	
+	public LogParser(){
+		parser = new XUniversalParser();
+	}
 
 	/**
 	 * Checks whether the given file can be parsed by the file extension.
 	 */
-	public static boolean canParse(File file) {
+	public boolean canParse(File file) {
 		return parser.canParse(file);
 	}
 
@@ -59,11 +63,8 @@ public class LogParser {
 	 * @throws IOException
 	 *             Gets thrown if the file under the given path can't be read, is a directory, or doesn't exist.
 	 */
-	public static Collection<Collection<LogTrace>> parse(String filePath) throws ParameterException, IOException {
+	public Collection<Collection<LogTrace>> parse(String filePath) throws ParameterException, ParserException {
 		Validate.notNull(filePath);
-
-		//TODO: Throw ParserException
-		
 		return parse(new File(filePath));
 	}
 
@@ -78,144 +79,168 @@ public class LogParser {
 	 * @throws IOException
 	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
-	public static Collection<Collection<LogTrace>> parse(File file) throws ParameterException, IOException {
-		Validate.notNull(file);
-		if (!file.exists())
-			throw new IOException("I/O Error on opening file: File does not exist!");
-		if (file.isDirectory())
-			throw new IOException("I/O Error on opening file: File is a directory!");
+	public Collection<Collection<LogTrace>> parse(File file) throws ParameterException, ParserException {
+		Validate.noDirectory(file);
 		if (!file.canRead())
-			throw new IOException("I/O Error on opening file: Unable to read file!");
-		
-		// TODO: Throw ParserException
+			throw new ParameterException("Unable to read input file!");
 
 		Collection<XLog> logs = null;
 		try {
 			logs = parser.parse(file);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
 		}
 		Collection<Collection<LogTrace>> logTracesCollection = new ArrayList<Collection<LogTrace>>(logs.size());
 		for (XLog log : logs) {
 			Collection<LogTrace> logTraces = new ArrayList<LogTrace>();
-			int logTraceIndex = 0;
 			for (XTrace trace : log) {
-				LogTrace logTrace = new LogTrace(logTraceIndex);
-				for (XEvent event : trace) {
-					LogEntry logEntry = new LogEntry();
-					for (Map.Entry<String, XAttribute> attribute : event.getAttributes().entrySet()) {
-						String key = attribute.getKey();
-						String value = attribute.getValue().toString();
-						if (key.equals("concept:name")) {
-							try {
-								logEntry.setActivity(value);
-							} catch (LockingException e) {
-								// shouldn't happen
-								e.printStackTrace();
-							}
-						} else if (key.equals("org:resource")) {
-							if (value != null && value.length() > 0) {
-								if (logEntry.getOriginatorCandidates().contains(value) == false) {
-									try {
-										logEntry.addOriginatorCandidate(value);
-									} catch (NullPointerException e) {
-										// shouldn't happen
-										e.printStackTrace();
-									} catch (LockingException e) {
-										// shouldn't happen
-										e.printStackTrace();
-									}
-								}
-								try {
-									logEntry.setOriginator(value);
-								} catch (NullPointerException e) {
-									// shouldn't happen
-									e.printStackTrace();
-								} catch (LockingException e) {
-									// shouldn't happen
-									e.printStackTrace();
-								} catch (ModificationException e) {
-									// shouldn't happen
-									e.printStackTrace();
-								}
-							}
-						} else if (key.equals("lifecycle:transition")) {
-							if (value != null && value.length() > 0) {
-								EventType eventType = EventType.parse(value);
-								if (eventType != null) {
-									try {
-										logEntry.setEventType(eventType);
-									} catch (LockingException e) {
-										// shouldn't happen
-										e.printStackTrace();
-									}
-								}
-							}
-						} else if (key.equals("time:timestamp")) {
-							Date date = null;
-							String sanitizedDateString = value.replaceAll(":(\\d\\d)$", "$1");
-							for (ParserDateFormat pdf : ParserDateFormat.values()) {
-								if (date == null) {
-									try {
-										date = ParserDateFormat.getDateFormat(pdf).parse(sanitizedDateString);
-									} catch (ParseException e) {
-										// is allowed to happen
-									}
-								}
-							}
-							try {
-								if (date != null)
-									logEntry.setTimestamp(date);
-							} catch (NullPointerException e) {
-								// shouldn't happen
-								e.printStackTrace();
-							} catch (LockingException e) {
-								// shouldn't happen
-								e.printStackTrace();
-							}
-						} else if (key.equals("dataUsage:dataUsage")) {
-							// Get sub-attributes
-							for (Map.Entry<String, XAttribute> xAttribute : attribute.getValue().getAttributes().entrySet()) {
-								String dataAttributeKey = xAttribute.getKey();
-								String dataAttributeValue = xAttribute.getValue().toString();
-								// FIXME all values as string?
-								// -> If xAttribute allows to identify the value type, then try to cast to appropriate class
-								//    Maybe in the extension of the attribute value?
-								// -> Data usage modes have to be cast into DataUsage
-								DataAttribute dataAttribute = new DataAttribute(dataAttributeKey, dataAttributeValue);
-								String dataAttributeDataUsageString = null;
-								for (Map.Entry<String, XAttribute> dataUsage : xAttribute.getValue().getAttributes().entrySet()) {
-									if (dataUsage.getKey().equals("dataUsage")) {
-										dataAttributeDataUsageString = dataUsage.getValue().toString();
-									}
-								}
-								List<DataUsage> dataUsageList = parseDataUsageString(dataAttributeDataUsageString);
-								for (DataUsage d : dataUsageList) {
-									try {
-										logEntry.addDataUsage(dataAttribute, d);
-									} catch (NullPointerException e) {
-										// shouldn't happen
-										e.printStackTrace();
-									} catch (LockingException e) {
-										// shouldn't happen
-										e.printStackTrace();
-									}
-								}
-							}
-						} else {
-							// If the key is unknown, a meta attribute with the key/value pair is added
-							logEntry.addMetaAttribute(new DataAttribute(key, value));
+				Integer traceID = null;
+				
+				// Extract trace ID
+				for (Map.Entry<String, XAttribute> attribute : trace.getAttributes().entrySet()) {
+					String key = attribute.getKey();
+					String value = attribute.getValue().toString();
+					if(key.equals("concept:name")){
+						try {
+							Validate.notNegativeInteger(value);
+							traceID = Integer.parseInt(value);
+						} catch(ParameterException e){
+							throw new ParserException("Cannot extract case-id.");
 						}
 					}
-					logTrace.addEntry(logEntry);
+				}
+				if(traceID == null)
+					throw new ParserException("Cannot extract case-id");
+				
+				// Build new log trace
+				LogTrace logTrace = new LogTrace(traceID);
+				for (XEvent event : trace) {
+					// Add events to log trace
+					logTrace.addEntry(buildLogEntry(event));
 				}
 				logTraces.add(logTrace);
-				logTraceIndex++;
 			}
 			logTracesCollection.add(logTraces);
 		}
 
 		return logTracesCollection;
+	}
+	
+	private LogEntry buildLogEntry(XEvent xesEvent) throws ParserException{
+		LogEntry logEntry = new LogEntry();
+		for (Map.Entry<String, XAttribute> attribute : xesEvent.getAttributes().entrySet()) {
+			String key = attribute.getKey();
+			if (key.equals("concept:name")) {
+				addName(logEntry, attribute.getValue().toString());
+			} else if (key.equals("org:resource")) {
+				addOriginator(logEntry, attribute.getValue().toString());
+			} else if (key.equals("lifecycle:transition")) {
+				addEventType(logEntry, attribute.getValue().toString());
+			} else if (key.equals("time:timestamp")) {
+				addTimestamp(logEntry, attribute.getValue().toString());
+			} else if (key.equals("dataUsage:dataUsage")) {
+				addDataUsage(logEntry, attribute);
+			} else {
+				// If the key is unknown, a meta attribute with the key/value pair is added
+				addMetaInformation(logEntry, attribute);
+			}
+		}
+		return logEntry;
+	}
+	
+	private void addName(LogEntry entry, String value) throws ParserException{
+		if(value == null || value.isEmpty())
+			throw new ParserException("No value for concept:name");
+		try {
+			entry.setActivity(value);
+		} catch (Exception e) {
+			throw new ParserException("Cannot set activity of log entry: " + e.getMessage());
+		}
+	}
+	
+	private void addOriginator(LogEntry entry, String value) throws ParserException{
+		if(value == null || value.isEmpty())
+			throw new ParserException("No value for org:resource");
+		try {
+			entry.setOriginator(value);
+		} catch (Exception e) {
+			throw new ParserException("Cannot set originator of log entry: " + e.getMessage());
+		}
+	}
+	
+	private void addEventType(LogEntry entry, String value) throws ParserException{
+		if(value == null || value.isEmpty())
+			throw new ParserException("No value for lifecycle:transition");
+		EventType eventType = EventType.parse(value);
+		if (eventType == null)
+			throw new ParserException("Cannot parse event type: " + eventType);
+		try {
+			entry.setEventType(eventType);
+		} catch (Exception e) {
+			throw new ParserException("Cannot set event type of log entry: " + e.getMessage());
+		}
+	}
+	
+	private void addTimestamp(LogEntry entry, String value) throws ParserException{
+		if(value == null || value.isEmpty())
+			throw new ParserException("No value for time:timestamp");
+		Date date = null;
+		String sanitizedDateString = value.replaceAll(":(\\d\\d)$", "$1");
+		for (ParserDateFormat pdf : ParserDateFormat.values()) {
+			if (date == null) {
+				try {
+					date = ParserDateFormat.getDateFormat(pdf).parse(sanitizedDateString);
+				} catch (ParseException e) {
+					// is allowed to happen
+				} catch (ParameterException e) {
+					// cannot happen.
+					e.printStackTrace();
+				}
+			}
+		}
+		if(date == null)
+			throw new ParserException("Cannot read timestamp.");
+		
+		try {
+			entry.setTimestamp(date);
+		} catch (Exception e) {
+			throw new ParserException("Cannot set log entry timestamp: " + e.getMessage());
+		}
+	}
+	
+	private void addDataUsage(LogEntry entry, Map.Entry<String, XAttribute> attribute) throws ParserException{
+		// Get sub-attributes
+		for (Map.Entry<String, XAttribute> xAttribute : attribute.getValue().getAttributes().entrySet()) {
+			String dataAttributeKey = xAttribute.getKey();
+			String dataAttributeValue = xAttribute.getValue().toString();
+			// FIXME all values as string?
+			// -> If xAttribute allows to identify the value type, then try to cast to appropriate class
+			//    Maybe in the extension of the attribute value?
+			// -> Data usage modes have to be cast into DataUsage
+			DataAttribute dataAttribute = new DataAttribute(dataAttributeKey, dataAttributeValue);
+			String dataAttributeDataUsageString = null;
+			for (Map.Entry<String, XAttribute> dataUsage : xAttribute.getValue().getAttributes().entrySet()) {
+				if (dataUsage.getKey().equals("dataUsage")) {
+					dataAttributeDataUsageString = dataUsage.getValue().toString();
+				}
+			}
+			List<DataUsage> dataUsageList = parseDataUsageString(dataAttributeDataUsageString);
+			for (DataUsage d : dataUsageList) {
+				try {
+					entry.addDataUsage(dataAttribute, d);
+				} catch (NullPointerException e) {
+					// shouldn't happen
+					e.printStackTrace();
+				} catch (LockingException e) {
+					// shouldn't happen
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private void addMetaInformation(LogEntry entry, Map.Entry<String, XAttribute> attribute) throws ParserException{
+		entry.addMetaAttribute(new DataAttribute(attribute.getKey(), attribute.getValue()));
 	}
 
 	/**
@@ -242,7 +267,7 @@ public class LogParser {
 		return dataUsageList;
 	}
 
-	public static void main(String[] args) throws ParameterException, IOException {
-		LogParser.parse("/Users/stocker/Desktop/XESTest2.xes");
+	public static void main(String[] args) throws ParameterException, ParserException {
+		new LogParser().parse("/Users/stocker/Desktop/XESTest2.xes");
 	}
 }

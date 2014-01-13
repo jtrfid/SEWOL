@@ -13,6 +13,8 @@ public enum EventType {
 	 * Returns the {@link EventType} that has the same name as the given string. All underlines get dropped and the name is not case sensitive. If no fitting EventType value was found, the method returns <code>null</code>.
 	 */
 	public static EventType parse(String type) {
+		if(type == null || type.isEmpty())
+			return null;
 		// The underlines are removed because of the different representation in XES. E.g. "manual_skip" is named "manualskip" there.
 		String sanitizedType = type.toUpperCase().replaceAll("_", "");
 		for (EventType eventType : EventType.values()) {
