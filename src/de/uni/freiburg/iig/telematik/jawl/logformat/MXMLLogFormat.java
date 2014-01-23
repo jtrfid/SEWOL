@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
 
+import de.uni.freiburg.iig.telematik.jawl.log.DULogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.DataAttribute;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
@@ -20,7 +21,7 @@ import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException;
  * @author ts552
  *
  */
-public class MXMLLogFormat extends LogFormat {
+public class MXMLLogFormat extends AbstractLogFormat {
 
 	private static final String SEPARATOR = "\n";
 	private static final String FILE_HEADER_FORMAT = "<?xml version=\"1.0\" encoding=\"%%s\"?>%s<WorkflowLog>\n<Process id=\"process1\">%s";
@@ -102,7 +103,7 @@ public class MXMLLogFormat extends LogFormat {
 	}
 	
 	@Override
-	public String getTraceAsString(LogTrace trace) {
+	public <E extends LogEntry> String getTraceAsString(LogTrace<E> trace) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(String.format(INSTANCE_START_FORMAT, trace.getCaseNumber(), SEPARATOR));
 		for(LogEntry e: trace.getEntries()) {
@@ -113,7 +114,7 @@ public class MXMLLogFormat extends LogFormat {
 	}
 
 	@Override
-	public String getEntryAsString(LogEntry entry, int caseNumber) {
+	public <E extends LogEntry> String getEntryAsString(E entry, int caseNumber) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(ENTRY_START_FORMAT);
 		ArrayList<Object> formatArgs = new ArrayList<Object>();
@@ -137,20 +138,24 @@ public class MXMLLogFormat extends LogFormat {
 			formatArgs.add(entry.getOriginator());
 			formatArgs.add(SEPARATOR);
 		}
-		Set<DataAttribute> data = entry.getDataAttributes();
-		if(data!=null){
-			StringBuilder dataFormat = new StringBuilder();
-			formatArgs.add(SEPARATOR);
-			if (data != null)
-				for (DataAttribute input: data) {
-					dataFormat.append(ATTRIBUTE_FORMAT);
-					formatArgs.add(input.name);
-					formatArgs.add(input.value);
-					formatArgs.add(SEPARATOR);
-				}
-			builder.append(String.format(DATA_SUB_FORMAT, dataFormat.toString()));
-			formatArgs.add(SEPARATOR);
+		
+		if (entry instanceof DULogEntry) {
+			Set<DataAttribute> data = ((DULogEntry) entry).getDataAttributes();
+			if (data != null) {
+				StringBuilder dataFormat = new StringBuilder();
+				formatArgs.add(SEPARATOR);
+				if (data != null)
+					for (DataAttribute input : data) {
+						dataFormat.append(ATTRIBUTE_FORMAT);
+						formatArgs.add(input.name);
+						formatArgs.add(input.value);
+						formatArgs.add(SEPARATOR);
+					}
+				builder.append(String.format(DATA_SUB_FORMAT, dataFormat.toString()));
+				formatArgs.add(SEPARATOR);
+			}
 		}
+		
 		Set<DataAttribute> metaInformation = entry.getMetaAttributes();
 		if(metaInformation != null && !metaInformation.isEmpty()){
 			StringBuilder metaFormat = new StringBuilder();

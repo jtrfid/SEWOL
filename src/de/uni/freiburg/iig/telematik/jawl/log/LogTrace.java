@@ -9,29 +9,34 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LogTrace {
+import de.invation.code.toval.validate.ParameterException;
+import de.invation.code.toval.validate.Validate;
+
+public class LogTrace<E extends LogEntry> {
 	
-	private List<LogEntry> logEntries = new ArrayList<LogEntry>();
+	private List<E> logEntries = new ArrayList<E>();
 	private int caseNumber;
 	
-	public LogTrace(int caseNumber){
+	public LogTrace(Integer caseNumber) throws ParameterException{
+		Validate.notNegative(caseNumber);
 		this.caseNumber = caseNumber;
 	}
 	
-	public boolean addEntry(LogEntry entry){
-		if(entry!=null){
+	public boolean addEntry(E entry){
+		if(entry != null){
 			return logEntries.add(entry);
 		}
 		return false;
 	}
 	
-	public List<LogEntry> getEntries(){
+	public List<E> getEntries(){
 		return Collections.unmodifiableList(logEntries);
 	}
 	
-	public List<LogEntry> getEntriesForActivity(String activity){
-		List<LogEntry> result = new ArrayList<LogEntry>();
-		for(LogEntry entry: logEntries){
+	public List<E> getEntriesForActivity(String activity) throws ParameterException{
+		Validate.notNull(activity);
+		List<E> result = new ArrayList<E>();
+		for(E entry: logEntries){
 			if(entry.getActivity().equals(activity)){
 				result.add(entry);
 			}
@@ -43,29 +48,31 @@ public class LogTrace {
 	 * Returns all log entries of this trace whose activities are in the given activity set.
 	 * @param activities
 	 * @return
+	 * @throws ParameterException 
 	 */
-	public List<LogEntry> getEntriesForActivities(Set<String> activities){
-		List<LogEntry> result = new ArrayList<LogEntry>();
-		for(LogEntry entry: logEntries)
+	public List<E> getEntriesForActivities(Set<String> activities) throws ParameterException{
+		Validate.noNullElements(activities);
+		List<E> result = new ArrayList<E>();
+		for(E entry: logEntries)
 			if(activities.contains(entry.getActivity()))
 				result.add(entry);
 		return result;
 	}
 	
-	public List<LogEntry> getEntriesForGroup(String groupID){
-		List<LogEntry> result = new ArrayList<LogEntry>();
-		for(LogEntry entry: logEntries)
+	public List<E> getEntriesForGroup(String groupID) throws ParameterException{
+		Validate.notNull(groupID);
+		List<E> result = new ArrayList<E>();
+		for(E entry: logEntries)
 			if(entry.getGroup().equals(groupID))
 				result.add(entry);
 		return result;
 	}
 	
-	public List<LogEntry> getFirstKEntries(int k){
-		if(k<0)
-			throw new IllegalArgumentException();
+	public List<E> getFirstKEntries(Integer k) throws ParameterException{
+		Validate.notNegative(k);
 		if(k>size())
-			throw new IllegalArgumentException("Trace does only contain "+size()+" entries!");
-		List<LogEntry> result = new ArrayList<LogEntry>();
+			throw new ParameterException("Trace does only contain "+size()+" entries!");
+		List<E> result = new ArrayList<E>();
 		if(k==0)
 			return result;
 		for(int i=0; i<k; i++)
@@ -73,10 +80,11 @@ public class LogTrace {
 		return result;
 	}
 	
-	public List<LogEntry> getSucceedingEntries(LogEntry entry){
-		List<LogEntry> result = new ArrayList<LogEntry>();
+	public List<E> getSucceedingEntries(E entry) throws ParameterException{
+		Validate.notNull(entry);
+		List<E> result = new ArrayList<E>();
 		Integer index = null;
-		for(LogEntry traceEntry: logEntries){
+		for(E traceEntry: logEntries){
 			if(traceEntry == entry){
 				index = logEntries.indexOf(traceEntry);
 				break;
@@ -90,9 +98,10 @@ public class LogTrace {
 		return result;
 	}
 	
-	public LogEntry getDirectSuccessor(LogEntry entry){
+	public E getDirectSuccessor(E entry) throws ParameterException{
+		Validate.notNull(entry);
 		Integer index = null;
-		for(LogEntry traceEntry: logEntries){
+		for(E traceEntry: logEntries){
 			if(traceEntry == entry){
 				index = logEntries.indexOf(traceEntry);
 				break;
@@ -104,10 +113,11 @@ public class LogTrace {
 		return null;
 	}
 	
-	public List<LogEntry> getPreceedingEntries(LogEntry entry){
-		List<LogEntry> result = new ArrayList<LogEntry>();
+	public List<E> getPreceedingEntries(E entry) throws ParameterException{
+		Validate.notNull(entry);
+		List<E> result = new ArrayList<E>();
 		Integer index = null;
-		for(LogEntry traceEntry: logEntries){
+		for(E traceEntry: logEntries){
 			if(traceEntry == entry){
 				index = logEntries.indexOf(traceEntry);
 				break;
@@ -121,9 +131,10 @@ public class LogTrace {
 		return result;
 	}
 	
-	public LogEntry getDirectPredecessor(LogEntry entry){
+	public E getDirectPredecessor(E entry) throws ParameterException{
+		Validate.notNull(entry);
 		Integer index = null;
-		for(LogEntry traceEntry: logEntries){
+		for(E traceEntry: logEntries){
 			if(traceEntry == entry){
 				index = logEntries.indexOf(traceEntry);
 				break;
@@ -135,13 +146,14 @@ public class LogTrace {
 		return null;
 	}
 	
-	public boolean removeEntry(LogEntry entry){
+	public boolean removeEntry(E entry){
 		return logEntries.remove(entry);
 	}
 	
-	public boolean removeAllEntries(Collection<LogEntry> entries){
+	public boolean removeAllEntries(Collection<E> entries) throws ParameterException{
+		Validate.noNullElements(entries);
 		boolean entriesChanged = false;
-		for(LogEntry entry: entries){
+		for(E entry: entries){
 			if(removeEntry(entry))
 				entriesChanged = true;
 		}
@@ -162,7 +174,7 @@ public class LogTrace {
 	
 	public List<String> getActivities(){
 		List<String> result = new ArrayList<String>();
-		for(LogEntry entry: logEntries){
+		for(E entry: logEntries){
 			result.add(entry.getActivity());
 		}
 		return result;
@@ -170,7 +182,7 @@ public class LogTrace {
 	
 	public Set<String> getDistinctActivities(){
 		Set<String> result = new HashSet<String>();
-		for(LogEntry entry: logEntries)
+		for(E entry: logEntries)
 			result.add(entry.getActivity());
 		return result;
 	}
@@ -185,7 +197,7 @@ public class LogTrace {
 		return logEntries.toString();
 	}
 	
-	public static void main(String[] args) throws NullPointerException, LockingException, ParseException {
+	public static void main(String[] args) throws ParameterException, LockingException, ParseException {
 		LogEntry e1 = new LogEntry("a1");
 		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 		e1.setTimestamp(sdf.parse("01.01.2013 06:00"));
@@ -193,7 +205,7 @@ public class LogTrace {
 		e2.setTimestamp(sdf.parse("01.01.2013 12:00"));
 		LogEntry e3 = new LogEntry("a3");
 		e3.setTimestamp(sdf.parse("01.01.2013 18:00"));
-		LogTrace t = new LogTrace(1);
+		LogTrace<LogEntry> t = new LogTrace<LogEntry>(1);
 		t.addEntry(e1);
 		t.addEntry(e2);
 		t.addEntry(e3);

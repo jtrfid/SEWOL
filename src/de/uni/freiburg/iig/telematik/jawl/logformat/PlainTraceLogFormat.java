@@ -6,10 +6,7 @@ import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException;
 
-
-
-
-public class PlainTraceLogFormat extends LogFormat {
+public class PlainTraceLogFormat extends AbstractLogFormat {
 	
 	private static final char ACTIVITY_DELIMITER = '\t';
 	
@@ -32,21 +29,6 @@ public class PlainTraceLogFormat extends LogFormat {
 		return "";
 	}
 
-	@Override
-	public String getTraceAsString(LogTrace trace) {
-		StringBuilder builder = new StringBuilder();
-		for(LogEntry e: trace.getEntries()) {
-			builder.append(getEntryAsString(e, trace.getCaseNumber()));
-			builder.append(ACTIVITY_DELIMITER);
-		}
-		builder.append('\n');
-		return builder.toString();
-	}
-
-	@Override
-	public String getEntryAsString(LogEntry entry, int caseNumber) {
-		return entry.getActivity();
-	}
 
 	@Override
 	public boolean supportsLogPerspective(LogPerspective logPerspective) {
@@ -67,6 +49,21 @@ public class PlainTraceLogFormat extends LogFormat {
 	public LogFormatType getLogFormatType() {
 		return LogFormatType.PLAIN;
 	}
+	
+	@Override
+	public <E extends LogEntry> String getTraceAsString(LogTrace<E> trace) {
+		StringBuilder builder = new StringBuilder();
+		for(LogEntry e: trace.getEntries()) {
+			builder.append(getEntryAsString(e, trace.getCaseNumber()));
+			builder.append(ACTIVITY_DELIMITER);
+		}
+		builder.append('\n');
+		return builder.toString();
+	}
 
+	@Override
+	public <E extends LogEntry> String getEntryAsString(E entry, int caseNumber) {
+		return entry.getActivity();
+	}
 
 }

@@ -1,16 +1,18 @@
 package de.uni.freiburg.iig.telematik.jawl.log;
 
+import de.invation.code.toval.validate.ParameterException;
+
 
 public class TraceUtils {
 	
-	public static CommonLogEntries getCommonActivities(LogTrace... traces){
-		return new CommonLogEntries(traces);
+	public static <E extends LogEntry> CommonLogEntries<E> getCommonActivities(LogTrace<E>... traces) throws ParameterException{
+		return new CommonLogEntries<E>(traces);
 	}
 	
-	public static void main(String[] args){
-		LogTrace trace1 = new LogTrace(1);
-		LogTrace trace2 = new LogTrace(2);
-		LogTrace trace3 = new LogTrace(3);
+	public static void main(String[] args) throws ParameterException{
+		LogTrace<LogEntry> trace1 = new LogTrace<LogEntry>(1);
+		LogTrace<LogEntry> trace2 = new LogTrace<LogEntry>(2);
+		LogTrace<LogEntry> trace3 = new LogTrace<LogEntry>(3);
 		LogEntry entry1A = new LogEntry("A");
 		LogEntry entry1B = new LogEntry("B");
 		LogEntry entry1C = new LogEntry("C");

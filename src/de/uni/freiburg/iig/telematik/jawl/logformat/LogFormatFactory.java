@@ -4,12 +4,12 @@ import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException;
 
 public class LogFormatFactory {
 	
-	public static LogFormat MXML(){
+	public static AbstractLogFormat MXML(){
 		return new MXMLLogFormat();
 	}
 	
-	public static LogFormat PLAIN(){
-		LogFormat result = null;
+	public static AbstractLogFormat PLAIN(){
+		AbstractLogFormat result = null;
 		try {
 			result = new PlainTraceLogFormat(LogPerspective.TRACE_PERSPECTIVE);
 		} catch (PerspectiveException e) {
@@ -19,7 +19,7 @@ public class LogFormatFactory {
 		return result;
 	}
 	
-	public static LogFormat getFormat(LogFormatType formatType){
+	public static AbstractLogFormat getFormat(LogFormatType formatType){
 		switch (formatType) {
 			case PLAIN: return PLAIN();
 			case MXML: return MXML();
@@ -28,7 +28,7 @@ public class LogFormatFactory {
 		
 	}
 	
-	public static LogFormatType getType(LogFormat logFormat){
+	public static LogFormatType getType(AbstractLogFormat logFormat){
 		if(logFormat instanceof MXMLLogFormat)
 			return LogFormatType.MXML;
 		if(logFormat instanceof PlainTraceLogFormat)

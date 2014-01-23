@@ -15,7 +15,7 @@ import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException.Perspectiv
 
 
 
-public abstract class LogFormat extends FileFormat{
+public abstract class AbstractLogFormat extends FileFormat{
 	
 	protected final TimeZone DEFAULT_TIMEZONE = Calendar.getInstance().getTimeZone();
 	protected final Locale DEFAULT_LOCALE = new Locale(System.getProperty("user.language"));
@@ -27,16 +27,16 @@ public abstract class LogFormat extends FileFormat{
 	private Locale locale;
 	protected SimpleDateFormat dateFormat;
 	
-	public LogFormat(){
+	public AbstractLogFormat(){
 		initialize(DEFAULT_PERSPECTIVE);
 	}
 
-	public LogFormat(LogPerspective logPerspective) throws PerspectiveException {
+	public AbstractLogFormat(LogPerspective logPerspective) throws PerspectiveException {
 		super();
 		initialize(logPerspective);
 	}
 	
-	public LogFormat(LogPerspective logPerspective, Charset charset) throws PerspectiveException {
+	public AbstractLogFormat(LogPerspective logPerspective, Charset charset) throws PerspectiveException {
 		super(charset);
 		initialize(logPerspective);
 	}
@@ -91,9 +91,9 @@ public abstract class LogFormat extends FileFormat{
 	
 	public abstract boolean supportsLogPerspective(LogPerspective logPerspective);
 	
-	public abstract String getTraceAsString(LogTrace trace);
+	public abstract <E extends LogEntry> String getTraceAsString(LogTrace<E> trace);
 	
-	public abstract String getEntryAsString(LogEntry entry, int caseNumber);
+	public abstract <E extends LogEntry> String getEntryAsString(E entry, int caseNumber);
 	
 	public abstract LogFormatType getLogFormatType();
 

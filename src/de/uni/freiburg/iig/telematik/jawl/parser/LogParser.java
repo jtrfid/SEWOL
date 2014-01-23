@@ -21,9 +21,9 @@ import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
+import de.uni.freiburg.iig.telematik.jawl.log.DULogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.DataAttribute;
 import de.uni.freiburg.iig.telematik.jawl.log.EventType;
-import de.uni.freiburg.iig.telematik.jawl.log.LockingException;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 
@@ -59,7 +59,7 @@ public class LogParser {
 	 * @throws IOException
 	 *             Gets thrown if the file under the given path can't be read, is a directory, or doesn't exist.
 	 */
-	public Collection<Collection<LogTrace>> parse(String filePath) throws ParameterException, ParserException {
+	public Collection<Collection<LogTrace<LogEntry>>> parse(String filePath) throws ParameterException, ParserException {
 		Validate.notNull(filePath);
 		return parse(new File(filePath));
 	}
@@ -75,7 +75,7 @@ public class LogParser {
 	 * @throws IOException
 	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
-	public Collection<Collection<LogTrace>> parse(File file) throws ParameterException, ParserException {
+	public Collection<Collection<LogTrace<LogEntry>>> parse(File file) throws ParameterException, ParserException {
 		Validate.noDirectory(file);
 		if (!file.canRead())
 			throw new ParameterException("Unable to read input file!");
@@ -86,9 +86,15 @@ public class LogParser {
 		} catch (Exception e) {
 			throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
 		}
-		Collection<Collection<LogTrace>> logTracesCollection = new ArrayList<Collection<LogTrace>>(logs.size());
+		Collection<Collection<LogTrace<LogEntry>>> logTracesCollection = new ArrayList<Collection<LogTrace<LogEntry>>>(logs.size());
 		for (XLog log : logs) {
-			Collection<LogTrace> logTraces = new ArrayList<LogTrace>();
+			Class<?> logEntryClass = null;
+			Collection<LogTrace<LogEntry>> logTraces = new ArrayList<LogTrace<LogEntry>>();
+			if(containsDataUsageExtension(log)){
+				logEntryClass = DULogEntry.class;
+			} else {
+				logEntryClass = LogEntry.class;
+			}
 			for (XTrace trace : log) {
 				Integer traceID = null;
 
@@ -109,10 +115,10 @@ public class LogParser {
 					throw new ParserException("Cannot extract case-id");
 
 				// Build new log trace
-				LogTrace logTrace = new LogTrace(traceID);
+				LogTrace<LogEntry> logTrace = new LogTrace<LogEntry>(traceID);
 				for (XEvent event : trace) {
 					// Add events to log trace
-					logTrace.addEntry(buildLogEntry(event));
+					logTrace.addEntry(buildLogEntry(event, logEntryClass));
 				}
 				logTraces.add(logTrace);
 			}
@@ -121,9 +127,19 @@ public class LogParser {
 
 		return logTracesCollection;
 	}
-
-	private LogEntry buildLogEntry(XEvent xesEvent) throws ParserException, ParameterException {
-		LogEntry logEntry = new LogEntry();
+	
+	private boolean containsDataUsageExtension(XLog log) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	private LogEntry buildLogEntry(XEvent xesEvent, Class<?> logEntryClass) throws ParserException, ParameterException {
+		LogEntry logEntry;
+		try {
+			logEntry = (LogEntry) logEntryClass.newInstance();
+		} catch (Exception e) {
+			throw new ParameterException("Cannot instantiate log entry class: " + e.getMessage());
+		}
 		for (Map.Entry<String, XAttribute> attribute : xesEvent.getAttributes().entrySet()) {
 			String key = attribute.getKey();
 			if (key.equals("concept:name")) {
@@ -158,8 +174,8 @@ public class LogParser {
 		if (value == null || value.isEmpty())
 			throw new ParserException("No value for org:resource");
 		try {
-			if (!entry.getOriginatorCandidates().contains(value))
-				entry.addOriginatorCandidate(value);
+			if (!entry.getOriginator().equals(value))
+				entry.setOriginator(value);
 			entry.setOriginator(value);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -206,8 +222,11 @@ public class LogParser {
 			throw new ParserException("Cannot set log entry timestamp: " + e.getMessage());
 		}
 	}
+	
+	private void addDataUsage(LogEntry entry, Map.Entry<String, XAttribute> attribute) throws ParserException, ParameterException{
+		if(!(entry instanceof DULogEntry))
+			throw new ParameterException("Cannot add data usage to log entry of type " + entry.getClass().getSimpleName());
 
-	private void addDataUsage(LogEntry entry, Map.Entry<String, XAttribute> attribute) throws ParameterException {
 		// Get sub-attributes
 		for (Map.Entry<String, XAttribute> xAttribute : attribute.getValue().getAttributes().entrySet()) {
 			String dataAttributeKey = xAttribute.getKey();
@@ -222,13 +241,9 @@ public class LogParser {
 			List<DataUsage> dataUsageList = parseDataUsageString(dataAttributeDataUsageString);
 			for (DataUsage d : dataUsageList) {
 				try {
-					entry.addDataUsage(dataAttribute, d);
-				} catch (NullPointerException e) {
-					// shouldn't happen
-					e.printStackTrace();
-				} catch (LockingException e) {
-					// shouldn't happen
-					e.printStackTrace();
+					((DULogEntry)entry).addDataUsage(dataAttribute, d);
+				} catch (Exception e) {
+					throw new ParserException("Cannot add data usage information to log entry: " + e.getMessage());
 				}
 			}
 		}

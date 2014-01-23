@@ -9,7 +9,7 @@ import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
-import de.uni.freiburg.iig.telematik.jawl.logformat.LogFormat;
+import de.uni.freiburg.iig.telematik.jawl.logformat.AbstractLogFormat;
 import de.uni.freiburg.iig.telematik.jawl.logformat.LogPerspective;
 import de.uni.freiburg.iig.telematik.jawl.logformat.MXMLLogFormat;
 import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException.PerspectiveError;
@@ -25,7 +25,7 @@ public class LogWriter extends FileWriter{
 	public static final String DEFAULT_LOG_PATH = "";
 	public static final String DEFAULT_LOG_FILENAME = "LOG";
 	
-	protected LogFormat logFormat;
+	protected AbstractLogFormat logFormat;
 	protected LogPerspective logPerspective = LogPerspective.TRACE_PERSPECTIVE;
 	private boolean headerWritten = false;
 	
@@ -49,7 +49,7 @@ public class LogWriter extends FileWriter{
 	 * @throws ParameterException if some parameters are <code>null</code> or file name is an empty string.
 	 * @throws IOException if output file creation or header writing cause an exception.
 	 */
-	public LogWriter(LogFormat logFormat) 
+	public LogWriter(AbstractLogFormat logFormat) 
 			throws PerspectiveException, CompatibilityException, ParameterException, IOException{
 		super();
 		initialize(logFormat);
@@ -71,7 +71,7 @@ public class LogWriter extends FileWriter{
 	 * @throws ParameterException if some parameters are <code>null</code> or file name is an empty string.
 	 * @throws IOException if output file creation or header writing cause an exception.
 	 */
-	public LogWriter(LogFormat logFormat, Charset charset) 
+	public LogWriter(AbstractLogFormat logFormat, Charset charset) 
 			throws PerspectiveException, CompatibilityException, ParameterException, IOException {
 		super(charset);
 		initialize(logFormat);
@@ -92,7 +92,7 @@ public class LogWriter extends FileWriter{
 	 * @throws ParameterException if some parameters are <code>null</code> or file name is an empty string.
 	 * @throws IOException if output file creation or header writing cause an exception.
 	 */
-	public LogWriter(LogFormat logFormat, String fileName, Charset charset)
+	public LogWriter(AbstractLogFormat logFormat, String fileName, Charset charset)
 			throws PerspectiveException, CompatibilityException, ParameterException, IOException {
 		super(fileName, charset);
 		initialize(logFormat);
@@ -112,7 +112,7 @@ public class LogWriter extends FileWriter{
 	 * @throws ParameterException if some parameters are <code>null</code> or file name is an empty string.
 	 * @throws IOException if output file creation or header writing cause an exception.
 	 */
-	public LogWriter(LogFormat logFormat, String path, String fileName, Charset charset)
+	public LogWriter(AbstractLogFormat logFormat, String path, String fileName, Charset charset)
 			throws PerspectiveException, CompatibilityException, ParameterException, IOException {
 		super(path, fileName, charset);
 		initialize(logFormat);
@@ -133,7 +133,7 @@ public class LogWriter extends FileWriter{
 	 * @throws ParameterException if some parameters are <code>null</code> or file name is an empty string.
 	 * @throws IOException if output file creation or header writing cause an exception.
 	 */
-	public LogWriter(LogFormat logFormat, String path, String fileName)
+	public LogWriter(AbstractLogFormat logFormat, String path, String fileName)
 			throws PerspectiveException, CompatibilityException, ParameterException, IOException {
 		super(path, fileName);
 		initialize(logFormat);
@@ -155,7 +155,7 @@ public class LogWriter extends FileWriter{
 	 * @throws ParameterException if some parameters are <code>null</code> or file name is an empty string.
 	 * @throws IOException if output file creation or header writing cause an exception.
 	 */
-	public LogWriter(LogFormat logFormat, String fileName) 
+	public LogWriter(AbstractLogFormat logFormat, String fileName) 
 			throws PerspectiveException, CompatibilityException, ParameterException, IOException {
 		super(fileName);
 		initialize(logFormat);
@@ -179,7 +179,7 @@ public class LogWriter extends FileWriter{
 		return DEFAULT_LOG_PATH;
 	}
 	
-	public LogFormat getLogFormat(){
+	public AbstractLogFormat getLogFormat(){
 		return logFormat;
 	}
 
@@ -189,7 +189,7 @@ public class LogWriter extends FileWriter{
 	 * @throws PerspectiveException if the log format does not support the writers' log perspective.
 	 * @throws CompatibilityException if the charset of the log writer is not supported by the log format.
 	 */
-	private void setLogFormat(LogFormat logFormat) throws PerspectiveException, CompatibilityException{
+	private void setLogFormat(AbstractLogFormat logFormat) throws PerspectiveException, CompatibilityException{
 		if(!logFormat.supportsCharset(charset))
 			throw new CompatibilityException("Log format \""+logFormat.getName()+"\" does not support charset \""+charset.name()+"\"");
 		if(!logFormat.supportsLogPerspective(logPerspective))
@@ -208,7 +208,7 @@ public class LogWriter extends FileWriter{
 	 * @throws ConfigurationException if the charset of the log writer is not supported by the log format.
 	 * @throws PerspectiveException if the log format does not support the writers' log perspective.
 	 */
-	protected void initialize(LogFormat logFormat) throws PerspectiveException, IOException, CompatibilityException {
+	protected void initialize(AbstractLogFormat logFormat) throws PerspectiveException, IOException, CompatibilityException {
 		setLogFormat(logFormat);
 		try {
 			setEOLString(EOLType.LF);

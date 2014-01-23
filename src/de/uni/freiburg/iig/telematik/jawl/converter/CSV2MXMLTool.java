@@ -49,16 +49,12 @@ import javax.swing.SwingConstants;
 import de.invation.code.toval.graphic.diagrams.models.DotChartModel;
 import de.invation.code.toval.graphic.diagrams.panels.AdjustableDiagramPanel;
 import de.invation.code.toval.graphic.diagrams.panels.DotChartPanel;
-import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.jawl.log.DataAttribute;
-import de.uni.freiburg.iig.telematik.jawl.log.LockingException;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
-import de.uni.freiburg.iig.telematik.jawl.logformat.LogFormat;
+import de.uni.freiburg.iig.telematik.jawl.logformat.AbstractLogFormat;
 import de.uni.freiburg.iig.telematik.jawl.logformat.MXMLLogFormat;
-import de.uni.freiburg.iig.telematik.jawl.writer.LogWriter;
-import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException;
 
 
 //VORSICHT: Probleme beim Zeitstempel-Handling, evtl. auch in LogWriter
@@ -84,6 +80,7 @@ import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException;
  * @author Thomas Stocker
  */
 //TODO: Datumsformat aus erstem Eintrag verwenden
+
 @SuppressWarnings("serial")
 public class CSV2MXMLTool extends JFrame {
 	
@@ -101,7 +98,7 @@ public class CSV2MXMLTool extends JFrame {
 	protected JPanel interpretationPanel = null;
 	protected JPanel interpretations = new JPanel();
 	protected ArrayList<String> columnNames;
-	protected LogFormat logFormat = new MXMLLogFormat();
+	protected AbstractLogFormat logFormat = new MXMLLogFormat();
 
 	public CSV2MXMLTool() {
 		setContentPane(getContentPane());
@@ -304,8 +301,9 @@ public class CSV2MXMLTool extends JFrame {
 				}
 				lineCount++;
 			}
+			in.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null,"Cannot prepare preview: " + e.getMessage(),"Internal Exception", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -373,27 +371,13 @@ public class CSV2MXMLTool extends JFrame {
 				BufferedWriter output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outfile), logFormat.getCharset()));
 				output.write(logFormat.getFileHeader());
 				
-				LogWriter logWriter = null;
-				try {
-					logWriter = new LogWriter(new MXMLLogFormat());
-				} catch (PerspectiveException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				} catch (CompatibilityException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
-				} catch (ParameterException e4) {
-					// TODO Auto-generated catch block
-					e4.printStackTrace();
-				}
-				
 				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
 				String line = null;
 				int lineCount = 0;
 				int tokenCount;
 				Integer lastCaseID = null;
 				Integer actualCaseID = null;
-				LogTrace actualTrace = null;
+				LogTrace<LogEntry> actualTrace = null;
 				while ((line = in.readLine()) != null) {
 					if(lineCount == 0){
 						lineCount++;
@@ -407,37 +391,44 @@ public class CSV2MXMLTool extends JFrame {
 						for(int i=0; i<tokens.length; i++){
 //						while(st.hasMoreTokens() && !abort){
 							String nextToken = tokens[i];
-							if(!nextToken.isEmpty()){
-							switch(columnInterpretation.get(columnNames.get(tokenCount))){
-							case CASEID: 
-								actualCaseID = extractCaseNumber(clean(nextToken));
-								if(actualCaseID == null){
-									System.out.println("Skipped process activity due to missing case-ID");
-									abort = true;
-									continue;
-								}
-								break;
-							case ACTIVITY:
-								newEntry.setActivity(clean(nextToken.toString()));
-								break;
-							case ORIGINATOR:
-								newEntry.setOriginatorCandidate(clean(nextToken.toString()));
-								break;
-							case TIMESTAMP:
-								DateFormat formatter = new SimpleDateFormat();
+							if (!nextToken.isEmpty()) {
 								try {
-									newEntry.setTimestamp((Date) formatter.parse(clean(nextToken.toString())));
-								} catch (ParseException e1) {
-									System.out.println("Unable to parse date: " + clean(nextToken.toString()));
+									switch (columnInterpretation.get(columnNames.get(tokenCount))) {
+									case CASEID:
+										actualCaseID = extractCaseNumber(clean(nextToken));
+										if (actualCaseID == null) {
+											System.out.println("Skipped process activity due to missing case-ID");
+											abort = true;
+											continue;
+										}
+										break;
+									case ACTIVITY:
+										newEntry.setActivity(clean(nextToken.toString()));
+										break;
+									case ORIGINATOR:
+										newEntry.setOriginator(clean(nextToken.toString()));
+										break;
+									case TIMESTAMP:
+										DateFormat formatter = new SimpleDateFormat();
+										try {
+											newEntry.setTimestamp((Date) formatter.parse(clean(nextToken.toString())));
+										} catch (ParseException e1) {
+											System.out.println("Unable to parse date: " + clean(nextToken.toString()));
+										}
+										break;
+									// case DATA:
+									// newEntry.addDataUsage(new DataAttribute(clean(columnNames.get(tokenCount)), clean(nextToken.toString())), null);
+									// break;
+									case META:
+										newEntry.addMetaAttribute(new DataAttribute(clean(columnNames.get(tokenCount)), clean(nextToken.toString())));
+										break;
+									}
+								} catch (Exception ex) {
+									JOptionPane.showMessageDialog(CSV2MXMLTool.this, "Error during entry generation: " + ex.getMessage(), "Transformation Exception", JOptionPane.ERROR_MESSAGE);
+									output.close();
+									in.close();
+									return;
 								}
-								break;
-							case DATA:
-								newEntry.addDataUsage(new DataAttribute(clean(columnNames.get(tokenCount)), clean(nextToken.toString())), null);
-								break;
-							case META:
-								newEntry.addMetaAttribute(new DataAttribute(clean(columnNames.get(tokenCount)), clean(nextToken.toString())));
-								break;
-							}
 							}
 							tokenCount++;
 						}
@@ -450,15 +441,15 @@ public class CSV2MXMLTool extends JFrame {
 								output.write(logFormat.getTraceAsString(actualTrace));
 								System.out.println("Writing new trace ["+lastCaseID+"]: "+actualTrace.size()+" entries");
 								addActivityNumber(actualTrace.size());
-								if(actualTrace.size()>19)
-									try {
-										logWriter.writeTrace(actualTrace);
-									} catch (PerspectiveException e1) {
-										// TODO Auto-generated catch block
-										e1.printStackTrace();
-									}
 							}
-							actualTrace = new LogTrace(actualCaseID);
+							try {
+								actualTrace = new LogTrace<LogEntry>(actualCaseID);
+							} catch (ParameterException e1) {
+								JOptionPane.showMessageDialog(CSV2MXMLTool.this, "Error during trace generation: " + e1.getMessage(), "Transformation Exception", JOptionPane.ERROR_MESSAGE);
+								output.close();
+								in.close();
+								return;
+							}
 						}
 						actualTrace.addEntry(newEntry);
 						lastCaseID = actualCaseID;
@@ -467,14 +458,6 @@ public class CSV2MXMLTool extends JFrame {
 				}
 				output.write(logFormat.getTraceAsString(actualTrace));
 				addActivityNumber(actualTrace.size());
-				if(actualTrace.size()>19)
-					try {
-						logWriter.writeTrace(actualTrace);
-					} catch (PerspectiveException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				logWriter.closeFile();
 				System.out.println("Writing new trace ["+actualCaseID+"]: "+actualTrace.size()+" entries");
 				System.out.println();
 				
@@ -496,11 +479,10 @@ public class CSV2MXMLTool extends JFrame {
 				
 				output.write(logFormat.getFileFooter());
 				output.close();
+				in.close();
 				System.out.println("Done");
 			} catch (IOException ioException) {
 				ioException.printStackTrace();
-			} catch (LockingException lockingException) {
-				// Cannot occur since no field is locked by default.
 			} catch (NullPointerException nullPointerException) {
 				nullPointerException.printStackTrace();
 			}
@@ -512,7 +494,7 @@ public class CSV2MXMLTool extends JFrame {
 		new CSV2MXMLTool();
 	}
 	
-	private enum LogConcept {CASEID, ACTIVITY, ORIGINATOR, TIMESTAMP, DATA, META};
+	private enum LogConcept {CASEID, ACTIVITY, ORIGINATOR, TIMESTAMP, META};
 	
 }
 

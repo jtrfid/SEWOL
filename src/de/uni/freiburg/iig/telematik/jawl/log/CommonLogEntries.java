@@ -6,17 +6,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CommonLogEntries {
+import de.invation.code.toval.validate.ParameterException;
+import de.invation.code.toval.validate.Validate;
+
+public class CommonLogEntries<E extends LogEntry> {
 	
-	Map<String, Map<LogTrace, List<LogEntry>>> commonEntries = new HashMap<String, Map<LogTrace, List<LogEntry>>>();;
+	Map<String, Map<LogTrace<E>, List<E>>> commonEntries = new HashMap<String, Map<LogTrace<E>, List<E>>>();;
 	
-	public CommonLogEntries(LogTrace...traces){
-		for(LogTrace trace: traces){
-			Map<String, List<LogEntry>> traceEntries = getEntryActivityMap(trace);
+	public CommonLogEntries(LogTrace<E>...traces) throws ParameterException{
+		Validate.noNullElements(traces);
+		
+		for(LogTrace<E> trace: traces){
+			Map<String, List<E>> traceEntries = getEntryActivityMap(trace);
 			if(commonEntries.isEmpty()){
 				//First run
 				for(String activity: traceEntries.keySet()){
-					Map<LogTrace, List<LogEntry>> newMap = new HashMap<LogTrace, List<LogEntry>>();
+					Map<LogTrace<E>, List<E>> newMap = new HashMap<LogTrace<E>, List<E>>();
 					newMap.put(trace, traceEntries.get(activity));
 					commonEntries.put(activity, newMap);
 				}
@@ -36,8 +41,8 @@ public class CommonLogEntries {
 		}
 	}
 	
-	public Map<String, List<LogEntry>> getEntryActivityMap(LogTrace trace){
-		Map<String, List<LogEntry>> result = new HashMap<String, List<LogEntry>>();
+	public Map<String, List<E>> getEntryActivityMap(LogTrace<E> trace) throws ParameterException{
+		Map<String, List<E>> result = new HashMap<String, List<E>>();
 		for(String activity: trace.getDistinctActivities()){
 			result.put(activity, trace.getEntriesForActivity(activity));
 		}
@@ -56,7 +61,7 @@ public class CommonLogEntries {
 		return commonEntries.keySet();
 	}
 	
-	public Map<LogTrace, List<LogEntry>> getTraceMap(String activity){
+	public Map<LogTrace<E>, List<E>> getTraceMap(String activity){
 		if(activity == null)
 			throw new NullPointerException();
 		if(!commonEntries.containsKey(activity))
@@ -64,7 +69,7 @@ public class CommonLogEntries {
 		return commonEntries.get(activity);
 	}
 	
-	public List<LogEntry> getEntriesFor(String activity, LogTrace trace){
+	public List<E> getEntriesFor(String activity, LogTrace<E> trace){
 		if(activity == null)
 			throw new NullPointerException();
 		if(!commonEntries.containsKey(activity))
