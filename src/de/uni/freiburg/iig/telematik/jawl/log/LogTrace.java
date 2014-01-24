@@ -1,7 +1,5 @@
 package de.uni.freiburg.iig.telematik.jawl.log;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -195,20 +193,5 @@ public class LogTrace<E extends LogEntry> {
 	public String toString(){
 		//TODO: Format
 		return logEntries.toString();
-	}
-	
-	public static void main(String[] args) throws ParameterException, LockingException, ParseException {
-		LogEntry e1 = new LogEntry("a1");
-		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-		e1.setTimestamp(sdf.parse("01.01.2013 06:00"));
-		LogEntry e2 = new LogEntry("a2");
-		e2.setTimestamp(sdf.parse("01.01.2013 12:00"));
-		LogEntry e3 = new LogEntry("a3");
-		e3.setTimestamp(sdf.parse("01.01.2013 18:00"));
-		LogTrace<LogEntry> t = new LogTrace<LogEntry>(1);
-		t.addEntry(e1);
-		t.addEntry(e2);
-		t.addEntry(e3);
-		System.out.println(t);
 	}
 }
