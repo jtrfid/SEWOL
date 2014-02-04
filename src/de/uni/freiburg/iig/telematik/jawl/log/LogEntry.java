@@ -354,6 +354,7 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	/**
 	 * Returns a copy of the log entry.
 	 */
+	@Override
 	public LogEntry clone(){
 		try {
 			LogEntry result = newInstance();

@@ -22,7 +22,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -263,7 +262,7 @@ public class CSV2MXMLTool extends JFrame {
 	
 	public JMenuBar createMenu(){
 		JMenuBar menuBar = new JMenuBar();
-		JMenu file = (JMenu) menuBar.add(new JMenu("File"));
+		JMenu file = menuBar.add(new JMenu("File"));
 		file.setMnemonic('F');
 		JMenuItem openItem = new JMenuItem("Open");
 		openItem.addActionListener(new OpenAction());
@@ -411,7 +410,7 @@ public class CSV2MXMLTool extends JFrame {
 									case TIMESTAMP:
 										DateFormat formatter = new SimpleDateFormat();
 										try {
-											newEntry.setTimestamp((Date) formatter.parse(clean(nextToken.toString())));
+											newEntry.setTimestamp(formatter.parse(clean(nextToken.toString())));
 										} catch (ParseException e1) {
 											System.out.println("Unable to parse date: " + clean(nextToken.toString()));
 										}

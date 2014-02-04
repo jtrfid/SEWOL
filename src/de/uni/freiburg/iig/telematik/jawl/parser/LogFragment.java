@@ -18,12 +18,14 @@ public class LogFragment extends InputStream {
 		buffer.append(System.getProperty("line.separator"));
 	}
 	
+	@Override
 	public void reset(){
 		content = null;
 		buffer = new StringBuffer();
 		counter = 0;
 	}
 	
+	@Override
 	public void close(){
 		content = buffer.toString().getBytes();
 	}

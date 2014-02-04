@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.deckfour.xes.extension.XExtension;
 import org.deckfour.xes.in.XUniversalParser;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
@@ -168,12 +169,18 @@ public class LogParser {
 	private boolean parsed(){
 		return parsedLogFile != null;
 	}
-	
+
+	/**
+	 * Checks if the extension list contains the {@link XExtension} with the name <i>AttributeDataUsage</i>.
+	 */
 	private boolean containsDataUsageExtension(XLog log) {
-		// TODO Auto-generated method stub
+		for (XExtension extension : log.getExtensions()) {
+			if (extension.getName().equals("AttributeDataUsage"))
+				return true;
+		}
 		return false;
 	}
-	
+
 	private LogEntry buildLogEntry(XEvent xesEvent, Class<?> logEntryClass) throws ParserException, ParameterException {
 		LogEntry logEntry;
 		try {
@@ -215,7 +222,7 @@ public class LogParser {
 		if (value == null || value.isEmpty())
 			throw new ParserException("No value for org:resource");
 		try {
-			if (!entry.getOriginator().equals(value))
+			if (entry.getOriginator() == null || !entry.getOriginator().equals(value))
 				entry.setOriginator(value);
 			entry.setOriginator(value);
 		} catch (Exception e) {
