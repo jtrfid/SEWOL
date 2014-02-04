@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.deckfour.xes.in.XUniversalParser;
@@ -20,11 +23,13 @@ import org.deckfour.xes.model.XTrace;
 import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.ParameterException;
+import de.invation.code.toval.validate.ParameterException.ErrorCode;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.jawl.log.DULogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.DataAttribute;
 import de.uni.freiburg.iig.telematik.jawl.log.EventType;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
+import de.uni.freiburg.iig.telematik.jawl.log.LogSummary;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 
 /**
@@ -40,6 +45,8 @@ import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 public class LogParser {
 
 	private XUniversalParser parser = new XUniversalParser();
+	private List<List<LogTrace<LogEntry>>> parsedLogFile = null;
+	private Map<Integer, LogSummary> summaries = new HashMap<Integer, LogSummary>();
 
 	/**
 	 * Checks whether the given file can be parsed by the file extension.
@@ -59,7 +66,7 @@ public class LogParser {
 	 * @throws IOException
 	 *             Gets thrown if the file under the given path can't be read, is a directory, or doesn't exist.
 	 */
-	public Collection<Collection<LogTrace<LogEntry>>> parse(String filePath) throws ParameterException, ParserException {
+	public List<List<LogTrace<LogEntry>>> parse(String filePath) throws ParameterException, ParserException {
 		Validate.notNull(filePath);
 		return parse(new File(filePath));
 	}
@@ -75,7 +82,7 @@ public class LogParser {
 	 * @throws IOException
 	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
-	public Collection<Collection<LogTrace<LogEntry>>> parse(File file) throws ParameterException, ParserException {
+	public List<List<LogTrace<LogEntry>>> parse(File file) throws ParameterException, ParserException {
 		Validate.noDirectory(file);
 		if (!file.canRead())
 			throw new ParameterException("Unable to read input file!");
@@ -86,10 +93,10 @@ public class LogParser {
 		} catch (Exception e) {
 			throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
 		}
-		Collection<Collection<LogTrace<LogEntry>>> logTracesCollection = new ArrayList<Collection<LogTrace<LogEntry>>>(logs.size());
+		parsedLogFile = new ArrayList<List<LogTrace<LogEntry>>>(logs.size());
 		for (XLog log : logs) {
 			Class<?> logEntryClass = null;
-			Collection<LogTrace<LogEntry>> logTraces = new ArrayList<LogTrace<LogEntry>>();
+			List<LogTrace<LogEntry>> logTraces = new ArrayList<LogTrace<LogEntry>>();
 			if(containsDataUsageExtension(log)){
 				logEntryClass = DULogEntry.class;
 			} else {
@@ -122,10 +129,44 @@ public class LogParser {
 				}
 				logTraces.add(logTrace);
 			}
-			logTracesCollection.add(logTraces);
+			parsedLogFile.add(logTraces);
 		}
 
-		return logTracesCollection;
+		return parsedLogFile;
+	}
+	
+	public LogSummary getSummary(int index) throws ParameterException{
+		if(!parsed())
+			throw new ParameterException("Log not parsed yet!");
+		Validate.notNegative(index);
+		if(index > parsedLogFiles()-1)
+			throw new ParameterException(ErrorCode.RANGEVIOLATION, "No log for index " + index);
+		if(!summaries.containsKey(index))
+			summaries.put(index, new LogSummary(getParsedLog(index)));
+		return summaries.get(index);
+	}
+	
+	private int parsedLogFiles(){
+		if(!parsed())
+			return 0;
+		return parsedLogFile.size();
+	}
+	
+	public List<LogTrace<LogEntry>> getFirstParsedLog() throws ParameterException{
+		return getParsedLog(0);
+	}
+	
+	public List<LogTrace<LogEntry>> getParsedLog(int index) throws ParameterException{
+		if(!parsed())
+			throw new ParameterException("Log not parsed yet!");
+		Validate.notNegative(index);
+		if(index > parsedLogFiles()-1)
+			throw new ParameterException(ErrorCode.RANGEVIOLATION, "No log for index " + index);
+		return parsedLogFile.get(index);
+	}
+	
+	private boolean parsed(){
+		return parsedLogFile != null;
 	}
 	
 	private boolean containsDataUsageExtension(XLog log) {

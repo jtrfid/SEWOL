@@ -14,6 +14,7 @@ public class LogTrace<E extends LogEntry> {
 	
 	private List<E> logEntries = new ArrayList<E>();
 	private int caseNumber;
+	private int similarInstances = 0;
 	
 	public LogTrace(Integer caseNumber) throws ParameterException{
 		Validate.notNegative(caseNumber);
@@ -166,6 +167,16 @@ public class LogTrace<E extends LogEntry> {
 		return logEntries.size();
 	}
 	
+	public int getSimilarInstances() {
+		return similarInstances;
+	}
+
+	public void setSimilarInstances(int similarInstances) throws ParameterException {
+		Validate.notNull(similarInstances);
+		Validate.notNegative(similarInstances);
+		this.similarInstances = similarInstances;
+	}
+
 	public boolean containsActivity(String activity){
 		return getDistinctActivities().contains(activity);
 	}
@@ -182,6 +193,13 @@ public class LogTrace<E extends LogEntry> {
 		Set<String> result = new HashSet<String>();
 		for(E entry: logEntries)
 			result.add(entry.getActivity());
+		return result;
+	}
+	
+	public Set<String> getDistinctOriginators(){
+		Set<String> result = new HashSet<String>();
+		for(E entry: logEntries)
+			result.add(entry.getOriginator());
 		return result;
 	}
 	
