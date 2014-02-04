@@ -14,7 +14,7 @@ public class LogTrace<E extends LogEntry> {
 	
 	private List<E> logEntries = new ArrayList<E>();
 	private int caseNumber;
-	private int similarInstances = 0;
+	private Set<Integer> similarInstances = new HashSet<Integer>();
 	
 	public LogTrace(Integer caseNumber) throws ParameterException{
 		Validate.notNegative(caseNumber);
@@ -167,14 +167,23 @@ public class LogTrace<E extends LogEntry> {
 		return logEntries.size();
 	}
 	
-	public int getSimilarInstances() {
-		return similarInstances;
+	public Set<Integer> getSimilarInstances() {
+		return Collections.unmodifiableSet(similarInstances);
+	}
+	
+	public int getNumberOfSimilarInstances(){
+		return similarInstances.size();
+	}
+	
+	public void addSimilarInstance(Integer similarInstance) throws ParameterException {
+		Validate.notNull(similarInstance);
+		this.similarInstances.add(similarInstance);
 	}
 
-	public void setSimilarInstances(int similarInstances) throws ParameterException {
+	public void setSimilarInstances(Collection<Integer> similarInstances) throws ParameterException {
 		Validate.notNull(similarInstances);
-		Validate.notNegative(similarInstances);
-		this.similarInstances = similarInstances;
+		this.similarInstances.clear();
+		this.similarInstances.addAll(similarInstances);
 	}
 
 	public boolean containsActivity(String activity){
