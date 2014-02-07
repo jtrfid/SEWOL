@@ -8,13 +8,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import org.deckfour.xes.extension.XExtension;
+import org.deckfour.xes.in.XParser;
+import org.deckfour.xes.in.XParserRegistry;
 import org.deckfour.xes.in.XUniversalParser;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
@@ -45,7 +46,6 @@ import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
  */
 public class LogParser {
 
-	private XUniversalParser parser = new XUniversalParser();
 	private List<List<LogTrace<LogEntry>>> parsedLogFile = null;
 	private Map<Integer, LogSummary> summaries = new HashMap<Integer, LogSummary>();
 
@@ -53,7 +53,12 @@ public class LogParser {
 	 * Checks whether the given file can be parsed by the file extension.
 	 */
 	public boolean canParse(File file) {
-		return parser.canParse(file);
+		for(XParser parser : XParserRegistry.instance().getAvailable()) {
+			if(parser.canParse(file)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -90,10 +95,22 @@ public class LogParser {
 
 		Collection<XLog> logs = null;
 		try {
-			logs = parser.parse(file);
+			// TODO choose parser
+			for(XParser parser : XParserRegistry.instance().getAvailable()) {
+				if(parser.canParse(file)) {
+					try {
+						logs = parser.parse(file);
+					} catch(Exception e) {
+						throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
+					}
+				}
+			}
 		} catch (Exception e) {
 			throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
 		}
+		if (logs == null)
+			throw new ParserException("No suitable parser could be found!");
+
 		parsedLogFile = new ArrayList<List<LogTrace<LogEntry>>>(logs.size());
 		for (XLog log : logs) {
 			Class<?> logEntryClass = null;
@@ -124,6 +141,13 @@ public class LogParser {
 
 				// Build new log trace
 				LogTrace<LogEntry> logTrace = new LogTrace<LogEntry>(traceID);
+
+				// Check for similar instances
+				Collection<Integer> similarInstances = getSimilarInstances(trace);
+				if (similarInstances != null) {
+					logTrace.setSimilarInstances(similarInstances);
+				}
+
 				for (XEvent event : trace) {
 					// Add events to log trace
 					logTrace.addEntry(buildLogEntry(event, logEntryClass));
@@ -299,6 +323,42 @@ public class LogParser {
 
 	private void addMetaInformation(LogEntry entry, Map.Entry<String, XAttribute> attribute) throws ParserException {
 		entry.addMetaAttribute(new DataAttribute(attribute.getKey(), attribute.getValue()));
+	}
+	
+	private Collection<Integer> getSimilarInstances(XTrace trace) throws ParserException {
+		// Check for similar instances
+		Integer numSimilarInstances = null;
+		String groupedIdentifiers = null;
+		for (Entry<String, XAttribute> v : trace.getAttributes().entrySet()) {
+			if (v.getKey().toLowerCase().equals("numSimilarInstances".toLowerCase())) {
+				try {
+					numSimilarInstances = Integer.parseInt(v.getValue().toString().trim());
+				} catch(NumberFormatException e) {
+					throw new ParserException("The value of \"numSimilarInstances\" is not of the type integer: " + v.getValue().toString() + ": " + e.getMessage());
+				}
+			}
+			if (v.getKey().toLowerCase().equals("GroupedIdentifiers".toLowerCase())) {
+				groupedIdentifiers = v.getValue().toString();
+			}
+		}
+		if (numSimilarInstances != null && groupedIdentifiers != null) {
+			String[] groupedIdentifiersSplitted = groupedIdentifiers.trim().split("\\s*,\\s*");
+
+			if (groupedIdentifiersSplitted.length != numSimilarInstances)
+				System.err.println("The amount of similar instances differ in \"numSimilarInstances\" and \"GroupedIdentifiers\".");
+
+			Collection<Integer> groupedIdentifiersArray = new Vector<Integer>(groupedIdentifiersSplitted.length);
+			for (int i = 0; i < groupedIdentifiersSplitted.length; i++) {
+				try {
+					groupedIdentifiersArray.add(Integer.parseInt(groupedIdentifiersSplitted[i].trim()));
+				} catch(NumberFormatException e) {
+					throw new ParserException("The given identifier \"" + groupedIdentifiersSplitted[i] + "\" is not of the integer type: " + e.getMessage());
+				}
+			}
+			if (groupedIdentifiersArray.size() > 0)
+				return groupedIdentifiersArray;
+		}
+		return null;
 	}
 
 	/**
