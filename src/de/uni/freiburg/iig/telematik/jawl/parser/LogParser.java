@@ -16,7 +16,6 @@ import java.util.Vector;
 import org.deckfour.xes.extension.XExtension;
 import org.deckfour.xes.in.XParser;
 import org.deckfour.xes.in.XParserRegistry;
-import org.deckfour.xes.in.XUniversalParser;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
@@ -39,7 +38,7 @@ import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
  * A parser class for MXML and XES files for the JAWL log classes.
  * </p>
  * <p>
- * The {@link XUniversalParser} from OpenXES is used, as it already converts MXML and XES files into an uniform format. Because of the transformation of the files to an OpenXES log format and the subsequent transformation to the JAWL log format, the complexity in time and space ends up in O(2n). An own implementation without the OpenXES classes could result in O(n).
+ * The {@link XParserRegistry} from OpenXES is used, as it helps choosing the right parser. Because of the transformation of the files to an OpenXES log format and the subsequent transformation to the JAWL log format, the complexity in time and space ends up in O(2n). An own implementation without the OpenXES classes could result in O(n).
  * </p>
  * 
  * @author Adrian Lange
@@ -53,12 +52,24 @@ public class LogParser {
 	 * Checks whether the given file can be parsed by the file extension.
 	 */
 	public boolean canParse(File file) {
-		for(XParser parser : XParserRegistry.instance().getAvailable()) {
-			if(parser.canParse(file)) {
+		for (XParser parser : XParserRegistry.instance().getAvailable()) {
+			if (parser.canParse(file)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Returns a suitable parser by the file extension.
+	 */
+	public XParser getParser(File file) {
+		for (XParser parser : XParserRegistry.instance().getAvailable()) {
+			if (parser.canParse(file)) {
+				return parser;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -76,6 +87,8 @@ public class LogParser {
 		Validate.notNull(filePath);
 		return parse(new File(filePath));
 	}
+
+	// TODO add parse(InputStream is) method. How to specify parser?
 
 	/**
 	 * Parses the specified log file and returns a collection of processes.
@@ -95,12 +108,12 @@ public class LogParser {
 
 		Collection<XLog> logs = null;
 		try {
-			// TODO choose parser
-			for(XParser parser : XParserRegistry.instance().getAvailable()) {
-				if(parser.canParse(file)) {
+			// choose parser
+			for (XParser parser : XParserRegistry.instance().getAvailable()) {
+				if (parser.canParse(file)) {
 					try {
 						logs = parser.parse(file);
-					} catch(Exception e) {
+					} catch (Exception e) {
 						throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
 					}
 				}
@@ -115,7 +128,7 @@ public class LogParser {
 		for (XLog log : logs) {
 			Class<?> logEntryClass = null;
 			List<LogTrace<LogEntry>> logTraces = new ArrayList<LogTrace<LogEntry>>();
-			if(containsDataUsageExtension(log)){
+			if (containsDataUsageExtension(log)) {
 				logEntryClass = DULogEntry.class;
 			} else {
 				logEntryClass = LogEntry.class;
@@ -159,38 +172,38 @@ public class LogParser {
 
 		return parsedLogFile;
 	}
-	
-	public LogSummary getSummary(int index) throws ParameterException{
-		if(!parsed())
+
+	public LogSummary getSummary(int index) throws ParameterException {
+		if (!parsed())
 			throw new ParameterException("Log not parsed yet!");
 		Validate.notNegative(index);
-		if(index > parsedLogFiles()-1)
+		if (index > parsedLogFiles() - 1)
 			throw new ParameterException(ErrorCode.RANGEVIOLATION, "No log for index " + index);
-		if(!summaries.containsKey(index))
+		if (!summaries.containsKey(index))
 			summaries.put(index, new LogSummary(getParsedLog(index)));
 		return summaries.get(index);
 	}
-	
-	private int parsedLogFiles(){
-		if(!parsed())
+
+	private int parsedLogFiles() {
+		if (!parsed())
 			return 0;
 		return parsedLogFile.size();
 	}
-	
-	public List<LogTrace<LogEntry>> getFirstParsedLog() throws ParameterException{
+
+	public List<LogTrace<LogEntry>> getFirstParsedLog() throws ParameterException {
 		return getParsedLog(0);
 	}
-	
-	public List<LogTrace<LogEntry>> getParsedLog(int index) throws ParameterException{
-		if(!parsed())
+
+	public List<LogTrace<LogEntry>> getParsedLog(int index) throws ParameterException {
+		if (!parsed())
 			throw new ParameterException("Log not parsed yet!");
 		Validate.notNegative(index);
-		if(index > parsedLogFiles()-1)
+		if (index > parsedLogFiles() - 1)
 			throw new ParameterException(ErrorCode.RANGEVIOLATION, "No log for index " + index);
 		return parsedLogFile.get(index);
 	}
-	
-	private boolean parsed(){
+
+	private boolean parsed() {
 		return parsedLogFile != null;
 	}
 
@@ -294,9 +307,9 @@ public class LogParser {
 			throw new ParserException("Cannot set log entry timestamp: " + e.getMessage());
 		}
 	}
-	
-	private void addDataUsage(LogEntry entry, Map.Entry<String, XAttribute> attribute) throws ParserException, ParameterException{
-		if(!(entry instanceof DULogEntry))
+
+	private void addDataUsage(LogEntry entry, Map.Entry<String, XAttribute> attribute) throws ParserException, ParameterException {
+		if (!(entry instanceof DULogEntry))
 			throw new ParameterException("Cannot add data usage to log entry of type " + entry.getClass().getSimpleName());
 
 		// Get sub-attributes
@@ -313,7 +326,7 @@ public class LogParser {
 			List<DataUsage> dataUsageList = parseDataUsageString(dataAttributeDataUsageString);
 			for (DataUsage d : dataUsageList) {
 				try {
-					((DULogEntry)entry).addDataUsage(dataAttribute, d);
+					((DULogEntry) entry).addDataUsage(dataAttribute, d);
 				} catch (Exception e) {
 					throw new ParserException("Cannot add data usage information to log entry: " + e.getMessage());
 				}
@@ -324,7 +337,7 @@ public class LogParser {
 	private void addMetaInformation(LogEntry entry, Map.Entry<String, XAttribute> attribute) throws ParserException {
 		entry.addMetaAttribute(new DataAttribute(attribute.getKey(), attribute.getValue()));
 	}
-	
+
 	private Collection<Integer> getSimilarInstances(XTrace trace) throws ParserException {
 		// Check for similar instances
 		Integer numSimilarInstances = null;
@@ -333,7 +346,7 @@ public class LogParser {
 			if (v.getKey().toLowerCase().equals("numSimilarInstances".toLowerCase())) {
 				try {
 					numSimilarInstances = Integer.parseInt(v.getValue().toString().trim());
-				} catch(NumberFormatException e) {
+				} catch (NumberFormatException e) {
 					throw new ParserException("The value of \"numSimilarInstances\" is not of the type integer: " + v.getValue().toString() + ": " + e.getMessage());
 				}
 			}
@@ -351,7 +364,7 @@ public class LogParser {
 			for (int i = 0; i < groupedIdentifiersSplitted.length; i++) {
 				try {
 					groupedIdentifiersArray.add(Integer.parseInt(groupedIdentifiersSplitted[i].trim()));
-				} catch(NumberFormatException e) {
+				} catch (NumberFormatException e) {
 					throw new ParserException("The given identifier \"" + groupedIdentifiersSplitted[i] + "\" is not of the integer type: " + e.getMessage());
 				}
 			}

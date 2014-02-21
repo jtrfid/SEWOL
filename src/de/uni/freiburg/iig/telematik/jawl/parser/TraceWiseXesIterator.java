@@ -7,10 +7,40 @@ import de.invation.code.toval.file.FileReader;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 
-public class TraceWiseXesParser implements Iterator<LogFragment> {
+/**
+ * <p>
+ * The TraceWiseXesIterator is an {@link Iterator} implementation that splits large XES files into smaller ones. For not keeping the whole document in memory, the source file gets streamed.
+ * </p>
+ * <p>
+ * The fragment size has a direct effect on the memory usage and the performance of the following parsing process. By choosing a large fragment size, the parser will need a lot of memory and might need to write out some shadow maps for swapping. For a low fragment size one must keep in mind that the parser reloads the extensions regularly, what slows down the parsing process enormously. For many
+ * traces with few entries a fragment size of 10000 can be sufficient, where a fragment size of 100 can bring a good performance with less very large traces. The default value of a fragment size of 1000 should bring a good tradeoff of memory usage and performance.
+ * </p>
+ * <p>
+ * To use the TraceWiseXesIterator with the parser one can do the following:
+ * 
+ * <pre>
+ * {@code
+ * 	TraceWiseXesIterator traceIterator = new TraceWiseXesIterator(PATH_TO_XES, 1000);
+ * 	XesXmlParser parser = new XesXmlParser();
+ * 	while (traceIterator.hasNext()) {
+ * 		List<XLog> logFragment = parser.parse(traceIterator.next());
+ * 		// do something
+ * 	}
+ * }
+ * </pre>
+ * 
+ * </p>
+ * 
+ * @version 1.0
+ * @author Thomas Stocker
+ * @author Adrian Lange
+ */
+public class TraceWiseXesIterator implements Iterator<LogFragment> {
+
+	/** TODO */
+	public static final int DEFAULT_FRAGMENT_SIZE = 1000;
 
 	private final String LOG_END = "</log>";
-	public static final int DEFAULT_FRAGMENT_SIZE = 1;
 
 	private FileReader fileReader = null;
 	private String header = null;
@@ -18,11 +48,26 @@ public class TraceWiseXesParser implements Iterator<LogFragment> {
 	private String lastTraceStart = null;
 	private int fragmentSize = 1;
 
-	public TraceWiseXesParser(String logFile) throws ParameterException, IOException {
+	/**
+	 * TODO
+	 * 
+	 * @param logFile
+	 * @throws ParameterException
+	 * @throws IOException
+	 */
+	public TraceWiseXesIterator(String logFile) throws ParameterException, IOException {
 		this(logFile, DEFAULT_FRAGMENT_SIZE);
 	}
 
-	public TraceWiseXesParser(String logFile, int fragmentSize) throws ParameterException, IOException {
+	/**
+	 * TODO
+	 * 
+	 * @param logFile
+	 * @param fragmentSize
+	 * @throws ParameterException
+	 * @throws IOException
+	 */
+	public TraceWiseXesIterator(String logFile, int fragmentSize) throws ParameterException, IOException {
 		Validate.exists(logFile);
 		Validate.positive(fragmentSize);
 		fileReader = new FileReader(logFile);
@@ -63,19 +108,6 @@ public class TraceWiseXesParser implements Iterator<LogFragment> {
 		return hasNextTrace;
 	}
 
-	// @Override
-	// public LogTrace next() {
-	// if(hasNext()){
-	// try {
-	// System.out.println(nextStringFragment());
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// }
-	// return null;
-	// }
-
 	@Override
 	public LogFragment next() {
 		if (hasNext()) {
@@ -88,7 +120,6 @@ public class TraceWiseXesParser implements Iterator<LogFragment> {
 				}
 				newFragment.addLine(LOG_END);
 				newFragment.close();
-				// System.out.println(newFragment);
 				return newFragment;
 			} catch (Exception e) {
 				e.printStackTrace();

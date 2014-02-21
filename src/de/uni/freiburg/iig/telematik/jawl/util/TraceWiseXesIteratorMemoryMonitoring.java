@@ -8,9 +8,9 @@ import java.util.Vector;
 import org.deckfour.xes.in.XesXmlParser;
 import org.deckfour.xes.model.XLog;
 
-import de.uni.freiburg.iig.telematik.jawl.parser.TraceWiseXesParser;
+import de.uni.freiburg.iig.telematik.jawl.parser.TraceWiseXesIterator;
 
-public class TraceWiseXesParserMemoryMonitoring {
+public class TraceWiseXesIteratorMemoryMonitoring {
 
 	public static final String PATH_1 = "/Users/stocker/Desktop/XESTest2.xes";
 	public static final String PATH_2 = "E:\\Documents\\IIG\\xes\\examples\\hjg.xes";
@@ -64,7 +64,7 @@ public class TraceWiseXesParserMemoryMonitoring {
 		t.start();
 
 		// Parse XES document
-		TraceWiseXesParser traceParser = new TraceWiseXesParser(PATH_3, TRACES_PER_ITERATION);
+		TraceWiseXesIterator traceParser = new TraceWiseXesIterator(PATH_3, TRACES_PER_ITERATION);
 
 		List<List<XLog>> parsedDocument = new Vector<List<XLog>>();
 		XesXmlParser parser = new XesXmlParser();
