@@ -1,7 +1,9 @@
 package de.uni.freiburg.iig.telematik.jawl.parser;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,38 +90,28 @@ public class LogParser {
 		return parse(new File(filePath));
 	}
 
-	// TODO add parse(InputStream is) method. How to specify parser?
-
 	/**
-	 * Parses the specified log file and returns a collection of processes.
+	 * Parses the specified log file in the input stream and returns a collection of processes. To specify the needed parser, a {@link ParserFileFormat} must be given.
 	 * 
-	 * @param file
-	 *            File to parse
+	 * @param inputStream
+	 *            Input to parse
+	 * @param fileFormat
+	 *            Format of the input stream to specify the needed parser
 	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
-	 * @throws ParameterException
-	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
-	 * @throws IOException
-	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
-	public List<List<LogTrace<LogEntry>>> parse(File file) throws ParameterException, ParserException {
-		Validate.noDirectory(file);
-		if (!file.canRead())
-			throw new ParameterException("Unable to read input file!");
+	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParserFileFormat fileFormat) throws ParameterException, ParserException {
+		try {
+			inputStream.available();
+		} catch (IOException e) {
+			throw new ParameterException("Unable to read input file: " + e.getMessage());
+		}
 
 		Collection<XLog> logs = null;
+		XParser parser = fileFormat.getParser();
 		try {
-			// choose parser
-			for (XParser parser : XParserRegistry.instance().getAvailable()) {
-				if (parser.canParse(file)) {
-					try {
-						logs = parser.parse(file);
-					} catch (Exception e) {
-						throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
-					}
-				}
-			}
+			logs = parser.parse(inputStream);
 		} catch (Exception e) {
-			throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
+			throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
 		}
 		if (logs == null)
 			throw new ParserException("No suitable parser could have been found!");
@@ -171,6 +163,34 @@ public class LogParser {
 		}
 
 		return parsedLogFile;
+	}
+
+	/**
+	 * Parses the specified log file and returns a collection of processes.
+	 * 
+	 * @param file
+	 *            File to parse
+	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
+	 * @throws ParameterException
+	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
+	 * @throws IOException
+	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
+	 */
+	public List<List<LogTrace<LogEntry>>> parse(File file) throws ParameterException, ParserException {
+		Validate.noDirectory(file);
+		if (!file.canRead())
+			throw new ParameterException("Unable to read input file!");
+
+		try {
+			try {
+				InputStream is = new FileInputStream(file);
+				return parse(is, ParserFileFormat.getFileFormat(file));
+			} catch (Exception e) {
+				throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
+			}
+		} catch (Exception e) {
+			throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
+		}
 	}
 
 	public LogSummary getSummary(int index) throws ParameterException {

@@ -37,7 +37,7 @@ import de.invation.code.toval.validate.Validate;
  */
 public class TraceWiseXesIterator implements Iterator<LogFragment> {
 
-	/** TODO */
+	/** Specifies the default number of traces for the iterator */
 	public static final int DEFAULT_FRAGMENT_SIZE = 1000;
 
 	private final String LOG_END = "</log>";
@@ -49,23 +49,22 @@ public class TraceWiseXesIterator implements Iterator<LogFragment> {
 	private int fragmentSize = 1;
 
 	/**
-	 * TODO
+	 * Creates a new TraceWiseXesIterator with the default fragment size.
 	 * 
 	 * @param logFile
-	 * @throws ParameterException
-	 * @throws IOException
+	 *            Path to the log file to read
 	 */
 	public TraceWiseXesIterator(String logFile) throws ParameterException, IOException {
 		this(logFile, DEFAULT_FRAGMENT_SIZE);
 	}
 
 	/**
-	 * TODO
+	 * Creates a new TraceWiseXesIterator with the specified fragment size.
 	 * 
 	 * @param logFile
+	 *            Path to the log file to read
 	 * @param fragmentSize
-	 * @throws ParameterException
-	 * @throws IOException
+	 *            The number of traces for the iterator
 	 */
 	public TraceWiseXesIterator(String logFile, int fragmentSize) throws ParameterException, IOException {
 		Validate.exists(logFile);
