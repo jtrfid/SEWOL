@@ -109,7 +109,7 @@ public class LogParser {
 			throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
 		}
 		if (logs == null)
-			throw new ParserException("No suitable parser could be found!");
+			throw new ParserException("No suitable parser could have been found!");
 
 		parsedLogFile = new ArrayList<List<LogTrace<LogEntry>>>(logs.size());
 		for (XLog log : logs) {
