@@ -12,8 +12,8 @@ import de.invation.code.toval.validate.Validate;
  * The TraceWiseXesIterator is an {@link Iterator} implementation that splits large XES files into smaller ones. For not keeping the whole document in memory, the source file gets streamed.
  * </p>
  * <p>
- * The fragment size has a direct effect on the memory usage and the performance of the following parsing process. By choosing a large fragment size, the parser will need a lot of memory and might need to write out some shadow maps for swapping. For a low fragment size one must keep in mind that the parser reloads the extensions regularly, what slows down the parsing process enormously. For many
- * traces with few entries a fragment size of 10000 can be sufficient, where a fragment size of 100 can bring a good performance with less very large traces. The default value of a fragment size of 1000 should bring a good tradeoff of memory usage and performance.
+ * The fragment size has a direct impact on the memory usage and the performance of the following parsing process. By choosing a large fragment size, the parser might need a lot of memory and might need to write out some shadow maps for swapping (see NikeFS of OpenXES). For a low fragment size one must keep in mind that the parser reloads the extensions regularly, what slows down the parsing process enormously and also fills up the shadow maps. For many
+ * traces with few entries a fragment size of more than 10000 can be sufficient, where a fragment size of 1000 can bring a good performance with less very large traces. The default value of a fragment size of 5000 should bring a good tradeoff of memory usage and performance.
  * </p>
  * <p>
  * To use the TraceWiseXesIterator with the parser one can do the following:
@@ -38,7 +38,7 @@ import de.invation.code.toval.validate.Validate;
 public class TraceWiseXesIterator implements Iterator<LogFragment> {
 
 	/** Specifies the default number of traces for the iterator */
-	public static final int DEFAULT_FRAGMENT_SIZE = 1000;
+	public static final int DEFAULT_FRAGMENT_SIZE = 5000;
 
 	private final String LOG_END = "</log>";
 
