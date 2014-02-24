@@ -7,11 +7,11 @@ import de.invation.code.toval.file.EOLType;
 import de.invation.code.toval.file.FileWriter;
 import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
+import de.uni.freiburg.iig.telematik.jawl.format.AbstractLogFormat;
+import de.uni.freiburg.iig.telematik.jawl.format.LogPerspective;
+import de.uni.freiburg.iig.telematik.jawl.format.MXMLLogFormat;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
-import de.uni.freiburg.iig.telematik.jawl.logformat.AbstractLogFormat;
-import de.uni.freiburg.iig.telematik.jawl.logformat.LogPerspective;
-import de.uni.freiburg.iig.telematik.jawl.logformat.MXMLLogFormat;
 import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException.PerspectiveError;
 
 
