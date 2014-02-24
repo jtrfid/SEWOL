@@ -193,6 +193,22 @@ public class DULogEntry extends LogEntry {
 		result = prime * result + ((dataUsage == null) ? 0 : dataUsage.hashCode());
 		return result;
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DULogEntry other = (DULogEntry) obj;
+		if (dataUsage == null) {
+			if (other.dataUsage != null)
+				return false;
+		} else if (!dataUsage.equals(other.dataUsage))
+			return false;
+		return true;
+	}
 
 }

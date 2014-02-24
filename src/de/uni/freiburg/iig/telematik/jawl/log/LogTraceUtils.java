@@ -1,5 +1,6 @@
 package de.uni.freiburg.iig.telematik.jawl.log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,6 +46,14 @@ public class LogTraceUtils {
 	
 	public static <E extends LogEntry> List<LogTrace<E>> createTraceList(LogTrace<E>... traces){
 		return Arrays.asList(traces);
+	}
+	
+	public static <E extends LogEntry> List<List<String>> createStringRepresentation(List<LogTrace> traceList){
+		List<List<String>> result = new ArrayList<List<String>>();
+		for(LogTrace trace: traceList){
+			result.add(trace.getActivities());
+		}
+		return result;
 	}
 
 }

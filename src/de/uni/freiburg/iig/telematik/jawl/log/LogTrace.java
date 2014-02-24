@@ -13,8 +13,10 @@ import de.invation.code.toval.validate.Validate;
 public class LogTrace<E extends LogEntry> {
 	
 	private List<E> logEntries = new ArrayList<E>();
-	private int caseNumber;
+	private int caseNumber = -1;
 	private Set<Integer> similarInstances = new HashSet<Integer>();
+	
+	public LogTrace(){}
 	
 	public LogTrace(Integer caseNumber) throws ParameterException{
 		Validate.notNegative(caseNumber);
@@ -157,6 +159,11 @@ public class LogTrace<E extends LogEntry> {
 				entriesChanged = true;
 		}
 		return entriesChanged;
+	}
+	
+	public void setCaseNumber(int caseNumber) throws ParameterException{
+		Validate.notNull(caseNumber);
+		this.caseNumber = caseNumber;
 	}
 	
 	public int getCaseNumber(){

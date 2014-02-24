@@ -17,6 +17,7 @@ import de.invation.code.toval.validate.Validate;
 
 public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	
+	private static final String toStringFormat = "[%s|%s|%s]";
 	/**
 	 * The timestamp of the log entry (the time the related activity was conducted).<br>
 	 */
@@ -386,23 +387,58 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result 
-				+ ((activity == null) ? 0 : activity.hashCode());
-		result = prime * result 
-				+ ((eventType == null) ? 0 : eventType.hashCode());
-		result = prime * result 
-				+ ((metaData == null) ? 0 : metaData.hashCode());
-		result = prime * result 
-				+ ((originator == null) ? 0 : originator.hashCode());
-		result = prime * result 
-				+ ((timestamp == null) ? 0 : timestamp.hashCode());
+		result = prime * result + ((activity == null) ? 0 : activity.hashCode());
+		result = prime * result + ((eventType == null) ? 0 : eventType.hashCode());
+		result = prime * result + ((metaData == null) ? 0 : metaData.hashCode());
+		result = prime * result + ((originator == null) ? 0 : originator.hashCode());
+		result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
 		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LogEntry other = (LogEntry) obj;
+		if (activity == null) {
+			if (other.activity != null)
+				return false;
+		} else if (!activity.equals(other.activity))
+			return false;
+		if (eventType != other.eventType)
+			return false;
+		if (metaData == null) {
+			if (other.metaData != null)
+				return false;
+		} else if (!metaData.equals(other.metaData))
+			return false;
+		if (originator == null) {
+			if (other.originator != null)
+				return false;
+		} else if (!originator.equals(other.originator))
+			return false;
+		if (timestamp == null) {
+			if (other.timestamp != null)
+				return false;
+		} else if (!timestamp.equals(other.timestamp))
+			return false;
+		return true;
 	}
 	
 	@Override
 	public String toString(){
 		String timestamp = (this.timestamp == null) ? "-" : sdf.format(this.timestamp);
-		return '['+ timestamp +'|'+this.getActivity()+'|'+this.getOriginator()+']';
+		return String.format(toStringFormat, timestamp , getActivity(), getOriginator());
+	}
+	
+	public static void main(String[] args) throws ParameterException {
+		LogEntry e1 = new LogEntry("A");
+		LogEntry e2 = new LogEntry("A");
+		System.out.println(e1.equals(e2));
 	}
 	
 }

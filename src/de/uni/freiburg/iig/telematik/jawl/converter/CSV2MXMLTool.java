@@ -49,11 +49,11 @@ import de.invation.code.toval.graphic.diagrams.models.DotChartModel;
 import de.invation.code.toval.graphic.diagrams.panels.AdjustableDiagramPanel;
 import de.invation.code.toval.graphic.diagrams.panels.DotChartPanel;
 import de.invation.code.toval.validate.ParameterException;
+import de.uni.freiburg.iig.telematik.jawl.format.AbstractLogFormat;
+import de.uni.freiburg.iig.telematik.jawl.format.MXMLLogFormat;
 import de.uni.freiburg.iig.telematik.jawl.log.DataAttribute;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
-import de.uni.freiburg.iig.telematik.jawl.logformat.AbstractLogFormat;
-import de.uni.freiburg.iig.telematik.jawl.logformat.MXMLLogFormat;
 
 
 //VORSICHT: Probleme beim Zeitstempel-Handling, evtl. auch in LogWriter

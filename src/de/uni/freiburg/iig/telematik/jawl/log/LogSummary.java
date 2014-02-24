@@ -8,18 +8,28 @@ import java.util.Set;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 
-public class LogSummary {
+public class LogSummary<E extends LogEntry> {
 	
 	private Set<String> activities = new HashSet<String>();
 	private Set<String> originators = new HashSet<String>();
+	
+	public LogSummary() {}
 
-	public LogSummary(List<LogTrace<LogEntry>> traces) throws ParameterException{
+	public LogSummary(List<LogTrace<E>> traces) throws ParameterException{
+		addTraces(traces);
+	}
+	
+	public void addTraces(List<LogTrace<E>> traces) throws ParameterException{
 		Validate.notNull(traces);
-		for(LogTrace<LogEntry> trace: traces){
-			Validate.notNull(trace);
-			activities.addAll(trace.getDistinctActivities());
-			originators.addAll(trace.getDistinctOriginators());
+		for(LogTrace<E> trace: traces){
+			addTrace(trace);
 		}
+	}
+	
+	public void addTrace(LogTrace<E> trace) throws ParameterException{
+		Validate.notNull(trace);
+		activities.addAll(trace.getDistinctActivities());
+		originators.addAll(trace.getDistinctOriginators());
 	}
 
 	public Set<String> getActivities() {
@@ -30,6 +40,4 @@ public class LogSummary {
 		return Collections.unmodifiableSet(originators);
 	}
 	
-	
-
 }
