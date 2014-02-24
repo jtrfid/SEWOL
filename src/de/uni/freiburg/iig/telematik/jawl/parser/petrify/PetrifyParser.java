@@ -1,14 +1,17 @@
 package de.uni.freiburg.iig.telematik.jawl.parser.petrify;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import de.invation.code.toval.file.FileReader;
 import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
@@ -17,28 +20,36 @@ import de.uni.freiburg.iig.telematik.jawl.parser.LogParserInterface;
 
 public class PetrifyParser implements LogParserInterface {
 
-	@Override
-	public List<List<LogTrace<LogEntry>>> parse(File file, boolean onlyDistinctTraces) throws IOException, ParserException, ParameterException {
+	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, boolean onlyDistinctTraces) throws IOException, ParameterException, ParserException {
+		try {
+			inputStream.available();
+		} catch (IOException e) {
+			throw new ParameterException("Unable to read input file: " + e.getMessage());
+		}
+
 		List<List<LogTrace<LogEntry>>> result = new ArrayList<List<LogTrace<LogEntry>>>();
 		List<LogTrace<LogEntry>> traceList = new ArrayList<LogTrace<LogEntry>>();
 		Set<LogTrace<LogEntry>> traceSet = new HashSet<LogTrace<LogEntry>>();
 		result.add(traceList);
-		FileReader reader = new FileReader(file.getAbsolutePath());
+
+		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 		String nextLine = null;
 		int traceCount = 0;
-		while ((nextLine = reader.readLine()) != null) {
+
+		while ((nextLine = bufferedReader.readLine()) != null) {
 			LogTrace<LogEntry> newTrace = new LogTrace<LogEntry>(++traceCount);
 			StringTokenizer tokenizer = new StringTokenizer(nextLine);
-			while(tokenizer.hasMoreTokens()){
+			while (tokenizer.hasMoreTokens()) {
 				String nextToken = tokenizer.nextToken();
-				if(nextToken != null && !nextToken.isEmpty()){
+				if (nextToken != null && !nextToken.isEmpty()) {
 					newTrace.addEntry(new LogEntry(nextToken));
 				}
 			}
-			if(!onlyDistinctTraces){
+			if (!onlyDistinctTraces) {
 				traceList.add(newTrace);
 			} else {
-				if(traceSet.add(newTrace)){
+				if (traceSet.add(newTrace)) {
 					traceList.add(newTrace);
 				}
 			}
@@ -46,6 +57,9 @@ public class PetrifyParser implements LogParserInterface {
 		return result;
 	}
 
-	
-
+	@Override
+	public List<List<LogTrace<LogEntry>>> parse(File file, boolean onlyDistinctTraces) throws IOException, ParserException, ParameterException {
+		InputStream inputStream = new FileInputStream(file);
+		return parse(inputStream, onlyDistinctTraces);
+	}
 }
