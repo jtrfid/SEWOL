@@ -14,10 +14,11 @@ import java.util.Set;
 import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
+import de.uni.freiburg.iig.telematik.jawl.log.LogSummary;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
-import de.uni.freiburg.iig.telematik.jawl.parser.LogParserInterface;
+import de.uni.freiburg.iig.telematik.jawl.parser.AbstractLogParser;
 
-public class PlainParser implements LogParserInterface {
+public class PlainParser extends AbstractLogParser {
 
 	private String delimiter = null;
 
@@ -31,11 +32,11 @@ public class PlainParser implements LogParserInterface {
 		} catch (IOException e) {
 			throw new ParameterException("Unable to read input file: " + e.getMessage());
 		}
-
-		List<List<LogTrace<LogEntry>>> result = new ArrayList<List<LogTrace<LogEntry>>>();
+		
+		parsedLogFiles = new ArrayList<List<LogTrace<LogEntry>>>();
 		List<LogTrace<LogEntry>> traceList = new ArrayList<LogTrace<LogEntry>>();
 		Set<LogTrace<LogEntry>> traceSet = new HashSet<LogTrace<LogEntry>>();
-		result.add(traceList);
+		parsedLogFiles.add(traceList);
 
 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -57,8 +58,9 @@ public class PlainParser implements LogParserInterface {
 				}
 			}
 		}
-
-		return result;
+		
+		summaries.put(0, new LogSummary<LogEntry>(traceList));
+		return parsedLogFiles;
 	}
 
 	@Override

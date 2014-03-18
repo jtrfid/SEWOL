@@ -15,10 +15,11 @@ import java.util.StringTokenizer;
 import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
+import de.uni.freiburg.iig.telematik.jawl.log.LogSummary;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
-import de.uni.freiburg.iig.telematik.jawl.parser.LogParserInterface;
+import de.uni.freiburg.iig.telematik.jawl.parser.AbstractLogParser;
 
-public class PetrifyParser implements LogParserInterface {
+public class PetrifyParser extends AbstractLogParser {
 
 	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, boolean onlyDistinctTraces) throws IOException, ParameterException, ParserException {
 		try {
@@ -27,10 +28,11 @@ public class PetrifyParser implements LogParserInterface {
 			throw new ParameterException("Unable to read input file: " + e.getMessage());
 		}
 
-		List<List<LogTrace<LogEntry>>> result = new ArrayList<List<LogTrace<LogEntry>>>();
+		parsedLogFiles = new ArrayList<List<LogTrace<LogEntry>>>();
+		
 		List<LogTrace<LogEntry>> traceList = new ArrayList<LogTrace<LogEntry>>();
 		Set<LogTrace<LogEntry>> traceSet = new HashSet<LogTrace<LogEntry>>();
-		result.add(traceList);
+		parsedLogFiles.add(traceList);
 
 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -54,7 +56,8 @@ public class PetrifyParser implements LogParserInterface {
 				}
 			}
 		}
-		return result;
+		summaries.put(0, new LogSummary<LogEntry>(traceList));
+		return parsedLogFiles;
 	}
 
 	@Override

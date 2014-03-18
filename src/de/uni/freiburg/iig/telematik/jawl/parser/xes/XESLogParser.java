@@ -9,11 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import org.deckfour.xes.extension.XExtension;
 import org.deckfour.xes.in.XParser;
@@ -26,7 +25,6 @@ import org.deckfour.xes.model.XTrace;
 import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.ParameterException;
-import de.invation.code.toval.validate.ParameterException.ErrorCode;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.jawl.log.DULogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.DataAttribute;
@@ -34,7 +32,7 @@ import de.uni.freiburg.iig.telematik.jawl.log.EventType;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogSummary;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
-import de.uni.freiburg.iig.telematik.jawl.parser.LogParserInterface;
+import de.uni.freiburg.iig.telematik.jawl.parser.AbstractLogParser;
 import de.uni.freiburg.iig.telematik.jawl.parser.ParserDateFormat;
 import de.uni.freiburg.iig.telematik.jawl.parser.ParserFileFormat;
 
@@ -48,10 +46,7 @@ import de.uni.freiburg.iig.telematik.jawl.parser.ParserFileFormat;
  * 
  * @author Adrian Lange
  */
-public class XESLogParser implements LogParserInterface {
-
-	private List<List<LogTrace<LogEntry>>> parsedLogFile = null;
-	private Map<Integer, LogSummary> summaries = new HashMap<Integer, LogSummary>();
+public class XESLogParser extends AbstractLogParser {
 
 	/**
 	 * Checks whether the given file can be parsed by the file extension.
@@ -111,7 +106,8 @@ public class XESLogParser implements LogParserInterface {
 		if (logs == null)
 			throw new ParserException("No suitable parser could have been found!");
 
-		parsedLogFile = new ArrayList<List<LogTrace<LogEntry>>>(logs.size());
+		parsedLogFiles = new ArrayList<List<LogTrace<LogEntry>>>(logs.size());
+		int logNumber = 0;
 		for (XLog log : logs) {
 			Class<?> logEntryClass = null;
 			List<LogTrace<LogEntry>> logTraces = new ArrayList<LogTrace<LogEntry>>();
@@ -154,10 +150,12 @@ public class XESLogParser implements LogParserInterface {
 				}
 				logTraces.add(logTrace);
 			}
-			parsedLogFile.add(logTraces);
+			parsedLogFiles.add(logTraces);
+			summaries.put(logNumber, new LogSummary<LogEntry>(logTraces));
+			logNumber++;
 		}
 
-		return parsedLogFile;
+		return parsedLogFiles;
 	}
 
 	/**
@@ -187,40 +185,6 @@ public class XESLogParser implements LogParserInterface {
 		} catch (Exception e) {
 			throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
 		}
-	}
-
-	public LogSummary getSummary(int index) throws ParameterException {
-		if (!parsed())
-			throw new ParameterException("Log not parsed yet!");
-		Validate.notNegative(index);
-		if (index > parsedLogFiles() - 1)
-			throw new ParameterException(ErrorCode.RANGEVIOLATION, "No log for index " + index);
-		if (!summaries.containsKey(index))
-			summaries.put(index, new LogSummary(getParsedLog(index)));
-		return summaries.get(index);
-	}
-
-	private int parsedLogFiles() {
-		if (!parsed())
-			return 0;
-		return parsedLogFile.size();
-	}
-
-	public List<LogTrace<LogEntry>> getFirstParsedLog() throws ParameterException {
-		return getParsedLog(0);
-	}
-
-	public List<LogTrace<LogEntry>> getParsedLog(int index) throws ParameterException {
-		if (!parsed())
-			throw new ParameterException("Log not parsed yet!");
-		Validate.notNegative(index);
-		if (index > parsedLogFiles() - 1)
-			throw new ParameterException(ErrorCode.RANGEVIOLATION, "No log for index " + index);
-		return parsedLogFile.get(index);
-	}
-
-	private boolean parsed() {
-		return parsedLogFile != null;
 	}
 
 	/**
