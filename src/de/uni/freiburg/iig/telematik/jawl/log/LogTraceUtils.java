@@ -12,8 +12,16 @@ public class LogTraceUtils {
 	public static LogTrace<LogEntry> createTraceFromActivities(int caseNumber, String... activities) throws ParameterException{
 		return createTraceFromActivities(caseNumber, LogEntry.class, activities);
 	}
-		
+	
 	public static <E extends LogEntry> LogTrace<E> createTraceFromActivities(int caseNumber, Class<E> entryClass, String... activities) throws ParameterException{
+		return createTraceFromActivities(caseNumber, entryClass, Arrays.asList(activities));
+	}
+	
+	public static LogTrace<LogEntry> createTraceFromActivities(int caseNumber, List<String> activities) throws ParameterException{
+		return createTraceFromActivities(caseNumber, LogEntry.class, activities);
+	}
+		
+	public static <E extends LogEntry> LogTrace<E> createTraceFromActivities(int caseNumber, Class<E> entryClass, List<String> activities) throws ParameterException{
 		Validate.notNegative(caseNumber);
 		Validate.notNull(entryClass);
 		try {
@@ -48,9 +56,9 @@ public class LogTraceUtils {
 		return Arrays.asList(traces);
 	}
 	
-	public static <E extends LogEntry> List<List<String>> createStringRepresentation(List<LogTrace> traceList){
+	public static <E extends LogEntry> List<List<String>> createStringRepresentation(List<LogTrace<E>> traceList){
 		List<List<String>> result = new ArrayList<List<String>>();
-		for(LogTrace trace: traceList){
+		for(LogTrace<E> trace: traceList){
 			result.add(trace.getActivities());
 		}
 		return result;
