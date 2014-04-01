@@ -215,11 +215,13 @@ public class XESLogParser extends AbstractLogParser {
 				addEventType(logEntry, attribute.getValue().toString());
 			} else if (key.equals("time:timestamp")) {
 				addTimestamp(logEntry, attribute.getValue().toString());
-			} else if (key.equals("dataUsage:data")) {
-				addDataUsage(logEntry, attribute);
 			} else {
-				// If the key is unknown, a meta attribute with the key/value pair is added
-				addMetaInformation(logEntry, attribute);
+				// If the key is unknown, a meta attribute or a data attribute with the key/value pair is added
+				if (attribute.getValue().getAttributes().containsKey("dataUsage:usage")) {
+					addDataUsage(logEntry, attribute);
+				} else {
+					addMetaInformation(logEntry, attribute);
+				}
 			}
 		}
 		return logEntry;
@@ -291,22 +293,21 @@ public class XESLogParser extends AbstractLogParser {
 	private void addDataUsage(LogEntry entry, Map.Entry<String, XAttribute> attribute) throws ParserException, ParameterException {
 		if (!(entry instanceof DULogEntry))
 			throw new ParameterException("Cannot add data usage to log entry of type " + entry.getClass().getSimpleName());
+		
+		String dataAttributeKey = attribute.getKey();
+		Object dataAttributeValue = parseAttributeValue(attribute.getValue());
+		DataAttribute dataAttribute = new DataAttribute(dataAttributeKey, dataAttributeValue);
 
 		// Get sub-attributes
-		for (Map.Entry<String, XAttribute> xAttribute : attribute.getValue().getAttributes().entrySet()) {
-			String dataAttributeKey = xAttribute.getKey();
-			Object dataAttributeValue = parseAttributeValue(xAttribute.getValue());
-			DataAttribute dataAttribute = new DataAttribute(dataAttributeKey, dataAttributeValue);
+		for (Map.Entry<String, XAttribute> subattribute : attribute.getValue().getAttributes().entrySet()) {
 			String dataAttributeDataUsageString = null;
-			for (Map.Entry<String, XAttribute> dataUsage : xAttribute.getValue().getAttributes().entrySet()) {
-				if (dataUsage.getKey().equals("dataUsage")) {
-					dataAttributeDataUsageString = dataUsage.getValue().toString();
-				}
+			if (subattribute.getKey().equals("dataUsage:usage")) {
+				dataAttributeDataUsageString = subattribute.getValue().toString();
 			}
 			List<DataUsage> dataUsageList = parseDataUsageString(dataAttributeDataUsageString);
-			for (DataUsage d : dataUsageList) {
+			for (DataUsage dataUsage : dataUsageList) {
 				try {
-					((DULogEntry) entry).addDataUsage(dataAttribute, d);
+					((DULogEntry) entry).addDataUsage(dataAttribute, dataUsage);
 				} catch (Exception e) {
 					throw new ParserException("Cannot add data usage information to log entry: " + e.getMessage());
 				}

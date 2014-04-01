@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="SEPIA.package" default="package" basedir=".">
+<project name="JAWL.package" default="package" basedir=".">
 
 	<!--
 	Apache Ant build file for the JAWL project
@@ -16,8 +16,8 @@
 	Then the project gets compiled (see #compile) and all unit tests are performed
 	(see #test). If the compilation ran without errors, the JARs are packaged (see #package).
 	
-	SEPIA depends on the projects TOVAL and JAGAL, which compiled classes must be
-	present under the specified paths.
+	JAWL depends on the project TOVAL, which's compiled classes must be present
+	under the specified paths.
 	
 	author: Adrian Lange
 	 -->
@@ -46,7 +46,7 @@
 	<path id="TOVAL.classpath">
 		<pathelement location="${TOVAL.location}/bin" />
 	</path>
-	<path id="SEPIA.classpath">
+	<path id="JAWL.classpath">
 		<pathelement location="${classes.target.dir}" />
 		<pathelement location="${tests.target.dir}" />
 		<path refid="TOVAL.classpath" />
@@ -111,12 +111,12 @@
 		<echo>Compile classes...</echo>
 		<javac destdir="${classes.target.dir}" includeantruntime="false">
 			<src path="${src.dir}" />
-			<classpath refid="SEPIA.classpath" />
+			<classpath refid="JAWL.classpath" />
 		</javac>
 		<echo>Compile tests...</echo>
 		<javac destdir="${tests.target.dir}" includeantruntime="false">
 			<src path="${test.dir}" />
-			<classpath refid="SEPIA.classpath" />
+			<classpath refid="JAWL.classpath" />
 		</javac>
 	</target>
 
