@@ -12,7 +12,7 @@ import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 
 public interface LogParserInterface {
 
-	public List<List<LogTrace<LogEntry>>> parse(File file, boolean onlyDistinctTraces) throws IOException, ParserException, ParameterException;
+	public List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws IOException, ParserException, ParameterException;
 	
 	public List<LogTrace<LogEntry>> getParsedLog(int index) throws ParameterException;
 	

@@ -35,6 +35,7 @@ import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 import de.uni.freiburg.iig.telematik.jawl.parser.AbstractLogParser;
 import de.uni.freiburg.iig.telematik.jawl.parser.ParserDateFormat;
 import de.uni.freiburg.iig.telematik.jawl.parser.ParserFileFormat;
+import de.uni.freiburg.iig.telematik.jawl.parser.ParsingMode;
 
 /**
  * <p>
@@ -71,9 +72,9 @@ public class XESLogParser extends AbstractLogParser {
 	 * @throws IOException
 	 *             Gets thrown if the file under the given path can't be read, is a directory, or doesn't exist.
 	 */
-	public List<List<LogTrace<LogEntry>>> parse(String filePath, boolean onlyDistinctTraces) throws ParameterException, ParserException {
+	public List<List<LogTrace<LogEntry>>> parse(String filePath, ParsingMode parsingMode) throws ParameterException, ParserException {
 		Validate.notNull(filePath);
-		return parse(new File(filePath), onlyDistinctTraces);
+		return parse(new File(filePath), parsingMode);
 	}
 
 	/**
@@ -89,7 +90,7 @@ public class XESLogParser extends AbstractLogParser {
 	 * @throws IOException
 	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
-	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, boolean onlyDistinctTraces, ParserFileFormat fileFormat) throws ParameterException, ParserException {
+	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode, ParserFileFormat fileFormat) throws ParameterException, ParserException {
 		try {
 			inputStream.available();
 		} catch (IOException e) {
@@ -170,7 +171,7 @@ public class XESLogParser extends AbstractLogParser {
 	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
 	@Override
-	public List<List<LogTrace<LogEntry>>> parse(File file, boolean onlyDistinctTraces) throws ParameterException, ParserException {
+	public List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws ParameterException, ParserException {
 		Validate.noDirectory(file);
 		if (!file.canRead())
 			throw new ParameterException("Unable to read input file!");
@@ -178,7 +179,7 @@ public class XESLogParser extends AbstractLogParser {
 		try {
 			try {
 				InputStream is = new FileInputStream(file);
-				return parse(is, onlyDistinctTraces, ParserFileFormat.getFileFormat(file));
+				return parse(is, parsingMode, ParserFileFormat.getFileFormat(file));
 			} catch (Exception e) {
 				throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
 			}
@@ -395,6 +396,6 @@ public class XESLogParser extends AbstractLogParser {
 	}
 
 	public static void main(String[] args) throws ParameterException, ParserException {
-		new XESLogParser().parse("/Users/stocker/Desktop/XESTest2.xes", false);
+		new XESLogParser().parse("/Users/stocker/Desktop/XESTest2.xes", ParsingMode.COMPLETE);
 	}
 }

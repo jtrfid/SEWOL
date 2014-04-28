@@ -17,36 +17,36 @@ import de.uni.freiburg.iig.telematik.jawl.parser.xes.XESLogParser;
 public class temp {
 	
 	public static List<List<LogTrace<LogEntry>>> parse(File file) throws IOException, ParserException, ParameterException {
-		return parse(file, false);
+		return parse(file, ParsingMode.COMPLETE);
 	}
 
-	public static List<List<LogTrace<LogEntry>>> parse(File file, boolean onlyDistinctTraces) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
 		validateFile(file);
 		LogParsingFormat format = guessFormat(file);
 		if(format == null)
 			throw new ParserException(ErrorCode.UNKNOWN_FILE_EXTENSION);
 		LogParserInterface parser = getParser(file, format);
-		return parser.parse(file, onlyDistinctTraces);
+		return parser.parse(file, parsingMode);
 	}
 	
 	public static List<List<LogTrace<LogEntry>>> parse(String fileName) throws IOException, ParserException, ParameterException {
-		return parse(fileName, false);
+		return parse(fileName, ParsingMode.COMPLETE);
 	}
 	
-	public static List<List<LogTrace<LogEntry>>> parse(String fileName, boolean onlyDistinctTraces) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(String fileName, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
 		Validate.notNull(fileName);
-		return parse(prepareFile(fileName), onlyDistinctTraces);
+		return parse(prepareFile(fileName), parsingMode);
 	}
 	
 	public static List<List<LogTrace<LogEntry>>> parse(File file, LogParsingFormat format) throws IOException, ParserException, ParameterException {
-		return parse(file, format, false);
+		return parse(file, format, ParsingMode.COMPLETE);
 	}
 	
-	public static List<List<LogTrace<LogEntry>>> parse(File file, LogParsingFormat format, boolean onlyDistinctTraces) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(File file, LogParsingFormat format, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
 		validateFile(file);
 		Validate.notNull(format);
 		LogParserInterface parser = getParser(file, format);
-		return parser.parse(file, onlyDistinctTraces);
+		return parser.parse(file, parsingMode);
 	}
 	
 	public static List<List<LogTrace<LogEntry>>> parse(String fileName, LogParsingFormat format) throws IOException, ParserException, ParameterException {

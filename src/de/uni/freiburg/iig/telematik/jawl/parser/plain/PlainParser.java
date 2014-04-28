@@ -17,6 +17,7 @@ import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogSummary;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 import de.uni.freiburg.iig.telematik.jawl.parser.AbstractLogParser;
+import de.uni.freiburg.iig.telematik.jawl.parser.ParsingMode;
 
 public class PlainParser extends AbstractLogParser {
 
@@ -26,7 +27,7 @@ public class PlainParser extends AbstractLogParser {
 		this.delimiter = delimiter;
 	}
 
-	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, boolean onlyDistinctTraces) throws IOException, ParameterException, ParserException {
+	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode) throws IOException, ParameterException, ParserException {
 		try {
 			inputStream.available();
 		} catch (IOException e) {
@@ -43,19 +44,27 @@ public class PlainParser extends AbstractLogParser {
 		String nextLine = null;
 		int traceCount = 0;
 
+		int distinctActivitySequences = 0;
+		Set<List<String>> activitySequences = new HashSet<List<String>>();
 		while ((nextLine = bufferedReader.readLine()) != null) {
+			List<String> newActivitySequence = new ArrayList<String>();
 			LogTrace<LogEntry> newTrace = new LogTrace<LogEntry>(++traceCount);
 			for (String nextToken : nextLine.split(delimiter)) {
 				if (nextToken != null && !nextToken.isEmpty()) {
 					newTrace.addEntry(new LogEntry(nextToken));
+					newActivitySequence.add(nextToken);
 				}
 			}
-			if (!onlyDistinctTraces) {
+			switch(parsingMode){
+			case COMPLETE:
 				traceList.add(newTrace);
-			} else {
-				if (traceSet.add(newTrace)) {
+				break;
+			case DISTINCT_TRACES:
+			case DISTINCT_ACTIVITY_SEQUENCES:
+				if(activitySequences.add(newActivitySequence)){
 					traceList.add(newTrace);
 				}
+				break;
 			}
 		}
 		
@@ -64,8 +73,8 @@ public class PlainParser extends AbstractLogParser {
 	}
 
 	@Override
-	public List<List<LogTrace<LogEntry>>> parse(File file, boolean onlyDistinctTraces) throws IOException, ParserException, ParameterException {
+	public List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
 		InputStream inputStream = new FileInputStream(file);
-		return parse(inputStream, onlyDistinctTraces);
+		return parse(inputStream, parsingMode);
 	}
 }

@@ -2,7 +2,10 @@ package de.uni.freiburg.iig.telematik.jawl.log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
@@ -56,10 +59,18 @@ public class LogTraceUtils {
 		return Arrays.asList(traces);
 	}
 	
-	public static <E extends LogEntry> List<List<String>> createStringRepresentation(List<LogTrace<E>> traceList){
+	public static <E extends LogEntry> List<List<String>> createStringRepresentation(Collection<LogTrace<E>> traceList, boolean onlyDistinctSequences){
+		Set<List<String>> distinctSequences = new HashSet<List<String>>();
 		List<List<String>> result = new ArrayList<List<String>>();
 		for(LogTrace<E> trace: traceList){
-			result.add(trace.getActivities());
+			List<String> activityList = trace.getActivities();
+			if(!onlyDistinctSequences){
+				result.add(activityList);
+			} else {
+				if(distinctSequences.add(activityList)){
+					result.add(activityList);
+				}
+			}
 		}
 		return result;
 	}

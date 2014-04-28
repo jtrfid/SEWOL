@@ -18,10 +18,11 @@ import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogSummary;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 import de.uni.freiburg.iig.telematik.jawl.parser.AbstractLogParser;
+import de.uni.freiburg.iig.telematik.jawl.parser.ParsingMode;
 
 public class PetrifyParser extends AbstractLogParser {
 
-	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, boolean onlyDistinctTraces) throws IOException, ParameterException, ParserException {
+	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode) throws IOException, ParameterException, ParserException {
 		try {
 			inputStream.available();
 		} catch (IOException e) {
@@ -48,12 +49,16 @@ public class PetrifyParser extends AbstractLogParser {
 					newTrace.addEntry(new LogEntry(nextToken));
 				}
 			}
-			if (!onlyDistinctTraces) {
+			switch(parsingMode){
+			case COMPLETE:
 				traceList.add(newTrace);
-			} else {
+				break;
+			case DISTINCT_ACTIVITY_SEQUENCES:
+			case DISTINCT_TRACES:
 				if (traceSet.add(newTrace)) {
 					traceList.add(newTrace);
 				}
+				break;
 			}
 		}
 		summaries.put(0, new LogSummary<LogEntry>(traceList));
@@ -61,8 +66,8 @@ public class PetrifyParser extends AbstractLogParser {
 	}
 
 	@Override
-	public List<List<LogTrace<LogEntry>>> parse(File file, boolean onlyDistinctTraces) throws IOException, ParserException, ParameterException {
+	public List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
 		InputStream inputStream = new FileInputStream(file);
-		return parse(inputStream, onlyDistinctTraces);
+		return parse(inputStream, parsingMode);
 	}
 }
