@@ -3,13 +3,14 @@ package de.uni.freiburg.iig.telematik.jawl.writer;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import javax.naming.ConfigurationException;
+
 import de.invation.code.toval.file.EOLType;
 import de.invation.code.toval.file.FileWriter;
 import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.jawl.format.AbstractLogFormat;
 import de.uni.freiburg.iig.telematik.jawl.format.LogPerspective;
-import de.uni.freiburg.iig.telematik.jawl.format.MXMLLogFormat;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
 import de.uni.freiburg.iig.telematik.jawl.writer.PerspectiveException.PerspectiveError;
@@ -227,7 +228,7 @@ public class LogWriter extends FileWriter{
 	 * @param logTrace The log trace to write.
 	 * @throws IOException 
 	 */
-	public void writeTrace(LogTrace logTrace) throws PerspectiveException, IOException{
+	public void writeTrace(LogTrace<LogEntry> logTrace) throws PerspectiveException, IOException{
 		if(logPerspective == LogPerspective.ACTIVITY_PERSPECTIVE)
 			throw new PerspectiveException(PerspectiveError.WRITE_TRACE_IN_ACTIVITY_PERSPECTIVE);
 		
@@ -265,19 +266,19 @@ public class LogWriter extends FileWriter{
 	}
 	
 	
-	//------- Test
-	
-	public static void main(String[] args) throws Exception{
-		LogEntry en1 = new LogEntry("A");
-		LogEntry en2 = new LogEntry("B");
-		LogEntry en3 = new LogEntry("C");
-		LogTrace tr1 = new LogTrace(1);
-		tr1.addEntry(en1);
-		tr1.addEntry(en2);
-		tr1.addEntry(en3);
-		LogWriter writer = new LogWriter(new MXMLLogFormat(), "WriterTest");
-		writer.writeTrace(tr1);
-		writer.closeFile();
-	}
+//	//------- Test
+//	
+//	public static void main(String[] args) throws Exception{
+//		LogEntry en1 = new LogEntry("A");
+//		LogEntry en2 = new LogEntry("B");
+//		LogEntry en3 = new LogEntry("C");
+//		LogTrace tr1 = new LogTrace(1);
+//		tr1.addEntry(en1);
+//		tr1.addEntry(en2);
+//		tr1.addEntry(en3);
+//		LogWriter writer = new LogWriter(new MXMLLogFormat(), "WriterTest");
+//		writer.writeTrace(tr1);
+//		writer.closeFile();
+//	}
 
 }

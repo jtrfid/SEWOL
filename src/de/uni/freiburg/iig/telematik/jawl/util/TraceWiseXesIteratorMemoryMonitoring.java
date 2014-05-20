@@ -89,6 +89,7 @@ public class TraceWiseXesIteratorMemoryMonitoring {
 		System.out.println(memoryUsages);
 	}
 
+	@SuppressWarnings("unused")
 	private static void printLogStatistics(List<List<XLog>> logs) {
 		System.out.println("memory usage read in an interval of " + TIMER_INTERVAL + " miliseconds");
 		System.out.println("splitted in " + logs.size() + " log parts");

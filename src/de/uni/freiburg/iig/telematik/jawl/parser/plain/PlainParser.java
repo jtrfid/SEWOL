@@ -36,7 +36,6 @@ public class PlainParser extends AbstractLogParser {
 		
 		parsedLogFiles = new ArrayList<List<LogTrace<LogEntry>>>();
 		List<LogTrace<LogEntry>> traceList = new ArrayList<LogTrace<LogEntry>>();
-		Set<LogTrace<LogEntry>> traceSet = new HashSet<LogTrace<LogEntry>>();
 		parsedLogFiles.add(traceList);
 
 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -44,7 +43,6 @@ public class PlainParser extends AbstractLogParser {
 		String nextLine = null;
 		int traceCount = 0;
 
-		int distinctActivitySequences = 0;
 		Set<List<String>> activitySequences = new HashSet<List<String>>();
 		while ((nextLine = bufferedReader.readLine()) != null) {
 			List<String> newActivitySequence = new ArrayList<String>();
