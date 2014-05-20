@@ -228,7 +228,7 @@ public class LogWriter extends FileWriter{
 	 * @param logTrace The log trace to write.
 	 * @throws IOException 
 	 */
-	public void writeTrace(LogTrace<LogEntry> logTrace) throws PerspectiveException, IOException{
+	public <E extends LogEntry> void writeTrace(LogTrace<E> logTrace) throws PerspectiveException, IOException{
 		if(logPerspective == LogPerspective.ACTIVITY_PERSPECTIVE)
 			throw new PerspectiveException(PerspectiveError.WRITE_TRACE_IN_ACTIVITY_PERSPECTIVE);
 		
