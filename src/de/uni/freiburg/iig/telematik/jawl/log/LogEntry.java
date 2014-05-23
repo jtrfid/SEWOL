@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.Set;
 
 import de.invation.code.toval.time.TimeValue;
-import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 
 
@@ -68,9 +67,8 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	/**
 	 * Generates a new log entry using the given activity.
 	 * @param activity Activity of the log entry.
-	 * @throws ParameterException if the given activity is <code>null</code>.
 	 */
-	public LogEntry(String activity) throws ParameterException {
+	public LogEntry(String activity) {
 		this();
 		try {
 			setActivity(activity);
@@ -97,10 +95,9 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	 * @param date the time to set.
 	 * @return <code>true</code> if {@link #timestamp} was modified;<br>
 	 * <code>false</code> otherwise.
-	 * @throws ParameterException if the given timestamp is <code>null</code>
 	 * @throws LockingException if the field TIME is locked and the given timestamp differs from the current value of {@link #timestamp}.
 	 */
-	public boolean setTimestamp(Date date) throws ParameterException, LockingException {
+	public boolean setTimestamp(Date date) throws LockingException {
 		Validate.notNull(date);
 		
 		if(isFieldLocked(EntryField.TIME)){
@@ -113,17 +110,17 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 		}
 	}
 	
-	public boolean addTime(Long milliseconds) throws ParameterException, LockingException {
+	public boolean addTime(Long milliseconds) throws LockingException {
 		Validate.notNegative(milliseconds);
 		return modifyTime(milliseconds, TimeModification.ADD);
 	}
 	
-	public boolean subTime(Long milliseconds) throws ParameterException, LockingException {
+	public boolean subTime(Long milliseconds) throws LockingException {
 		Validate.notNegative(milliseconds);
 		return modifyTime(milliseconds, TimeModification.SUB);
 	}
 	
-	private boolean modifyTime(Long milliseconds, TimeModification mod) throws ParameterException, LockingException {
+	private boolean modifyTime(Long milliseconds, TimeModification mod) throws LockingException {
 		Validate.notNegative(milliseconds);
 		Validate.notNull(mod);
 		if(milliseconds == 0)
@@ -143,12 +140,12 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 		ADD, SUB;
 	}
 	
-	public boolean addTimeValue(TimeValue timeValue) throws ParameterException, LockingException {
+	public boolean addTimeValue(TimeValue timeValue) throws LockingException {
 		Validate.notNull(timeValue);
 		return addTime(timeValue.getValueInMilliseconds());
 	}
 	
-	public boolean subTimeValue(TimeValue timeValue) throws ParameterException, LockingException {
+	public boolean subTimeValue(TimeValue timeValue) throws LockingException {
 		Validate.notNull(timeValue);
 		return subTime(timeValue.getValueInMilliseconds());
 	}
@@ -171,12 +168,11 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	/**
 	 * Sets the activity of the log entry ({@link #activity}).
 	 * @param activity Activity to set.
-	 * @throws ParameterException  if the given activity is <code>null</code>.
 	 * @throws LockingException if the field ACTIVITY is locked and the given activity differs from the current value of {@link #activity}.
 	 * @return <code>true</code> if {@link #activity} was modified;<br>
 	 * <code>false</code> otherwise.
 	 */
-	public boolean setActivity(String activity) throws ParameterException, LockingException {
+	public boolean setActivity(String activity) throws LockingException {
 		Validate.notNull(activity);
 		Validate.notEmpty(activity);
 		if(isFieldLocked(EntryField.ACTIVITY)){
@@ -212,7 +208,7 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	 * @return <code>true</code> if {@link #originator} was modified;<br>
 	 * <code>false</code> otherwise.
 	 */
-	public boolean setOriginator(String originator) throws ParameterException, LockingException{
+	public boolean setOriginator(String originator) throws LockingException{
 		Validate.notNull(originator);
 		Validate.notEmpty(originator);
 		
@@ -244,12 +240,11 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	/**
 	 * Sets the event type of the log entry ({@link #eventType}).
 	 * @param eventType Event type to set.
-	 * @throws ParameterException if the given event type is <code>null</code>.
 	 * @throws LockingException if the field EVENTTYPE is locked and the given event type differs from {@link #eventType}.
 	 * @return <code>true</code> if {@link #eventType} was modified;<br>
 	 * <code>false</code> otherwise.
 	 */
-	public boolean setEventType(EventType eventType) throws ParameterException, LockingException{
+	public boolean setEventType(EventType eventType) throws LockingException{
 		Validate.notNull(eventType);
 		
 		if(isFieldLocked(EntryField.EVENTTYPE)){
@@ -369,7 +364,7 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 		return new LogEntry();
 	}
 	
-	protected void copyFieldValues(LogEntry clone) throws LockingException, ParameterException{
+	protected void copyFieldValues(LogEntry clone) throws LockingException{
 		clone.setActivity(activity);
 		clone.setTimestamp((Date) this.timestamp.clone());
 		clone.setEventType(eventType);
@@ -433,12 +428,6 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	public String toString(){
 		String timestamp = (this.timestamp == null) ? "-" : sdf.format(this.timestamp);
 		return String.format(toStringFormat, timestamp , getActivity(), getOriginator());
-	}
-	
-	public static void main(String[] args) throws ParameterException {
-		LogEntry e1 = new LogEntry("A");
-		LogEntry e2 = new LogEntry("A");
-		System.out.println(e1.equals(e2));
 	}
 	
 }

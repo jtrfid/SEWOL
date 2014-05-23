@@ -18,7 +18,7 @@ public class LogTrace<E extends LogEntry> {
 	
 	public LogTrace(){}
 	
-	public LogTrace(Integer caseNumber) throws ParameterException{
+	public LogTrace(Integer caseNumber) {
 		Validate.notNegative(caseNumber);
 		this.caseNumber = caseNumber;
 	}
@@ -34,7 +34,7 @@ public class LogTrace<E extends LogEntry> {
 		return Collections.unmodifiableList(logEntries);
 	}
 	
-	public List<E> getEntriesForActivity(String activity) throws ParameterException{
+	public List<E> getEntriesForActivity(String activity) {
 		Validate.notNull(activity);
 		List<E> result = new ArrayList<E>();
 		for(E entry: logEntries){
@@ -49,9 +49,8 @@ public class LogTrace<E extends LogEntry> {
 	 * Returns all log entries of this trace whose activities are in the given activity set.
 	 * @param activities
 	 * @return
-	 * @throws ParameterException 
 	 */
-	public List<E> getEntriesForActivities(Set<String> activities) throws ParameterException{
+	public List<E> getEntriesForActivities(Set<String> activities){
 		Validate.noNullElements(activities);
 		List<E> result = new ArrayList<E>();
 		for(E entry: logEntries)
@@ -60,7 +59,7 @@ public class LogTrace<E extends LogEntry> {
 		return result;
 	}
 	
-	public List<E> getEntriesForGroup(String groupID) throws ParameterException{
+	public List<E> getEntriesForGroup(String groupID){
 		Validate.notNull(groupID);
 		List<E> result = new ArrayList<E>();
 		for(E entry: logEntries)
@@ -69,7 +68,7 @@ public class LogTrace<E extends LogEntry> {
 		return result;
 	}
 	
-	public List<E> getFirstKEntries(Integer k) throws ParameterException{
+	public List<E> getFirstKEntries(Integer k){
 		Validate.notNegative(k);
 		if(k>size())
 			throw new ParameterException("Trace does only contain "+size()+" entries!");
@@ -81,7 +80,7 @@ public class LogTrace<E extends LogEntry> {
 		return result;
 	}
 	
-	public List<E> getSucceedingEntries(E entry) throws ParameterException{
+	public List<E> getSucceedingEntries(E entry){
 		Validate.notNull(entry);
 		List<E> result = new ArrayList<E>();
 		Integer index = null;
@@ -99,7 +98,7 @@ public class LogTrace<E extends LogEntry> {
 		return result;
 	}
 	
-	public E getDirectSuccessor(E entry) throws ParameterException{
+	public E getDirectSuccessor(E entry){
 		Validate.notNull(entry);
 		Integer index = null;
 		for(E traceEntry: logEntries){
@@ -114,7 +113,7 @@ public class LogTrace<E extends LogEntry> {
 		return null;
 	}
 	
-	public List<E> getPreceedingEntries(E entry) throws ParameterException{
+	public List<E> getPreceedingEntries(E entry){
 		Validate.notNull(entry);
 		List<E> result = new ArrayList<E>();
 		Integer index = null;
@@ -132,7 +131,7 @@ public class LogTrace<E extends LogEntry> {
 		return result;
 	}
 	
-	public E getDirectPredecessor(E entry) throws ParameterException{
+	public E getDirectPredecessor(E entry) {
 		Validate.notNull(entry);
 		Integer index = null;
 		for(E traceEntry: logEntries){
@@ -151,7 +150,7 @@ public class LogTrace<E extends LogEntry> {
 		return logEntries.remove(entry);
 	}
 	
-	public boolean removeAllEntries(Collection<E> entries) throws ParameterException{
+	public boolean removeAllEntries(Collection<E> entries){
 		Validate.noNullElements(entries);
 		boolean entriesChanged = false;
 		for(E entry: entries){
@@ -161,7 +160,7 @@ public class LogTrace<E extends LogEntry> {
 		return entriesChanged;
 	}
 	
-	public void setCaseNumber(int caseNumber) throws ParameterException{
+	public void setCaseNumber(int caseNumber){
 		Validate.notNull(caseNumber);
 		this.caseNumber = caseNumber;
 	}
@@ -182,12 +181,12 @@ public class LogTrace<E extends LogEntry> {
 		return similarInstances.size();
 	}
 	
-	public void addSimilarInstance(Integer similarInstance) throws ParameterException {
+	public void addSimilarInstance(Integer similarInstance) {
 		Validate.notNull(similarInstance);
 		this.similarInstances.add(similarInstance);
 	}
 
-	public void setSimilarInstances(Collection<Integer> similarInstances) throws ParameterException {
+	public void setSimilarInstances(Collection<Integer> similarInstances) {
 		Validate.notNull(similarInstances);
 		this.similarInstances.clear();
 		this.similarInstances.addAll(similarInstances);
@@ -225,7 +224,6 @@ public class LogTrace<E extends LogEntry> {
 	
 	@Override
 	public String toString(){
-		//TODO: Format
 		return logEntries.toString();
 	}
 }

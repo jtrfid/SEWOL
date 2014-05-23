@@ -22,7 +22,7 @@ public enum ParserDateFormat {
 	 * 
 	 * @see SimpleDateFormat
 	 */
-	public static String getFormatString(ParserDateFormat pdf) throws ParameterException {
+	public static String getFormatString(ParserDateFormat pdf) {
 		Validate.notNull(pdf);
 		switch (pdf) {
 		case DEFAULT_MXML:
@@ -37,7 +37,7 @@ public enum ParserDateFormat {
 	/**
 	 * Returns the {@link DateFormat} that belongs to the ParserDateFormat.
 	 */
-	public static DateFormat getDateFormat(ParserDateFormat pdf) throws ParameterException {
+	public static DateFormat getDateFormat(ParserDateFormat pdf) {
 		return new SimpleDateFormat(getFormatString(pdf));
 	}
 }

@@ -12,19 +12,19 @@ import de.invation.code.toval.validate.Validate;
 
 public class LogTraceUtils {
 
-	public static LogTrace<LogEntry> createTraceFromActivities(int caseNumber, String... activities) throws ParameterException{
+	public static LogTrace<LogEntry> createTraceFromActivities(int caseNumber, String... activities) {
 		return createTraceFromActivities(caseNumber, LogEntry.class, activities);
 	}
 	
-	public static <E extends LogEntry> LogTrace<E> createTraceFromActivities(int caseNumber, Class<E> entryClass, String... activities) throws ParameterException{
+	public static <E extends LogEntry> LogTrace<E> createTraceFromActivities(int caseNumber, Class<E> entryClass, String... activities){
 		return createTraceFromActivities(caseNumber, entryClass, Arrays.asList(activities));
 	}
 	
-	public static LogTrace<LogEntry> createTraceFromActivities(int caseNumber, List<String> activities) throws ParameterException{
+	public static LogTrace<LogEntry> createTraceFromActivities(int caseNumber, List<String> activities) {
 		return createTraceFromActivities(caseNumber, LogEntry.class, activities);
 	}
 		
-	public static <E extends LogEntry> LogTrace<E> createTraceFromActivities(int caseNumber, Class<E> entryClass, List<String> activities) throws ParameterException{
+	public static <E extends LogEntry> LogTrace<E> createTraceFromActivities(int caseNumber, Class<E> entryClass, List<String> activities){
 		Validate.notNegative(caseNumber);
 		Validate.notNull(entryClass);
 		try {

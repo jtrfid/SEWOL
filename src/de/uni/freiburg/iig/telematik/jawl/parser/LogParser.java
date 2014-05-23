@@ -6,7 +6,6 @@ import java.util.List;
 
 import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.parser.ParserException.ErrorCode;
-import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.jawl.log.LogEntry;
 import de.uni.freiburg.iig.telematik.jawl.log.LogTrace;
@@ -16,11 +15,11 @@ import de.uni.freiburg.iig.telematik.jawl.parser.xes.XESLogParser;
 
 public class LogParser {
 
-	public static List<List<LogTrace<LogEntry>>> parse(File file) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(File file) throws IOException, ParserException {
 		return parse(file, ParsingMode.COMPLETE);
 	}
 
-	public static List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws IOException, ParserException{
 		validateFile(file);
 		LogParsingFormat format = guessFormat(file);
 		if(format == null)
@@ -29,32 +28,32 @@ public class LogParser {
 		return parser.parse(file, parsingMode);
 	}
 	
-	public static List<List<LogTrace<LogEntry>>> parse(String fileName) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(String fileName) throws IOException, ParserException {
 		return parse(fileName, ParsingMode.COMPLETE);
 	}
 	
-	public static List<List<LogTrace<LogEntry>>> parse(String fileName, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(String fileName, ParsingMode parsingMode) throws IOException, ParserException{
 		Validate.notNull(fileName);
 		return parse(prepareFile(fileName), parsingMode);
 	}
 	
-	public static List<List<LogTrace<LogEntry>>> parse(File file, LogParsingFormat format) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(File file, LogParsingFormat format) throws IOException, ParserException {
 		return parse(file, format, ParsingMode.COMPLETE);
 	}
 	
-	public static List<List<LogTrace<LogEntry>>> parse(String fileName, LogParsingFormat format, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(String fileName, LogParsingFormat format, ParsingMode parsingMode) throws IOException, ParserException {
 		Validate.notNull(fileName);
 		return parse(prepareFile(fileName), format, parsingMode);
 	}
 	
-	public static List<List<LogTrace<LogEntry>>> parse(File file, LogParsingFormat format, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(File file, LogParsingFormat format, ParsingMode parsingMode) throws IOException, ParserException {
 		validateFile(file);
 		Validate.notNull(format);
 		LogParserInterface parser = getParser(file, format);
 		return parser.parse(file, parsingMode);
 	}
 	
-	public static List<List<LogTrace<LogEntry>>> parse(String fileName, LogParsingFormat format) throws IOException, ParserException, ParameterException {
+	public static List<List<LogTrace<LogEntry>>> parse(String fileName, LogParsingFormat format) throws IOException, ParserException {
 		Validate.notNull(fileName);
 		return parse(prepareFile(fileName), format);
 	}
