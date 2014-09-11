@@ -50,5 +50,9 @@ public class MXMLSequentializer {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void main(String[] args) throws Exception {
+		MXMLSequentializer.convertMXML("/Users/stocker/Documents/Kooperationen/Micronas/Prozessdaten/Testdaten 2/2013/Logistisch/Logistisch - keine AdHoc - ohne offene Rechnungen in Zahlungsfrist.mxml");
+	}
 
 }

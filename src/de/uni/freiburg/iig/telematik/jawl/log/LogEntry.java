@@ -78,6 +78,16 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	}
 	
 	
+	public void clearFields(){
+		this.activity = null;
+		this.eventType = null;
+		this.group = null;
+		this.metaData.clear();
+		this.originator = null;
+		this.timestamp = null;
+	}
+	
+	
 	//------- Timestamp -------------------------------------------------------------------------
 	
 	/**
@@ -163,6 +173,12 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	 */
 	public String getActivity(){
 		return activity;
+	}
+	
+	public void reduceToActivity(){
+		String activity = getActivity();
+		clearFields();
+		this.activity = activity;
 	}
 	
 	/**

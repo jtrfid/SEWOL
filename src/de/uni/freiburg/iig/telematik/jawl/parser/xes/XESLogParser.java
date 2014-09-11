@@ -9,8 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Vector;
 
@@ -109,7 +111,11 @@ public class XESLogParser extends AbstractLogParser {
 
 		parsedLogFiles = new ArrayList<List<LogTrace<LogEntry>>>(logs.size());
 		int logNumber = 0;
+		Set<List<String>> activitySequencesSet = new HashSet<List<String>>();
+		Set<LogTrace<LogEntry>> traceSet = new HashSet<LogTrace<LogEntry>>();
 		for (XLog log : logs) {
+			activitySequencesSet.clear();
+			traceSet.clear();
 			Class<?> logEntryClass = null;
 			List<LogTrace<LogEntry>> logTraces = new ArrayList<LogTrace<LogEntry>>();
 			if (containsDataUsageExtension(log)) {
@@ -149,7 +155,19 @@ public class XESLogParser extends AbstractLogParser {
 					// Add events to log trace
 					logTrace.addEntry(buildLogEntry(event, logEntryClass));
 				}
-				logTraces.add(logTrace);
+				
+				switch(parsingMode){
+				case DISTINCT_ACTIVITY_SEQUENCES:
+					if(!activitySequencesSet.add(logTrace.getActivities()))
+						break;
+					logTrace.reduceToActivities();
+//				case DISTINCT_TRACES:
+//					if(!traceSet.add(logTrace))
+//						break;
+				case COMPLETE:
+					logTraces.add(logTrace);
+				}
+				
 			}
 			parsedLogFiles.add(logTraces);
 			summaries.put(logNumber, new LogSummary<LogEntry>(logTraces));

@@ -11,6 +11,8 @@ import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 
 public class LogTraceUtils {
+	
+	private static final String traceFormat = "trace%s: %s";
 
 	public static LogTrace<LogEntry> createTraceFromActivities(int caseNumber, String... activities) {
 		return createTraceFromActivities(caseNumber, LogEntry.class, activities);
@@ -73,6 +75,25 @@ public class LogTraceUtils {
 			}
 		}
 		return result;
+	}
+	
+	public static <E extends LogEntry> boolean containsTracesWithDuplicates(Collection<LogTrace<E>> traceList){
+		for(LogTrace<E> trace: traceList){
+			if(trace.containsDuplicateActivities()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static <E extends LogEntry> void print(Collection<LogTrace<E>> coll){
+		if(coll == null)
+			throw new NullPointerException();
+		if(coll.isEmpty())
+			return;
+		for(LogTrace<E> t: coll){
+			System.out.println(String.format(traceFormat, t.getCaseNumber(), t.getActivities()));
+		}
 	}
 
 }

@@ -472,7 +472,7 @@ public class CSV2MXMLTool extends JFrame {
 				List<Integer> numTraces = new ArrayList<Integer>();
 				numTraces.addAll(numberOfActivities.values());
 				DotChartModel<Integer> chartModel = new DotChartModel<Integer>(activityNumbers, numTraces);
-				DotChartPanel panel = new DotChartPanel(chartModel, true, true);
+				DotChartPanel panel = new DotChartPanel(chartModel, true, true, true);
 				AdjustableDiagramPanel adjustablePanel = new AdjustableDiagramPanel(panel);
 				adjustablePanel.asFrame();
 				

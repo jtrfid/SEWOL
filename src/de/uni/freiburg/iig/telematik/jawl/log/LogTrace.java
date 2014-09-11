@@ -3,8 +3,10 @@ package de.uni.freiburg.iig.telematik.jawl.log;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.invation.code.toval.validate.ParameterException;
@@ -196,12 +198,49 @@ public class LogTrace<E extends LogEntry> {
 		return getDistinctActivities().contains(activity);
 	}
 	
+	public int activitySupport(String activity){
+		int result = 0;
+		for(E entry: logEntries){
+			if(entry.getActivity().equals(activity)){
+				result++;
+			}
+		}
+		return result;
+	}
+	
+	public Map<String,Integer> getActivitySupports(){
+		Map<String,Integer> result = new HashMap<String,Integer>();
+		for(E entry: logEntries){
+			if(!result.containsKey(entry.getActivity())){
+				result.put(entry.getActivity(), 1);
+			} else {
+				result.put(entry.getActivity(), result.get(entry.getActivity()) + 1);
+			}
+		}
+		return result;
+	}
+	
+	public boolean containsDuplicateActivities(){
+		Map<String,Integer> activitySupports = getActivitySupports();
+		for(String activity: activitySupports.keySet()){
+			if(activitySupports.get(activity) > 1){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public List<String> getActivities(){
 		List<String> result = new ArrayList<String>();
 		for(E entry: logEntries){
 			result.add(entry.getActivity());
 		}
 		return result;
+	}
+	
+	public void reduceToActivities(){
+		for(E entry: logEntries)
+			entry.reduceToActivity();
 	}
 	
 	public Set<String> getDistinctActivities(){

@@ -45,21 +45,20 @@ public class PlainParser extends AbstractLogParser {
 
 		Set<List<String>> activitySequences = new HashSet<List<String>>();
 		while ((nextLine = bufferedReader.readLine()) != null) {
-			List<String> newActivitySequence = new ArrayList<String>();
 			LogTrace<LogEntry> newTrace = new LogTrace<LogEntry>(++traceCount);
 			for (String nextToken : nextLine.split(delimiter)) {
 				if (nextToken != null && !nextToken.isEmpty()) {
 					newTrace.addEntry(new LogEntry(nextToken));
-					newActivitySequence.add(nextToken);
 				}
 			}
 			switch(parsingMode){
 			case COMPLETE:
 				traceList.add(newTrace);
 				break;
-			case DISTINCT_TRACES:
+//			case DISTINCT_TRACES:
 			case DISTINCT_ACTIVITY_SEQUENCES:
-				if(activitySequences.add(newActivitySequence)){
+				if(activitySequences.add(newTrace.getActivities())){
+					newTrace.reduceToActivities();
 					traceList.add(newTrace);
 				}
 				break;

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.invation.code.toval.statistic.Observation;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 
@@ -12,6 +13,7 @@ public class LogSummary<E extends LogEntry> {
 	
 	private Set<String> activities = new HashSet<String>();
 	private Set<String> originators = new HashSet<String>();
+	private Observation traceLength = new Observation();
 	
 	public LogSummary() {}
 
@@ -30,6 +32,7 @@ public class LogSummary<E extends LogEntry> {
 		Validate.notNull(trace);
 		activities.addAll(trace.getDistinctActivities());
 		originators.addAll(trace.getDistinctOriginators());
+		traceLength.addValue(trace.size());
 	}
 
 	public Set<String> getActivities() {
@@ -38,6 +41,10 @@ public class LogSummary<E extends LogEntry> {
 
 	public Set<String> getOriginators() {
 		return Collections.unmodifiableSet(originators);
+	}
+	
+	public double getAverageTraceLength(){
+		return traceLength.getAverage();
 	}
 	
 }

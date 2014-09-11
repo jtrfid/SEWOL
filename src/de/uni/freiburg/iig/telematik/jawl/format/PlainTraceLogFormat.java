@@ -15,6 +15,11 @@ public class PlainTraceLogFormat extends AbstractLogFormat {
 	public PlainTraceLogFormat(LogPerspective logPerspective) throws PerspectiveException {
 		super(logPerspective);
 	}
+	
+	public PlainTraceLogFormat(LogPerspective logPerspective, char delimiter) throws PerspectiveException {
+		super(logPerspective);
+		this.activityDelimiter = delimiter;
+	}
 
 	@Override
 	public String getFileExtension() {

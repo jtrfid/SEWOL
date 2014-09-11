@@ -40,6 +40,7 @@ public class PetrifyParser extends AbstractLogParser {
 		String nextLine = null;
 		int traceCount = 0;
 
+		Set<List<String>> activitySequences = new HashSet<List<String>>();
 		while ((nextLine = bufferedReader.readLine()) != null) {
 			LogTrace<LogEntry> newTrace = new LogTrace<LogEntry>(++traceCount);
 			StringTokenizer tokenizer = new StringTokenizer(nextLine);
@@ -54,8 +55,9 @@ public class PetrifyParser extends AbstractLogParser {
 				traceList.add(newTrace);
 				break;
 			case DISTINCT_ACTIVITY_SEQUENCES:
-			case DISTINCT_TRACES:
-				if (traceSet.add(newTrace)) {
+//			case DISTINCT_TRACES:
+				if(activitySequences.add(newTrace.getActivities())){
+					newTrace.reduceToActivities();
 					traceList.add(newTrace);
 				}
 				break;
