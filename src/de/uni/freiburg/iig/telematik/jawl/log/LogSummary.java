@@ -13,15 +13,16 @@ public class LogSummary<E extends LogEntry> {
 	
 	private Set<String> activities = new HashSet<String>();
 	private Set<String> originators = new HashSet<String>();
+	private Set<String> roles = new HashSet<String>();
 	private Observation traceLength = new Observation();
 	
 	public LogSummary() {}
 
-	public LogSummary(List<LogTrace<E>> traces) throws ParameterException{
+	public LogSummary(List<LogTrace<E>> traces) throws ParameterException {
 		addTraces(traces);
 	}
 	
-	public void addTraces(List<LogTrace<E>> traces) throws ParameterException{
+	public void addTraces(List<LogTrace<E>> traces) throws ParameterException {
 		Validate.notNull(traces);
 		for(LogTrace<E> trace: traces){
 			addTrace(trace);
@@ -32,6 +33,7 @@ public class LogSummary<E extends LogEntry> {
 		Validate.notNull(trace);
 		activities.addAll(trace.getDistinctActivities());
 		originators.addAll(trace.getDistinctOriginators());
+		roles.addAll(trace.getDistinctRoles());
 		traceLength.addValue(trace.size());
 	}
 
@@ -41,6 +43,10 @@ public class LogSummary<E extends LogEntry> {
 
 	public Set<String> getOriginators() {
 		return Collections.unmodifiableSet(originators);
+	}
+
+	public Set<String> getRoles() {
+		return Collections.unmodifiableSet(roles);
 	}
 	
 	public double getAverageTraceLength(){

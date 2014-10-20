@@ -4,7 +4,8 @@ public enum EntryField {
 	
 	TIME, 
 	ACTIVITY, 
-	ORIGINATOR, 
+	ORIGINATOR,
+	ROLE,
 	ORIGINATOR_CANDIDATES, 
 	EVENTTYPE, 
 	DATA, 

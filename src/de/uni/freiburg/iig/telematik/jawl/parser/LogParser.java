@@ -3,7 +3,6 @@ package de.uni.freiburg.iig.telematik.jawl.parser;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.parser.ParserException.ErrorCode;
 import de.invation.code.toval.validate.Validate;

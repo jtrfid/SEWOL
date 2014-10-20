@@ -230,6 +230,8 @@ public class XESLogParser extends AbstractLogParser {
 				addName(logEntry, attribute.getValue().toString());
 			} else if (key.equals("org:resource")) {
 				addOriginator(logEntry, attribute.getValue().toString());
+			} else if (key.equals("Role")) {
+				addRole(logEntry, attribute.getValue().toString());
 			} else if (key.equals("lifecycle:transition")) {
 				addEventType(logEntry, attribute.getValue().toString());
 			} else if (key.equals("time:timestamp")) {
@@ -266,6 +268,19 @@ public class XESLogParser extends AbstractLogParser {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ParserException("Cannot set originator of log entry: " + e.getMessage());
+		}
+	}
+	
+	private void addRole(LogEntry entry, String value) throws ParserException {
+		if (value == null || value.isEmpty())
+			throw new ParserException("No value for Role");
+		try {
+			if (entry.getRole() == null || !entry.getRole().equals(value))
+				entry.setRole(value);
+			entry.setRole(value);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new ParserException("Cannot set role of log entry: " + e.getMessage());
 		}
 	}
 

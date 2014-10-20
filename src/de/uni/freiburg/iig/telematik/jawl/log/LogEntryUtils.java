@@ -122,6 +122,19 @@ public class LogEntryUtils {
 		}
 	}
 	
+	public static <E extends LogEntry> void setRoleForEntries(String role, List<E> entries) throws ParameterException{
+		validateEntries(entries);
+		try {
+			for(E entry: entries) {
+				entry.setRole(role);
+			}
+		} catch (ParameterException e) {
+			e.printStackTrace();
+		} catch (LockingException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	protected static <T extends LogEntry> void validateEntries(Collection<T> entries) throws ParameterException{
 		Validate.notNull(entries);
 		Validate.notEmpty(entries);

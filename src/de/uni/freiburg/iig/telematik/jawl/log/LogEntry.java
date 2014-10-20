@@ -30,6 +30,10 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	 */
 	protected String originator = null;
 	/**
+	 * The role of the originator.
+	 */
+	protected String role = null;
+	/**
 	 * The event type of the log entry.<br>
 	 * Activities can be related to a set of different events such as <i>start</i>,<i>complete</i>, etc.
 	 */
@@ -129,7 +133,7 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 		Validate.notNegative(milliseconds);
 		return modifyTime(milliseconds, TimeModification.SUB);
 	}
-	
+	//MBiManrX, synology.iig.uni-freiburg.de/Name/trunk
 	private boolean modifyTime(Long milliseconds, TimeModification mod) throws LockingException {
 		Validate.notNegative(milliseconds);
 		Validate.notNull(mod);
@@ -241,6 +245,42 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	public void removeOriginator(){
 		this.originator = null;
 	}
+	
+	//------- Role -------------------------------------------------------------------------
+	
+		/**
+		 * Returns the current value of the role field.
+		 * @return The role of the log entry.
+		 */
+		public String getRole(){
+			return role;
+		}
+		
+		/**
+		 * Sets the role of the log entry ({@link #role}).
+		 * @param role Role to set.
+		 * @throws ParameterException if the given value is <code>null</code>.
+		 * @throws LockingException if the role field is locked <br>and the given value differs from the actual value of {@link #role}.
+		 * @return <code>true</code> if {@link #role} was modified;<br>
+		 * <code>false</code> otherwise.
+		 */
+		public boolean setRole(String role) throws LockingException{
+			Validate.notNull(role);
+			Validate.notEmpty(role);
+			
+			if(isFieldLocked(EntryField.ROLE)){
+				if(!this.role.equals(role))
+					throw new LockingException(EntryField.ROLE);
+				return false;
+			} else {
+				this.role = role;
+				return true;
+			}
+		}
+		
+		public void removeRole(){
+			this.role = null;
+		}
 	
 	
 	//------- Event Type ------------------------------------------------------------------------
@@ -385,6 +425,7 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 		clone.setTimestamp((Date) this.timestamp.clone());
 		clone.setEventType(eventType);
 		clone.setOriginator(originator);
+		clone.setRole(role);
 		for(EntryField lockedField: locking.keySet())
 			clone.lockField(lockedField, locking.get(lockedField));
 	}

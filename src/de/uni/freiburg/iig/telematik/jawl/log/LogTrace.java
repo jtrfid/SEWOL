@@ -257,6 +257,13 @@ public class LogTrace<E extends LogEntry> {
 		return result;
 	}
 	
+	public Collection<? extends String> getDistinctRoles() {
+		Set<String> result = new HashSet<String>();
+		for(E entry: logEntries)
+			result.add(entry.getRole());
+		return result;	
+	}
+	
 	public void sort(){
 		Collections.sort(logEntries);
 	}
@@ -265,4 +272,5 @@ public class LogTrace<E extends LogEntry> {
 	public String toString(){
 		return logEntries.toString();
 	}
+
 }
