@@ -59,11 +59,11 @@ public class Context {
 		return DEFAULT_CONTEXT_NAME;
 	}
 	
-	public boolean addListener(ContextListener listener){
+	public boolean addContextListener(ContextListener listener){
 		return contextListenerSupport.addListener(listener);
 	}
 	
-	public boolean removeListener(ContextListener listener){
+	public boolean removeContextListener(ContextListener listener){
 		return contextListenerSupport.removeListener(listener);
 	}
 	
