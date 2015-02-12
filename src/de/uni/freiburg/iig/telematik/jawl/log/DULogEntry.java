@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
@@ -210,5 +214,51 @@ public class DULogEntry extends LogEntry {
 			return false;
 		return true;
 	}
+	
+	public static DULogEntry parse(String entryString) throws ParserException {
+		Matcher matcher = stringPattern.matcher(entryString);
+		if(!entryString.matches(stringPattern.pattern()))
+			throw new ParserException("Cannot parse log entry \""+entryString+"\". Required format: " + stringPattern);
+		int bracketIndex = entryString.indexOf('(');
+		boolean containsDataUsage = bracketIndex != -1;
+		String activityName = null;
+		if(!containsDataUsage){
+			activityName = entryString;
+		} else {
+			activityName = entryString.substring(0, bracketIndex);
+		}
+		DULogEntry entry = new DULogEntry(activityName);
+		if(containsDataUsage && matcher.find()){
+			String dataUsageString = matcher.group(1).substring(1, matcher.group(1).length()-1);
+			StringTokenizer tokenizer = new StringTokenizer(dataUsageString, ",");
+			while(tokenizer.hasMoreTokens()){
+				String nextDataUsage = tokenizer.nextToken();
+				String attributeName = nextDataUsage.substring(0, nextDataUsage.indexOf(':'));
+				String dataUsageCodes = nextDataUsage.substring(nextDataUsage.indexOf(':')+1);
+				Set<DataUsage> dataUsageModes = new HashSet<DataUsage>();
+				for(int i=0; i<dataUsageCodes.length(); i++){
+					dataUsageModes.add(DataUsage.fromAbbreviation(String.valueOf(dataUsageCodes.charAt(i)).toUpperCase()));
+				}
+				if(dataUsageModes.contains(DataUsage.CREATE) && dataUsageModes.contains(DataUsage.DELETE))
+					throw new ParserException("Invalid usage modes for attribute \""+attributeName+"\": CREATE and DELETE");
+				for (DataUsage dataUsage : dataUsageModes) {
+					try {
+						entry.addDataUsage(new DataAttribute(attributeName), dataUsage);
+					} catch (LockingException e) {
+						// Cannot happen, since the data usage field is not locked in this method.
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return entry;
+	}
+	
+	public static void main(String[] args) throws ParserException {
+		DULogEntry entry = DULogEntry.parse("A(att1:wrc,g:r,h:w)");
+		System.out.println(entry.getDataUsage());
+	}
+	
+	private static final Pattern stringPattern = Pattern.compile("\\w+(\\((\\w+:[rwcd]{1,4})(,(\\w+:[rwcd]{1,4}))*\\))?");
 
 }

@@ -241,8 +241,8 @@ public class LogWriter extends FileWriter{
 	}
 	
 	/**
-	 * This method is only allowed in the ativity perspective.
-	 * @param logEntry The log enty to write.
+	 * This method is only allowed in the activity perspective.
+	 * @param logEntry The log entry to write.
 	 * @throws IOException 
 	 */
 	public void writeEntry(LogEntry logEntry, int caseNumber) throws PerspectiveException, IOException{
