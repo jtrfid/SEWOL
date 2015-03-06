@@ -24,9 +24,9 @@ import de.invation.code.toval.validate.InconsistencyException;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.ParameterException.ErrorCode;
 import de.invation.code.toval.validate.Validate;
-import de.uni.freiburg.iig.telematik.seram.accesscontrol.AbstractACModel;
-import de.uni.freiburg.iig.telematik.seram.accesscontrol.acl.ACLModel;
-import de.uni.freiburg.iig.telematik.seram.accesscontrol.rbac.RBACModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.RBACModel;
 
 /**
  * This class provides context information for process execution.<br>

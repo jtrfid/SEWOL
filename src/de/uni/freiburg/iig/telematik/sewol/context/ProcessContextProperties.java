@@ -16,7 +16,7 @@ import de.invation.code.toval.properties.PropertyException;
 import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
-import de.uni.freiburg.iig.telematik.seram.accesscontrol.properties.ACModelProperty;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelProperty;
 
 public class ProcessContextProperties extends SOABaseProperties{
 	

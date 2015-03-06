@@ -16,7 +16,7 @@ import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.ParameterException.ErrorCode;
 import de.invation.code.toval.validate.Validate;
-import de.uni.freiburg.iig.telematik.seram.accesscontrol.acl.ACLModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
 
 /**
  * This class provides context information for process execution.<br>

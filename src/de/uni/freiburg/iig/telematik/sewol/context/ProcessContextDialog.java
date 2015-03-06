@@ -19,8 +19,8 @@ import javax.swing.JTextField;
 
 import de.invation.code.toval.misc.soabase.SOABaseDialog;
 import de.invation.code.toval.validate.ParameterException;
-import de.uni.freiburg.iig.telematik.seram.accesscontrol.AbstractACModel;
-import de.uni.freiburg.iig.telematik.seram.accesscontrol.graphic.ACModelDialog;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.graphic.ACModelDialog;
 import de.uni.freiburg.iig.telematik.sewol.context.du.DataUsageDialog;
 
 

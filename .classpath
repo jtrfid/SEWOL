@@ -6,6 +6,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/TOVAL"/>
 	<classpathentry kind="lib" path="lib/openxes/OpenXES.jar" sourcepath="lib/openxes/xes_src.zip"/>
 	<classpathentry kind="lib" path="lib/openxes/guava-16.0.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/SERAM"/>
+	<classpathentry kind="lib" path="lib/collections-generic-4.01.jar"/>
+	<classpathentry kind="lib" path="lib/jung-algorithms-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/jung-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/jung-graph-impl-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/jung-visualization-2.0.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JAGAL"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

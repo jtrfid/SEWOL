@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import de.invation.code.toval.misc.soabase.SOABaseListener;
 import de.invation.code.toval.types.DataUsage;
-import de.uni.freiburg.iig.telematik.seram.accesscontrol.AbstractACModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
 
 public interface ProcessContextListener extends SOABaseListener {
 	
