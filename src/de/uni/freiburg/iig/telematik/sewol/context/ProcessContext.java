@@ -15,7 +15,6 @@ import java.util.Set;
 import de.invation.code.toval.misc.SetUtils;
 import de.invation.code.toval.misc.soabase.SOABase;
 import de.invation.code.toval.misc.soabase.SOABaseChangeReply;
-import de.invation.code.toval.misc.soabase.SOABaseEditingInterface;
 import de.invation.code.toval.misc.soabase.SOABaseListener;
 import de.invation.code.toval.properties.PropertyException;
 import de.invation.code.toval.types.DataUsage;
