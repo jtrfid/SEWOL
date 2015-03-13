@@ -230,27 +230,33 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	}
 
 	public void setObjectPermission(String roleName, Set<String> objects) throws CompatibilityException {
-		rolePermissions.setObjectPermission(roleName, objects);
+		for (String object: objects) {
+			rolePermissions.addObjectPermission(roleName, object);
+		}
 	}
 	
 	public void setObjectPermission(String roleName, String object, DataUsage... dataUsageModes) throws CompatibilityException{
-		rolePermissions.setObjectPermission(roleName, object, dataUsageModes);
+		rolePermissions.addObjectPermission(roleName, object, dataUsageModes);
 	}
 	
 	public void setObjectPermission(String roleName, Collection<String> objects) throws CompatibilityException{
-		rolePermissions.setObjectPermission(roleName, objects);
+		for (String object: objects) {
+			rolePermissions.addObjectPermission(roleName, object);
+		}
 	}
 	
 	public void setObjectPermission(String roleName, String object) throws CompatibilityException{
-		rolePermissions.setObjectPermission(roleName, object);
+		rolePermissions.addObjectPermission(roleName, object);
 	}
 	
 	public void setObjectPermission(String roleName, String object, Collection<DataUsage> dataUsageModes) throws CompatibilityException{
-		rolePermissions.setObjectPermission(roleName, object, dataUsageModes);
+		rolePermissions.addObjectPermission(roleName, object, dataUsageModes);
 	}
 	
 	public void setObjectPermission(String roleName, Map<String, Set<DataUsage>> permissions) throws CompatibilityException{
-		rolePermissions.setObjectPermission(roleName, permissions);
+		for(String object: permissions.keySet()){
+			setObjectPermission(roleName, object, permissions.get(object));
+		}
 	}
 	
 	//------- inherited methods -----------------------------------------------------------
