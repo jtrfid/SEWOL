@@ -27,7 +27,7 @@ public class DataUsageTable extends JTable implements ObjectPermissionItemListen
 
 	private static final long serialVersionUID = -1935993027476998583L;
 	
-	private final int HEADER_HEIGHT = 40;
+//	private final int HEADER_HEIGHT = 40;
 
 	private ProcessContext context = null;
 	private String activity = null;
@@ -52,9 +52,6 @@ public class DataUsageTable extends JTable implements ObjectPermissionItemListen
 		int minWidthDUcolumn = Math.max(getModel().preferredCellSize().width, getModel().getMinHeaderWidth(1));
 		getColumnModel().getColumn(1).setWidth(minWidthDUcolumn);
 		getColumnModel().getColumn(1).setMinWidth(minWidthDUcolumn);
-		
-		int minHeight = HEADER_HEIGHT + getModel().getRowCount()*getRowHeight();
-		setPreferredSize(new Dimension(minWidthAttributeColumn + minWidthDUcolumn, minHeight));
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		setShowHorizontalLines(true);
