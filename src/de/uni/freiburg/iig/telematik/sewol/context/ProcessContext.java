@@ -560,6 +560,17 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 		activityDataUsage.get(activity).put(attribute, usageModes);
 	}
 	
+	public void setDataUsageFor(String activity, String attribute, DataUsage... usageModes) throws CompatibilityException{
+		validateActivity(activity);
+		validateAttribute(attribute);
+		Collection<DataUsage> usageModesCollection = Arrays.asList(usageModes);
+		validateUsageModes(usageModesCollection);
+		if(!activityDataUsage.containsKey(activity)){
+			activityDataUsage.put(activity, new HashMap<String, Set<DataUsage>>());
+		}
+		activityDataUsage.get(activity).put(attribute, new HashSet<DataUsage>(usageModesCollection));
+	}
+	
 	/**
 	 * Adds a data attribute for an activity.<br>
 	 * The given activity/attributes have to be known by the context, i.e. be contained in the activity/attribute list.
