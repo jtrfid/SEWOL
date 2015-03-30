@@ -225,6 +225,10 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 		rolePermissions.setActivityPermission(roleName, transactions);
 	}
 	
+	public void setActivityPermission(String roleName, String... transactions) throws CompatibilityException {
+		setActivityPermission(roleName, new HashSet<String>(Arrays.asList(transactions)));
+	}
+	
 	public void setObjectPermission(String roleName, Set<String> objects) throws CompatibilityException {
 		rolePermissions.setObjectPermission(roleName, objects);
 	}
