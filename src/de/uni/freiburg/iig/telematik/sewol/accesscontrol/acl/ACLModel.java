@@ -166,6 +166,14 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 		objectPermissionsOU.get(object).get(subject).addAll(dataUsageModes);
 	}
 	
+	private void setObjectPermissionsOU(String object, String subject, Collection<DataUsage> dataUsageModes){
+		if(!objectPermissionsOU.containsKey(object)){
+			objectPermissionsOU.put(object, new HashMap<String, Set<DataUsage>>());
+		}
+		objectPermissionsOU.get(object).put(subject, new HashSet<DataUsage>(dataUsageModes));
+	}
+	
+	
 	private void removeObjectPermissionsOU(String object, String subject, Collection<DataUsage> dataUsageModes){
 		if(!objectPermissionsOU.containsKey(object))
 			return;
@@ -232,6 +240,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 			objectPermissionsUO.put(subject, new HashMap<String, Set<DataUsage>>());
 		}
 		objectPermissionsUO.get(subject).put(object, new HashSet<DataUsage>(dataUsageModes));
+		setObjectPermissionsOU(object, subject, dataUsageModes);
 	}
 	
 	public void setObjectPermission(String subject, Map<String, Set<DataUsage>> permissions) throws CompatibilityException{
@@ -246,7 +255,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 		}
 		objectPermissionsUO.put(subject, permissions);
 		for(String object: permissions.keySet()){
-			addObjectPermissionsOU(object, subject, permissions.get(object));
+			setObjectPermissionsOU(object, subject, permissions.get(object));
 		}
 	}
 	
@@ -449,6 +458,9 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 	}
 	
 	@Override
+	public void nameChanged(String oldName, String newName) {}
+	
+	@Override
 	public ACLModel clone(){
 		try {
 			return new ACLModel(getProperties(), getContext());
@@ -479,12 +491,6 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 //		System.out.println(new ACLModel(props));
 //		acl.removeObject("O2");
 //		System.out.println(acl);
-		
-	}
-
-	@Override
-	public void nameChanged(String oldName, String newName) {
-		// TODO Auto-generated method stub
 		
 	}
 
