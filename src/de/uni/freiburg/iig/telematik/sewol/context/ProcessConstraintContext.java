@@ -10,11 +10,11 @@ import java.util.Set;
 import de.invation.code.toval.constraint.AbstractConstraint;
 import de.invation.code.toval.constraint.NumberConstraint;
 import de.invation.code.toval.misc.soabase.SOABase;
+import de.invation.code.toval.misc.soabase.SOABaseProperties;
 import de.invation.code.toval.properties.PropertyException;
 import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
-import de.invation.code.toval.validate.ParameterException.ErrorCode;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
 
@@ -161,18 +161,14 @@ public class ProcessConstraintContext extends ProcessContext {
 		}
 	}
 
+	@Override
+	protected Class<?> getPropertiesClass() {
+		return ProcessConstraintContextProperties.class;
+	}
+
+	@Override
 	public ProcessConstraintContextProperties getProperties() throws PropertyException{
-		if(!isValid())
-			throw new ParameterException(ErrorCode.INCONSISTENCY, "Cannot extract properties in invalid state!");
-		
-		ProcessConstraintContextProperties result = new ProcessConstraintContextProperties();
-		
-		result.setName(getName());
-		result.setActivities(getActivities());
-		result.setSubjects(getSubjects());
-		result.setObjects(getAttributes());
-		if(getACModel() != null)
-		result.setACModelName(getACModel().getName());
+		ProcessConstraintContextProperties result = (ProcessConstraintContextProperties) super.getProperties();
 		
 		for(String activity: getActivities()){
 			Set<AbstractConstraint<?>> routingConstraints = getRoutingConstraints(activity);
@@ -180,10 +176,6 @@ public class ProcessConstraintContext extends ProcessContext {
 				for(AbstractConstraint<?> routingConstraint: routingConstraints){
 					result.addRoutingConstraint(activity, routingConstraint);
 				}
-			}
-			Map<String, Set<DataUsage>> dataUsage = getDataUsageFor(activity);
-			if(dataUsage != null && !dataUsage.isEmpty()){
-				result.setDataUsage(activity, dataUsage);
 			}
 		}
 		return result;
@@ -227,34 +219,42 @@ public class ProcessConstraintContext extends ProcessContext {
 		return true;
 	}
 
-	public static void main(String[] args) throws PropertyException, IOException {
-		Map<String, Set<DataUsage>> usage1 = new HashMap<String, Set<DataUsage>>();
-		Set<DataUsage> modes1 = new HashSet<DataUsage>(Arrays.asList(DataUsage.READ, DataUsage.WRITE));
-		usage1.put("attribute1", modes1);
-		
-		Map<String, Set<DataUsage>> usage2 = new HashMap<String, Set<DataUsage>>();
-		Set<DataUsage> modes2 = new HashSet<DataUsage>(Arrays.asList(DataUsage.READ, DataUsage.WRITE));
-		usage2.put("attribute2", modes2);
-		
-		Set<String> activities = new HashSet<String>(Arrays.asList("act1", "act2"));
-		Set<String> attributes = new HashSet<String>(Arrays.asList("attribute1", "attribute2"));
-		Set<String> subjects = new HashSet<String>(Arrays.asList("s1", "s2"));
-		ProcessConstraintContext c = new ProcessConstraintContext("c1");
-		c.setActivities(activities);
-		c.addAttributes(attributes);
-		c.addSubjects(subjects);
-		c.setDataUsageFor("act1", usage1);
-		c.setDataUsageFor("act2", usage2);
-		c.addRoutingConstraint("act1", NumberConstraint.parse("attribute1 < 200"));
-		
-		ACLModel acModel = new ACLModel("acl1", c);
-		acModel.setName("acmodel1");
-		acModel.setActivityPermission("s1", activities);
-		c.setACModel(acModel);
-		
-		System.out.println(c);
-		
+//	public static void main(String[] args) throws Exception {
+//		Map<String, Set<DataUsage>> usage1 = new HashMap<String, Set<DataUsage>>();
+//		Set<DataUsage> modes1 = new HashSet<DataUsage>(Arrays.asList(DataUsage.READ, DataUsage.WRITE));
+//		usage1.put("attribute1", modes1);
+//		
+//		Map<String, Set<DataUsage>> usage2 = new HashMap<String, Set<DataUsage>>();
+//		Set<DataUsage> modes2 = new HashSet<DataUsage>(Arrays.asList(DataUsage.READ, DataUsage.WRITE));
+//		usage2.put("attribute2", modes2);
+//		
+//		Set<String> activities = new HashSet<String>(Arrays.asList("act1", "act2"));
+//		Set<String> attributes = new HashSet<String>(Arrays.asList("attribute1", "attribute2"));
+//		Set<String> subjects = new HashSet<String>(Arrays.asList("s1", "s2"));
+//		ProcessConstraintContext c = new ProcessConstraintContext("c1");
+//		c.setActivities(activities);
+//		c.addAttributes(attributes);
+//		c.addSubjects(subjects);
+//		c.setDataUsageFor("act1", usage1);
+//		c.setDataUsageFor("act2", usage2);
+//		c.addRoutingConstraint("act1", NumberConstraint.parse("attribute1 < 200"));
+//		
+//		ACLModel acModel = new ACLModel("acl1", c);
+//		acModel.setName("acmodel1");
+//		acModel.setActivityPermission("s1", activities);
+//		c.setACModel(acModel);
+//		
+//		System.out.println(c);
+//
 //		c.getProperties().store("/Users/stocker/Desktop/processContext");
-	}
+//		
+//		ProcessConstraintContextProperties properties = new ProcessConstraintContextProperties();
+//		properties.load("/Users/stocker/Desktop/processContext");
+//		SOABase c1 = SOABaseProperties.createFromProperties(properties);
+//		System.out.println(c1);
+//		System.out.println(c1.equals(c));
+//		System.out.println(properties.getBaseClass());
+//		System.out.println(c1.getClass());
+//	}
 
 }

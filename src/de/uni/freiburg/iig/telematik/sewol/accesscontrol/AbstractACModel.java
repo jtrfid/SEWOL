@@ -71,7 +71,7 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 	
 	protected void initialize() {
 		validUsageModes = new ArrayList<DataUsage>(Arrays.asList(DataUsage.values()));
-		acModelListenerSupport = new ACModelListenerSupport();
+		acModelListenerSupport = new ACModelListenerSupport(this);
 		acModelListenerSupport.addListener(this);
 	}
 	
@@ -98,12 +98,18 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 
 	public void setContext(SOABase context) {
 		Validate.notNull(context);
+		checkContextChange(context);
 		if(this.context != null){
 			this.context.removeContextListener(this);
 		}
 		this.context = context;
 		this.context.addContextListener(this);
+		contextChangeProcedure();
 	}
+
+	public abstract void checkContextChange(SOABase context);
+	
+	protected abstract void contextChangeProcedure();
 
 	public boolean addACModelListener(ACModelListener listener){
 		return acModelListenerSupport.addListener(listener);
@@ -351,7 +357,22 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 	}
 
 	@Override
-	public void validUsageModesChanged(Set<DataUsage> oldModes, Set<DataUsage> newModes) {}
+	public void validUsageModesChanged(AbstractACModel sender, Set<DataUsage> oldModes, Set<DataUsage> newModes) {}
+	
+	@Override
+	public void contextChanged(AbstractACModel sender, SOABase context) {}
+
+	@Override
+	public void accessPermissionAdded(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {}
+
+	@Override
+	public void accessPermissionRemoved(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {}
+
+	@Override
+	public void executionPermissionAdded(AbstractACModel sender, String subject, String transaction) {}
+
+	@Override
+	public void executionPermissionRemoved(AbstractACModel sender, String subject, String transaction) {}
 	
 	@Override
 	public abstract AbstractACModel<P> clone();

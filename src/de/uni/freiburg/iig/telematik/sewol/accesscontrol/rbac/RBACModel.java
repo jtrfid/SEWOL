@@ -88,6 +88,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 		roleMembershipRU = new HashMap<String, HashList<String>>();
 		roleMembershipUR = new HashMap<String, HashList<String>>();
 		rolePermissions = new ACLModel("rolePermissions");
+		rolePermissions.addACModelListener(this);
 		rightPropagationAlongLattice = false;
 		setRoleLattice(new RoleLattice());
 	}
@@ -100,8 +101,12 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	}
 	
 	@Override
-	public void setContext(SOABase context) {
-		super.setContext(context);
+	public void checkContextChange(SOABase context) {
+		rolePermissions.checkContextChange(context);
+	}
+	
+	@Override
+	public void contextChangeProcedure() {
 		SOABase clonedContext = context.clone();
 		clonedContext.setSubjectDescriptor("Role;Roles");
 		rolePermissions.setContext(clonedContext);
@@ -714,5 +719,39 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 
 	@Override
 	public void nameChanged(String oldName, String newName) {}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void accessPermissionAdded(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {
+		if(sender == rolePermissions){
+			acModelListenerSupport.notifyAccessPermissionAdded(subject, object, dataUsageModes);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void accessPermissionRemoved(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {
+		if(sender == rolePermissions){
+			acModelListenerSupport.notifyAccessPermissionRemoved(subject, object, dataUsageModes);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void executionPermissionAdded(AbstractACModel sender, String subject, String transaction) {
+		if(sender == rolePermissions){
+			acModelListenerSupport.notifyExecutionPermissionAdded(subject, transaction);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void executionPermissionRemoved(AbstractACModel sender, String subject, String transaction) {
+		if(sender == rolePermissions){
+			acModelListenerSupport.notifyExecutionPermissionRemoved(subject, transaction);
+		}
+	}
+	
+	
 
 }
