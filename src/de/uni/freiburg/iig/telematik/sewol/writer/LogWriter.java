@@ -265,9 +265,10 @@ public class LogWriter extends FileWriter{
 		}
 	}
 	
-	
+//	
 //	//------- Test
 //	
+//	@SuppressWarnings("rawtypes")
 //	public static void main(String[] args) throws Exception{
 //		LogEntry en1 = new LogEntry("A");
 //		LogEntry en2 = new LogEntry("B");

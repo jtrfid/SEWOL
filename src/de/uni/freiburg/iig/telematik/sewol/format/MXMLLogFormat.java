@@ -13,10 +13,10 @@ import de.uni.freiburg.iig.telematik.sewol.writer.PerspectiveException;
 
 
 /**
- * Weil die ZeilenumbrŸche hardcoded in den String-Konstanten sind muss darauf geachtet werden,
+ * Weil die Zeilenumbrï¿½che hardcoded in den String-Konstanten sind muss darauf geachtet werden,
  * dass immer dasselbe Zeilenumbruchs-Zeichen verwendet wird.
  * Die einzuhaltende Konvention ist '\n'.
- * LogWriter ist dementsprechend implementiert und erwartet ausschlie§lich solche ZeilenumbrŸche.
+ * LogWriter ist dementsprechend implementiert und erwartet ausschlieï¿½lich solche Zeilenumbrï¿½che.
  * 
  * @author ts552
  *
@@ -24,7 +24,7 @@ import de.uni.freiburg.iig.telematik.sewol.writer.PerspectiveException;
 public class MXMLLogFormat extends AbstractLogFormat {
 
 	private static final String DEFAULT_LINE_SEPARATOR = "\n";
-	private static final String FILE_HEADER_FORMAT = "<?xml version=\"1.0\" encoding=\"%%s\"?>%s<WorkflowLog>\n<Process id=\"process1\">%s";
+	private static final String FILE_HEADER_FORMAT = "<?xml version=\"1.0\" encoding=\"%%s\"?>%s<WorkflowLog>%s<Process id=\"process1\">%s";
 	private static final String FILE_HEADER = String.format(FILE_HEADER_FORMAT, DEFAULT_LINE_SEPARATOR, DEFAULT_LINE_SEPARATOR, DEFAULT_LINE_SEPARATOR);
 	private static final String FILE_FOOTER_FORMAT = "</Process>%s</WorkflowLog>%s";
 	private static final String FILE_FOOTER = String.format(FILE_FOOTER_FORMAT, DEFAULT_LINE_SEPARATOR, DEFAULT_LINE_SEPARATOR);

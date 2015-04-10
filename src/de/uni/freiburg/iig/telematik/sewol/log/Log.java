@@ -44,5 +44,4 @@ public class Log<E extends LogEntry> {
 	public List<LogTrace<E>> getTraces(){
 		return Collections.unmodifiableList(traces);
 	}
-
 }
