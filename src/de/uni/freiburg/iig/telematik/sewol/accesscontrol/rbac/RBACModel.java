@@ -169,7 +169,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	}
 	
 	public void setRoleMembership(String roleName, String... members) throws CompatibilityException {
-		setRoleMembership(roleName, members);
+		setRoleMembership(roleName, Arrays.asList(members));
 	}
 	
 	public void addRoleMembership(String subject, String... roles) throws CompatibilityException {

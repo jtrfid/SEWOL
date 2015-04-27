@@ -132,10 +132,13 @@ public class XESLogParser extends AbstractLogParser {
 					String value = attribute.getValue().toString();
 					if (key.equals("concept:name")) {
 						try {
-							Validate.notNegativeInteger(value);
 							traceID = Integer.parseInt(value);
-						} catch (ParameterException e) {
-							throw new ParserException("Cannot extract case-id.");
+						} catch (NumberFormatException e) {
+							// if NAN, take the hash
+							traceID = value.hashCode();
+						}
+						if (traceID < 0) {
+							traceID *= Integer.signum(traceID);
 						}
 					}
 				}

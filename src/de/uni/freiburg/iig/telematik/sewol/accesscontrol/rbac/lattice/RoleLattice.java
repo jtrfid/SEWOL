@@ -51,7 +51,7 @@ public class RoleLattice implements Cloneable{
 	
 	public boolean containsRoles(Collection<String> roles){
 		Validate.notNull(roles);
-		return roles.containsAll(roles);
+		return this.roles.containsAll(roles);
 	}
 	
 	public void setRoles(Collection<String> roles){
