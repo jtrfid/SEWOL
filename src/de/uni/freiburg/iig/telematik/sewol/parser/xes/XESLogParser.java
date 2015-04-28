@@ -340,13 +340,13 @@ public class XESLogParser extends AbstractLogParser {
 			String dataAttributeDataUsageString = null;
 			if (subattribute.getKey().equals("dataUsage:usage")) {
 				dataAttributeDataUsageString = subattribute.getValue().toString();
-			}
-			List<DataUsage> dataUsageList = parseDataUsageString(dataAttributeDataUsageString);
-			for (DataUsage dataUsage : dataUsageList) {
-				try {
-					((DULogEntry) entry).addDataUsage(dataAttribute, dataUsage);
-				} catch (Exception e) {
-					throw new ParserException("Cannot add data usage information to log entry: " + e.getMessage());
+				List<DataUsage> dataUsageList = parseDataUsageString(dataAttributeDataUsageString);
+				for (DataUsage dataUsage : dataUsageList) {
+					try {
+						((DULogEntry) entry).addDataUsage(dataAttribute, dataUsage);
+					} catch (Exception e) {
+						throw new ParserException("Cannot add data usage information to log entry: " + e.getMessage());
+					}
 				}
 			}
 		}

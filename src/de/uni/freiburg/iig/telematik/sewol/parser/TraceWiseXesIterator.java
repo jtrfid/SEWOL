@@ -88,7 +88,7 @@ public class TraceWiseXesIterator implements Iterator<LogFragment> {
 			buffer.append(nextLine);
 			buffer.append(System.getProperty("line.separator"));
 		}
-		if (!nextLine.trim().startsWith("</log")) {
+		if (nextLine != null && !nextLine.trim().startsWith("</log")) {
 			lastTraceStart = nextLine;
 			hasNextTrace = true;
 		} else {

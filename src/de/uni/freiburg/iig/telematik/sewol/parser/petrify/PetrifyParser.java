@@ -32,7 +32,7 @@ public class PetrifyParser extends AbstractLogParser {
 		parsedLogFiles = new ArrayList<List<LogTrace<LogEntry>>>();
 		
 		List<LogTrace<LogEntry>> traceList = new ArrayList<LogTrace<LogEntry>>();
-		Set<LogTrace<LogEntry>> traceSet = new HashSet<LogTrace<LogEntry>>();
+//		Set<LogTrace<LogEntry>> traceSet = new HashSet<LogTrace<LogEntry>>();
 		parsedLogFiles.add(traceList);
 
 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
