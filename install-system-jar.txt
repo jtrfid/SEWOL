@@ -1,0 +1,1 @@
+mvn org.apache.maven.plugins:maven-install-plugin:2.3.1:install-file -Dfile=lib/openxes/OpenXES.jar -DgroupId=org.deckfour.xes -DartifactId=OpenXES -Dversion=2.0 -Dpackaging=jar -DlocalRepositoryPath=lib/openxes-repo

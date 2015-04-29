@@ -62,19 +62,19 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
 /**
  * Diese Klasse dient dem Import von CSV-Dateien in das MXML-Format.<br>
  * <br>
- * Es gelten folgende Annahmen bezüglich der Struktur der CSV-Datei:<br>
+ * Es gelten folgende Annahmen bezueglich der Struktur der CSV-Datei:<br>
  * <ul>
  * <li>Werte sind Komma-, Semikolon- oder Tab-separiert.</li>
- * <li>Jede Zeile steht für eine Prozessaktivität.</li>
- * <li>Die Spalten stehen für die einzelnen Felder innerhalb einer Prozessaktivität (Name des Vorgangs, durchführender Akteur, ...)</li>
- * <li>Die erste Zeile enthält die Namen die einzelnen Felder von Prozessaktivitäten.</li>
- * <li>Alle Aktivitäten eines Prozessdurchlaufs sind gruppiert und in stehen in korrekter zeitlicher Abfolge untereinander.</li>
- * <li>Die Case-ID liegt entweder als Zahl vor oder enthält am Ende der Zeichenkette eine Zahl.</li>
- * <li>Die Zahlen für die Case-IDs sind für jeden Prozessdurchlauf verschieden.</li>
+ * <li>Jede Zeile steht fuer eine Prozessaktivitaet.</li>
+ * <li>Die Spalten stehen fuer die einzelnen Felder innerhalb einer Prozessaktivitaet (Name des Vorgangs, durchfuehrender Akteur, ...)</li>
+ * <li>Die erste Zeile enthaelt die Namen die einzelnen Felder von Prozessaktivitaeten.</li>
+ * <li>Alle Aktivitaeten eines Prozessdurchlaufs sind gruppiert und in stehen in korrekter zeitlicher Abfolge untereinander.</li>
+ * <li>Die Case-ID liegt entweder als Zahl vor oder enthaelt am Ende der Zeichenkette eine Zahl.</li>
+ * <li>Die Zahlen fuer die Case-IDs sind fuer jeden Prozessdurchlauf verschieden.</li>
  * </ul>
  * 
- * Werte für einzelne Felder werden vor der Verarbeitung gesäubert,
- * d.h. etwaige Anführungszeichen werden entfernt. 
+ * Werte fuer einzelne Felder werden vor der Verarbeitung gesaeubert,
+ * d.h. etwaige Anfuehrungszeichen werden entfernt. 
  * 
  * @author Thomas Stocker
  */

@@ -2,13 +2,13 @@
 <project name="JAWL.package" default="package" basedir=".">
 
 	<!--
-	Apache Ant build file for the JAWL project
+	Apache Ant build file for the SEWOL project
 	
 	This build file generates three JAR-files from the project:
-	- jawl-0.1.2.jar
-	- jawl-0.1.2-sources.jar
-	- jawl-0.1.2-javadoc.jar
-	- jawl-0.1.2-consistent.jar
+	- sewol-0.1.2.jar
+	- sewol-0.1.2-sources.jar
+	- sewol-0.1.2-javadoc.jar
+	- sewol-0.1.2-consistent.jar
 	
 	The building process starts with cleaning all target files including compiles
 	java classes, compiled tests, and test reports (see #clean). Afterwards a
@@ -16,14 +16,14 @@
 	Then the project gets compiled (see #compile) and all unit tests are performed
 	(see #test). If the compilation ran without errors, the JARs are packaged (see #package).
 	
-	JAWL depends on the project TOVAL, which's compiled classes must be present
+	SEWOL depends on the projects TOVAL and JAGAL, whose compiled classes must be present
 	under the specified paths.
 	
 	author: Adrian Lange
 	 -->
 
 	<!-- Project details -->
-	<property name="artifact.name" value="jawl" />
+	<property name="artifact.name" value="sewol" />
 	<property name="version.name" value="0.1.4" />
 
 	<!-- Names for generated files -->
@@ -45,7 +45,6 @@
 	<!-- Define classpath -->
 	<property name="TOVAL.location" value="../TOVAL" />
 	<property name="JAGAL.location" value="../JAGAL" />
-	<property name="SEPIA.location" value="../SEPIA" />
 
 	<path id="TOVAL.classpath">
 		<pathelement location="${TOVAL.location}/bin/classes" />
@@ -56,25 +55,18 @@
 		<path refid="TOVAL.classpath" />
 	</path>
 
-	<path id="SEPIA.classpath">
-		<pathelement location="${SEPIA.location}/bin/classes" />
-		<path refid="TOVAL.classpath" />
-		<path refid="JAGAL.classpath" />
-		<pathelement location="${SEPIA.location}/lib/junit/junit-4.11.jar" />
-		<pathelement location="${SEPIA.location}/lib/hamcrest/hamcrest-core-1.3.jar" />
-		<pathelement location="${SEPIA.location}/lib/isorelax/isorelax.jar" />
-		<pathelement location="${SEPIA.location}/lib/msv/msv-core-2013.6.1.jar" />
-		<pathelement location="${SEPIA.location}/lib/relaxngDatatype/relaxngDatatype-20020414.jar" />
-		<pathelement location="${SEPIA.location}/lib/xsdlib/xsdlib-2.2.jar" />
-		<pathelement location="${SEPIA.location}/lib/xsom/xsom-20110101-SNAPSHOT.jar" />
-	</path>
-
-	<path id="JAWL.classpath">
+	<path id="SEWOL.classpath">
 		<pathelement location="${classes.target.dir}" />
 		<pathelement location="${tests.target.dir}" />
 		<path refid="TOVAL.classpath" />
-		<path refid="SEPIA.classpath" />
+		<path refid="JAGAL.classpath" />
 		<pathelement location="lib/openxes/OpenXES.jar" />
+		<pathelement location="lib/openxes/guava-16.0.1.jar" />
+		<pathelement location="lib/collections-generic-4.01.jar" />
+		<pathelement location="lib/jung-algorithms-2.0.1.jar" />
+		<pathelement location="lib/jung-api-2.0.1.jar" />
+		<pathelement location="lib/jung-graph-impl-2.0.1.jar" />
+		<pathelement location="lib/jung-visualization-2.0.1.jar" />
 	</path>
 
 	<!-- Package JARs -->
@@ -127,14 +119,14 @@
 			</manifest>
 			<fileset dir="${classes.target.dir}" />
 			<fileset dir="${TOVAL.location}/bin/classes" />
-			<fileset dir="${SEPIA.location}/bin/classes" />
+			<fileset dir="${JAGAL.location}/bin/classes" />
 			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/openxes/OpenXES.jar" />
-			<zipfileset excludes="META-INF/*.SF" src="${SEPIA.location}/lib/isorelax/isorelax.jar" />
-			<zipfileset excludes="META-INF/*.SF" src="${SEPIA.location}/lib/msv/msv-core-2013.6.1.jar" />
-			<zipfileset excludes="META-INF/*.SF" src="${SEPIA.location}/lib/relaxngDatatype/relaxngDatatype-20020414.jar" />
-			<zipfileset excludes="META-INF/*.SF" src="${SEPIA.location}/lib/xsdlib/xsdlib-2.2.jar" />
-			<zipfileset excludes="META-INF/*.SF" src="${SEPIA.location}/lib/hamcrest/hamcrest-core-1.3.jar" />
-			<zipfileset excludes="META-INF/*.SF" src="${SEPIA.location}/lib/xsom/xsom-20110101-SNAPSHOT.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/openxes/guava-16.0.1.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/collections-generic-4.01.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/jung-algorithms-2.0.1.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/jung-api-2.0.1.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/jung-graph-impl-2.0.1.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/jung-visualization-2.0.1.jar" />
 		</jar>
 	</target>
 
@@ -142,12 +134,12 @@
 		<echo>Compile classes...</echo>
 		<javac destdir="${classes.target.dir}" includeantruntime="false">
 			<src path="${src.dir}" />
-			<classpath refid="JAWL.classpath" />
+			<classpath refid="SEWOL.classpath" />
 		</javac>
 		<echo>Compile tests...</echo>
 		<javac destdir="${tests.target.dir}" includeantruntime="false">
 			<src path="${test.dir}" />
-			<classpath refid="JAWL.classpath" />
+			<classpath refid="SEWOL.classpath" />
 		</javac>
 	</target>
 
