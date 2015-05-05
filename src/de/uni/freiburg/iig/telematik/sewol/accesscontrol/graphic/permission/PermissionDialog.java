@@ -26,7 +26,7 @@ import de.uni.freiburg.iig.telematik.sewol.context.ProcessContext;
 
 
 
-public class PermissionDialog extends AbstractDialog {
+public class PermissionDialog extends AbstractDialog<ACLModel> {
 	
 	private static final long serialVersionUID = -5216821409053567193L;
 	public static final Dimension PREFERRED_SIZE = new Dimension(500, 540);
@@ -40,7 +40,7 @@ public class PermissionDialog extends AbstractDialog {
 
 	@SuppressWarnings("rawtypes")
 	public PermissionDialog(Window owner, String title, AbstractACModel acModel) throws Exception {
-		super(owner, true, ButtonPanelLayout.CENTERED);
+		super(owner, ButtonPanelLayout.CENTERED);
 		setTitle(title);
 		setIncludeCancelButton(false);
 		if(!acModel.getContext().containsActivities())

@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.Arrays;
 import java.util.Collection;
 
 import javax.swing.BorderFactory;
@@ -19,14 +18,13 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import de.invation.code.toval.graphic.dialog.AbstractDialog;
+import de.invation.code.toval.graphic.dialog.AbstractEditCreateDialog;
 import de.invation.code.toval.misc.soabase.SOABase;
 import de.invation.code.toval.misc.soabase.SOABaseComboBox;
 import de.invation.code.toval.validate.ParameterException;
@@ -35,12 +33,13 @@ import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.graphic.permission.PermissionDialog;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACMValidationException;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelType;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.RBACModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.graphic.RoleLatticeDialog;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.graphic.RoleMembershipDialog;
 
-public class ACModelDialog extends AbstractDialog {
+public class ACModelDialog extends AbstractEditCreateDialog<AbstractACModel<?>> {
 	
 	private static final long serialVersionUID = -2689725669752188740L;
 	
@@ -66,26 +65,13 @@ public class ACModelDialog extends AbstractDialog {
 
 	private JCheckBox chckbxPropagateRights;
 	
-	@SuppressWarnings("rawtypes")
-	private AbstractACModel originalACModel;
-	private ACModelType modelType = null;
 	private Collection<SOABase> contextCandidates = null;
 	
 	//---------------------------------------------------
 	
 
-	public ACModelDialog(Window owner, String acModelName, ACModelType targetModelType) throws Exception {
-		super(owner);
-		Validate.notNull(acModelName);
-		Validate.notNull(targetModelType);
-		switch (targetModelType) {
-		case ACL:
-			setDialogObject(new ACLModel(acModelName));
-			break;
-		case RBAC:
-			setDialogObject(new RBACModel(acModelName));
-			break;
-		}
+	protected ACModelDialog(Window owner, String acModelName, ACModelType targetModelType) throws Exception {
+		super(owner, targetModelType, acModelName);
 	}
 	
 	public ACModelDialog(Window owner, String acModelName, ACModelType targetModelType, SOABase context) throws Exception {
@@ -102,9 +88,7 @@ public class ACModelDialog extends AbstractDialog {
 	
 	@SuppressWarnings("rawtypes")
 	public ACModelDialog(Window owner, AbstractACModel acModel) throws Exception {
-		super(owner, true);
-		this.originalACModel = acModel;
-		setDialogObject(originalACModel.clone());
+		super(owner, acModel);
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -117,19 +101,67 @@ public class ACModelDialog extends AbstractDialog {
 	
 	@SuppressWarnings("rawtypes")
 	@Override
+	protected AbstractACModel newDialogObject(Object... parameters) {
+		Validate.notNull(parameters);
+		if(parameters.length != 2)
+			throw new ParameterException("Expected 2 parameters, but got " + parameters.length);
+		Validate.notNull(parameters[0]);
+		Validate.notNull(parameters[1]);
+		ACModelType targetModelType = null;
+		try{
+			targetModelType = (ACModelType) parameters[0];
+		} catch(Exception ex){
+			throw new ParameterException("Cannot extract ac model type from parameter list.\nReason: " + ex);
+		}
+		String acModelName = null;
+		try{
+			acModelName = (String) parameters[1];
+		} catch(Exception ex){
+			throw new ParameterException("Cannot extract ac model name from parameter list.\nReason: " + ex);
+		}
+		switch (targetModelType) {
+		case ACL:
+			return new ACLModel(acModelName);
+		case RBAC:
+			return new RBACModel(acModelName);
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
 	public AbstractACModel getDialogObject(){
 		return (AbstractACModel) super.getDialogObject();
 	}
 
 	@Override
 	protected void setTitle() {
-		if(editMode){
+		if(editMode()){
 			setTitle("Edit Access Control Model");
 		} else {
 			setTitle("New Access Control Model");
 		}
 	}
 	
+
+	@Override
+	protected void validateAndSetFieldValues() throws Exception {
+		if(getDialogObject().getContext().isEmpty())
+			throw new ParameterException("Empty context");
+		
+		String acModelName = getFieldName().getText();
+		if(acModelName == null || acModelName.isEmpty())
+			throw new ParameterException("Empty name");
+
+		getDialogObject().setName(acModelName);
+		
+		try {
+			getDialogObject().checkValidity();
+		} catch (ACMValidationException e1) {
+			throw new ParameterException("Invalid AC Model\nReason: " + e1.getMessage());
+		}
+	}
+
 	@Override
 	protected void addComponents() throws Exception {
 		mainPanel().setLayout(new BorderLayout());
@@ -237,7 +269,7 @@ public class ACModelDialog extends AbstractDialog {
 	private JTextField getFieldName(){
 		if(txtName == null){
 			txtName = new JTextField();
-			txtName.setText(AbstractACModel.DEFAULT_AC_MODEL_NAME);
+			txtName.setText(getDialogObject().getName());
 			txtName.setColumns(10);
 			txtName.setPreferredSize(FIELD_DIMENSION);
 			txtName.setMinimumSize(FIELD_DIMENSION);
@@ -252,8 +284,15 @@ public class ACModelDialog extends AbstractDialog {
 			txtContextName.setColumns(10);
 			txtContextName.setPreferredSize(FIELD_DIMENSION);
 			txtContextName.setMinimumSize(FIELD_DIMENSION);
+			txtContextName.setEditable(false);
 		}
 		return txtContextName;
+	}
+	
+	@Override
+	protected void prepareEditing() throws Exception {
+		txtName.setText(getDialogObject().getName());
+		txtContextName.setText(getDialogObject().getContext().getName());
 	}
 	
 //	public ACModelDialog(Window owner, Context context) {
@@ -296,7 +335,7 @@ public class ACModelDialog extends AbstractDialog {
 						RoleMembershipDialog.showDialog(ACModelDialog.this, (RBACModel) getDialogObject());
 						updateTextArea();
 					} catch (Exception e1) {
-						JOptionPane.showMessageDialog(ACModelDialog.this, "Cannot launch role membership dialog.\nReason: " + e1.getMessage(), "Invalid Parameter", JOptionPane.ERROR_MESSAGE);
+						internalExceptionMessage("Cannot launch role membership dialog.\nReason: " + e1.getMessage());
 					}
 				}
 			});
@@ -315,7 +354,7 @@ public class ACModelDialog extends AbstractDialog {
 							context.showDialog(ACModelDialog.this);
 							updateTextArea();
 						} catch (Exception e1) {
-							JOptionPane.showMessageDialog(ACModelDialog.this, "Cannot launch context dialog.\nReason:" + e1.getMessage(), "Invalid Parameter", JOptionPane.ERROR_MESSAGE);
+							internalExceptionMessage("Cannot launch context dialog.\nReason: " + e1.getMessage());
 						}
 					}
 				}
@@ -340,7 +379,7 @@ public class ACModelDialog extends AbstractDialog {
 							PermissionDialog.showDialog(ACModelDialog.this, "Edit role permissions", ((RBACModel) getDialogObject()).getRolePermissions());
 						}
 					}catch(Exception ex){
-						JOptionPane.showMessageDialog(ACModelDialog.this, "<html>Cannot launch permission dialog.<br>Reason: "+ex.getMessage()+"</html>", "Invalid Parameter", JOptionPane.ERROR_MESSAGE);
+						internalExceptionMessage("<html>Cannot launch permission dialog.<br>Reason: "+ex.getMessage()+"</html>");
 					}
 					updateTextArea();
 				}
@@ -375,7 +414,7 @@ public class ACModelDialog extends AbstractDialog {
 					try {
 						RoleLatticeDialog.showDialog(ACModelDialog.this, ((RBACModel) getDialogObject()).getRoleLattice());
 					} catch (Exception e1) {
-						JOptionPane.showMessageDialog(ACModelDialog.this, "<html>Cannot launch role lattice dialog:<br>Reason: "+e1.getMessage()+"</html>", "Invalid Parameter", JOptionPane.ERROR_MESSAGE);
+						internalExceptionMessage("<html>Cannot launch role lattice dialog:<br>Reason: "+e1.getMessage()+"</html>");
 					}
 					updateTextArea();
 				}
@@ -392,10 +431,20 @@ public class ACModelDialog extends AbstractDialog {
 	}
 	
 	@SuppressWarnings("rawtypes")
+	public static AbstractACModel showDialog(String acModelName, ACModelType modelType) throws Exception {
+		return showDialog(null, acModelName, modelType);
+	}
+	
+	@SuppressWarnings("rawtypes")
 	public static AbstractACModel showDialog(Window owner, String acModelName, ACModelType modelType) throws Exception {
 		ACModelDialog acModelDialog = new ACModelDialog(owner, acModelName, modelType);
 		acModelDialog.setUpGUI();
 		return acModelDialog.getDialogObject();
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static AbstractACModel showDialog(String acModelName, ACModelType modelType, SOABase context) throws Exception {
+		return showDialog(null, acModelName, modelType, context);
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -406,10 +455,20 @@ public class ACModelDialog extends AbstractDialog {
 	}
 	
 	@SuppressWarnings("rawtypes")
+	public static AbstractACModel showDialog(String acModelName, ACModelType modelType, SOABase context, Collection<SOABase> contextCandidates) throws Exception {
+		return showDialog(null, acModelName, modelType, context, contextCandidates);
+	}
+	
+	@SuppressWarnings("rawtypes")
 	public static AbstractACModel showDialog(Window owner, String acModelName, ACModelType modelType, SOABase context, Collection<SOABase> contextCandidates) throws Exception {
 		ACModelDialog acModelDialog = new ACModelDialog(owner, acModelName, modelType, context, contextCandidates);
 		acModelDialog.setUpGUI();
 		return acModelDialog.getDialogObject();
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static void showDialog(AbstractACModel acModel) throws Exception {
+		showDialog(null, acModel);
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -419,23 +478,30 @@ public class ACModelDialog extends AbstractDialog {
 	}
 	
 	@SuppressWarnings("rawtypes")
+	public static void showDialog(AbstractACModel acModel, Collection<SOABase> contextCandidates) throws Exception {
+		showDialog(null, acModel, contextCandidates);
+	}
+	
+	@SuppressWarnings("rawtypes")
 	public static void showDialog(Window owner, AbstractACModel acModel, Collection<SOABase> contextCandidates) throws Exception {
 		ACModelDialog acModelDialog = new ACModelDialog(owner, acModel, contextCandidates);
 		acModelDialog.setUpGUI();
 	}
 	
 	public static void main(String[] args) throws Exception {
-//		ACModelDialog.showDialog(null, "ACModel1", ACModelType.ACL);
-		SOABase c1 = new SOABase("c1");
-		c1.setActivities(Arrays.asList("act1","act2","act3"));
-		SOABase c2 = new SOABase("c2");
-//		DUContext du1 = new DUContext("du1");
-//		du1.setActivities(Arrays.asList("act1","act2"));
-//		
-//		ACLModel m = new ACLModel("g", c1);
-//		du1.setACModel(m);
-//		ACModelDialog.showDialog(null, m);
-		ACModelDialog.showDialog(null, "ACModel1", ACModelType.RBAC, c1, Arrays.asList(c1,c2));
+////		ACModelDialog.showDialog(null, "ACModel1", ACModelType.ACL);
+//		SOABase c1 = new SOABase("c1");
+//		c1.setActivities(Arrays.asList("act1","act2","act3"));
+//		SOABase c2 = new SOABase("c2");
+////		DUContext du1 = new DUContext("du1");
+////		du1.setActivities(Arrays.asList("act1","act2"));
+////		
+////		ACLModel m = new ACLModel("g", c1);
+////		du1.setACModel(m);
+////		ACModelDialog.showDialog(null, m);
+//		ACModelDialog.showDialog(null, "ACModel1", ACModelType.RBAC, c1, Arrays.asList(c1,c2));
+		AbstractACModel model = ACModelDialog.showDialog("Gerd", ACModelType.ACL);
+		System.out.println(model);
 	}
 	
 	

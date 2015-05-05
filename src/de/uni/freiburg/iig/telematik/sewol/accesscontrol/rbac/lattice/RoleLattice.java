@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.invation.code.toval.graphic.dialog.DialogObject;
 import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
@@ -19,7 +20,7 @@ import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.event.Role
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.event.RoleLatticeListenerSupport;
 
 
-public class RoleLattice implements Cloneable{
+public class RoleLattice implements Cloneable, DialogObject<RoleLattice>{
 	
 	protected Set<String> roles = new HashSet<String>();
 	protected Graph<String> lattice = new Graph<String>();

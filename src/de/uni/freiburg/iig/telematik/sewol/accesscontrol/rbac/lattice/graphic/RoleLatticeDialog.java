@@ -19,17 +19,18 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
 
-import de.invation.code.toval.graphic.dialog.AbstractDialog;
+import de.invation.code.toval.graphic.dialog.AbstractEditCreateDialog;
 import de.invation.code.toval.graphic.dialog.DefineGenerateDialog;
 import de.invation.code.toval.graphic.renderer.AlternatingRowColorListCellRenderer;
 import de.invation.code.toval.validate.CompatibilityException;
+import de.invation.code.toval.validate.ParameterException;
+import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.RoleLattice;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
@@ -37,7 +38,7 @@ import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 
-public class RoleLatticeDialog extends AbstractDialog implements EdgeAddedListener{
+public class RoleLatticeDialog extends AbstractEditCreateDialog<RoleLattice> implements EdgeAddedListener{
 	
 	private static final long serialVersionUID = -5216821409053567193L;
 	
@@ -59,26 +60,30 @@ public class RoleLatticeDialog extends AbstractDialog implements EdgeAddedListen
 	private JList roleList;
 	private DefaultListModel roleListModel;
 	
-	private RoleLattice originalLattice = null;
 	
 	public RoleLatticeDialog(Window owner, Collection<String> roles) throws Exception {
-		super(owner);
-		setDialogObject(new RoleLattice(roles));
-		this.editMode = false;
-		initialize();
+		super(owner, roles);
 	}
 	
 	public RoleLatticeDialog(Window owner, RoleLattice lattice) throws Exception {
-		super(owner);
-		this.originalLattice = lattice;
-		this.editMode = true;
-		initialize();
+		super(owner, lattice);
 	}
 	
-	protected void initialize() {
-		if(editMode){
-			setDialogObject(originalLattice.clone());
+	@SuppressWarnings("unchecked")
+	@Override
+	protected RoleLattice newDialogObject(Object... parameters) {
+		Validate.notNull(parameters);
+		Validate.noNullElements(parameters);
+		Collection<String> roles = null;
+		try{
+			roles = (Collection<String>) parameters[0];
+		} catch(Exception e){
+			throw new ParameterException("Cannot extract roles from parameter list.\nReason: " + e.getMessage());
 		}
+		return new RoleLattice(roles);
+	}
+
+	protected void initialize() {
 		roleListModel = new DefaultListModel();
 		setupGraph();
 	}
@@ -127,7 +132,7 @@ public class RoleLatticeDialog extends AbstractDialog implements EdgeAddedListen
 					try {
 						newRoles = DefineGenerateDialog.showDialog(RoleLatticeDialog.this, "Roles");
 					} catch (Exception e2) {
-						JOptionPane.showMessageDialog(RoleLatticeDialog.this, "<html>Cannot launch value chooser dialog dialog.<br>Reason: " + e2.getMessage() + "</html>", "Internal Exception", JOptionPane.ERROR_MESSAGE);
+						internalExceptionMessage("<html>Cannot launch value chooser dialog dialog.<br>Reason: " + e2.getMessage() + "</html>");
 					}
 					if(newRoles != null){
 						if (getDialogObject() == null) {
@@ -136,7 +141,7 @@ public class RoleLatticeDialog extends AbstractDialog implements EdgeAddedListen
 							try {
 								getDialogObject().addRoles(newRoles);
 							} catch (Exception e1) {
-								JOptionPane.showMessageDialog(RoleLatticeDialog.this, "<html>Error on adding role to lattice:<br>Reason: " + e1.getMessage() + "</html>", "Parameter Exception", JOptionPane.ERROR_MESSAGE);
+								errorMessage("Invalid Parameter", "<html>Error on adding role to lattice:<br>Reason: " + e1.getMessage() + "</html>");
 							}
 						}
 						updateRoleList();
@@ -217,21 +222,20 @@ public class RoleLatticeDialog extends AbstractDialog implements EdgeAddedListen
 
 	@Override
 	protected void setTitle() {
-		if(!editMode){
+		if(!editMode()){
 			setTitle("Create role lattice");
 		} else {
 			setTitle("Edit role lattice");
 		}
 	}
 
+	
 	@Override
-	protected void okProcedure() {
+	protected void validateAndSetFieldValues() throws Exception {
 		if(getDialogObject() == null){
-			JOptionPane.showMessageDialog(RoleLatticeDialog.this, "Incomplete role lattice definition.", "Invalid Parameter", JOptionPane.ERROR_MESSAGE);
+			invalidFieldContentMessage("Incomplete role lattice definition.");
 			return;
 		}
-		originalLattice.takeoverValues(getDialogObject());
-		super.okProcedure();
 	}
 
 	private void setupGraph() throws CompatibilityException {
@@ -290,7 +294,7 @@ public class RoleLatticeDialog extends AbstractDialog implements EdgeAddedListen
 							try {
 								getDialogObject().removeRole((String) selectedRole);
 							} catch (Exception e1) {
-								JOptionPane.showMessageDialog(RoleLatticeDialog.this, "<html>Error on removing role from lattice:<br>Reason: "+e1.getMessage()+"</html>", "Parameter Exception", JOptionPane.ERROR_MESSAGE);
+								errorMessage("Invalid Parameter", "<html>Error on removing role from lattice:<br>Reason: "+e1.getMessage()+"</html>");
 							}
 						}
 						layout.reset();
@@ -391,5 +395,8 @@ public class RoleLatticeDialog extends AbstractDialog implements EdgeAddedListen
 		roleLatticeDialog.setUpGUI();
 		return roleLatticeDialog.getDialogObject();
 	}
+
+	@Override
+	protected void prepareEditing() throws Exception {}
 	
 }

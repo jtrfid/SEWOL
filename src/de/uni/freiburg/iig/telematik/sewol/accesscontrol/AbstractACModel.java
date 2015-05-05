@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.invation.code.toval.graphic.dialog.DialogObject;
 import de.invation.code.toval.misc.soabase.SOABase;
 import de.invation.code.toval.misc.soabase.SOABaseChangeReply;
 import de.invation.code.toval.misc.soabase.SOABaseListener;
@@ -26,7 +27,7 @@ import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelType;
 
 
 
-public abstract class AbstractACModel<P extends ACModelProperties> implements SOABaseListener, ACModelListener, Cloneable {
+public abstract class AbstractACModel<P extends ACModelProperties> implements SOABaseListener, ACModelListener, Cloneable, DialogObject<AbstractACModel<P>> {
 	
 	public static final String DEFAULT_AC_MODEL_NAME = "ACModel";
 	
@@ -168,14 +169,18 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 	
 	public abstract boolean hasObjectPermissions();
 	
-	public ACModelProperties getProperties() throws PropertyException {
-		ACModelProperties result = new ACModelProperties();
+	public P getProperties() throws PropertyException {
+		P result = createNewProperties();
 		result.setName(getName());
 		result.setContextName(context.getName());
 		result.setSubjectDescriptor(getSubjectDescriptor());
 		result.setValidUsageModes(getValidUsageModes());
 		return result;
 	}
+	
+	protected abstract P createNewProperties();
+	
+	
 	
 	public boolean isExecutable(String activity) throws CompatibilityException {
 		getContext().validateActivity(activity);
@@ -202,6 +207,8 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 	 * <code>false</code> otherwise.
 	 */
 	public void checkValidity() throws ACMValidationException{
+		if(context == null)
+			throw new ACMValidationException("Invalid state of AC model: No context assigned");
 		if(!getContext().containsActivities())
 			return;
 		for(String activity: getContext().getActivities()){
@@ -227,6 +234,7 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 		if(!validUsageModes.containsAll(usageModes))
 			throw new ParameterException(ErrorCode.INCOMPATIBILITY, "Invalid usage mode. Permitted values: " + validUsageModes);
 	}
+
 	
 	protected void validateSubjectPermissions(Map<String, Set<DataUsage>> permissions) {
 		Validate.notNull(permissions);
@@ -356,24 +364,34 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 		return "AC model " + getName();
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void validUsageModesChanged(AbstractACModel sender, Set<DataUsage> oldModes, Set<DataUsage> newModes) {}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void contextChanged(AbstractACModel sender, SOABase context) {}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void accessPermissionAdded(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void accessPermissionRemoved(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void executionPermissionAdded(AbstractACModel sender, String subject, String transaction) {}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void executionPermissionRemoved(AbstractACModel sender, String subject, String transaction) {}
 	
 	@Override
 	public abstract AbstractACModel<P> clone();
+	
+	public abstract void takeoverValues(AbstractACModel<P> other) throws Exception;
+	
+	public abstract void resetPermissions();
 }

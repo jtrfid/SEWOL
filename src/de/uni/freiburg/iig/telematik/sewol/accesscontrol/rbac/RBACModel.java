@@ -588,7 +588,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 
 	@Override
 	public RBACModelProperties getProperties() throws PropertyException {
-		RBACModelProperties result = new RBACModelProperties(super.getProperties());
+		RBACModelProperties result = super.getProperties();
 
 		result.setRightsPropagation(propagatesRights());
 		result.setRoles(roleLattice.getRoles());
@@ -609,6 +609,11 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 			result.setRoleMembership(subject, getRolesFor(subject, false));
 		}
 		return result;
+	}
+
+	@Override
+	protected RBACModelProperties createNewProperties() {
+		return new RBACModelProperties();
 	}
 
 	@Override
@@ -686,6 +691,24 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 		}
 	}
 	
+	@Override
+	public void takeoverValues(AbstractACModel<RBACModelProperties> other) throws Exception {
+		this.roleLattice.removeRoleLatticeListener(this);
+		resetRoleMembership();
+		resetPermissions();
+		initialize(other.getProperties());
+	}
+	
+	public void resetRoleMembership(){
+		roleMembershipRU.clear();
+		roleMembershipUR.clear();
+	}
+	
+	@Override
+	public void resetPermissions() {
+		rolePermissions.resetPermissions();
+	}
+
 	public static void main(String[] args) throws Exception{
 		SOABase context = new SOABase("c1");
 		context.setSubjects(Arrays.asList("U1","U2","U3","U4","U5","U6","U7","U8","U9","U10"));

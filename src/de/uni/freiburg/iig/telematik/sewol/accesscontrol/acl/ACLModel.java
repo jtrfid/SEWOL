@@ -464,12 +464,17 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 	
 	@Override
 	public ACLModelProperties getProperties() throws PropertyException {
-		ACLModelProperties result = new ACLModelProperties(super.getProperties());
+		ACLModelProperties result = super.getProperties();
 		for(String subject: context.getSubjects()){
 			result.setObjectPermission(subject, getObjectPermissionsForSubject(subject));
 			result.setActivityPermission(subject, getTransactionPermissionsForSubject(subject));
 		}
 		return result;
+	}
+
+	@Override
+	protected ACLModelProperties createNewProperties() {
+		return new ACLModelProperties();
 	}
 
 	@Override
@@ -547,6 +552,21 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 		} catch (PropertyException e) {
 			return null;
 		}
+	}
+	
+
+	@Override
+	public void takeoverValues(AbstractACModel<ACLModelProperties> other) throws Exception{
+		resetPermissions();
+		initialize(other.getProperties());
+	}
+	
+	@Override
+	public void resetPermissions() {
+		activityPermissionsTU.clear();
+		activityPermissionsUT.clear();
+		objectPermissionsOU.clear();
+		objectPermissionsUO.clear();
 	}
 
 	public static void main(String[] args) throws Exception {
