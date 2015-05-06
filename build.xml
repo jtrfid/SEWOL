@@ -24,7 +24,7 @@
 
 	<!-- Project details -->
 	<property name="artifact.name" value="sewol" />
-	<property name="version.name" value="0.1.4" />
+	<property name="version.name" value="0.1.5" />
 
 	<!-- Names for generated files -->
 	<property name="jar.file.name" value="${artifact.name}-${version.name}" />

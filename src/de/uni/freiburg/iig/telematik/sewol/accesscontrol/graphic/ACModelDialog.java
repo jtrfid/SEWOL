@@ -34,12 +34,13 @@ import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.graphic.permission.PermissionDialog;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACMValidationException;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelProperties;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelType;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.RBACModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.graphic.RoleLatticeDialog;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.graphic.RoleMembershipDialog;
 
-public class ACModelDialog extends AbstractEditCreateDialog<AbstractACModel<?>> {
+public class ACModelDialog <P extends ACModelProperties> extends AbstractEditCreateDialog<AbstractACModel<P>> {
 	
 	private static final long serialVersionUID = -2689725669752188740L;
 	
@@ -85,14 +86,12 @@ public class ACModelDialog extends AbstractEditCreateDialog<AbstractACModel<?>> 
 			throw new ParameterException(ErrorCode.INCONSISTENCY, "Context candidates must contain actually assigned context");
 		this.contextCandidates = contextCandidates;
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public ACModelDialog(Window owner, AbstractACModel acModel) throws Exception {
+
+	public ACModelDialog(Window owner, AbstractACModel<P> acModel) throws Exception {
 		super(owner, acModel);
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public ACModelDialog(Window owner, AbstractACModel acModel, Collection<SOABase> contextCandidates) throws Exception {
+
+	public ACModelDialog(Window owner, AbstractACModel<P> acModel, Collection<SOABase> contextCandidates) throws Exception {
 		this(owner, acModel);
 		if(!contextCandidates.contains(acModel.getContext()))
 			throw new ParameterException(ErrorCode.INCONSISTENCY, "Context candidates must contain actually assigned context");
@@ -127,11 +126,10 @@ public class ACModelDialog extends AbstractEditCreateDialog<AbstractACModel<?>> 
 		}
 		return null;
 	}
-	
-	@SuppressWarnings("rawtypes")
+
 	@Override
-	public AbstractACModel getDialogObject(){
-		return (AbstractACModel) super.getDialogObject();
+	public AbstractACModel<P> getDialogObject(){
+		return (AbstractACModel<P>) super.getDialogObject();
 	}
 
 	@Override
@@ -256,6 +254,7 @@ public class ACModelDialog extends AbstractEditCreateDialog<AbstractACModel<?>> 
 		return contextPanel;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private JComboBox getComboContext(){
 		if(comboContext == null){
 			comboContext = new SOABaseComboBox(contextCandidates);
@@ -429,62 +428,52 @@ public class ACModelDialog extends AbstractEditCreateDialog<AbstractACModel<?>> 
 			textArea.setText(getDialogObject().toString());
 		}
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public static AbstractACModel showDialog(String acModelName, ACModelType modelType) throws Exception {
+
+	public static <P extends ACModelProperties> AbstractACModel<P> showDialog(String acModelName, ACModelType modelType) throws Exception {
 		return showDialog(null, acModelName, modelType);
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public static AbstractACModel showDialog(Window owner, String acModelName, ACModelType modelType) throws Exception {
-		ACModelDialog acModelDialog = new ACModelDialog(owner, acModelName, modelType);
+
+	public static <P extends ACModelProperties> AbstractACModel<P> showDialog(Window owner, String acModelName, ACModelType modelType) throws Exception {
+		ACModelDialog<P> acModelDialog = new ACModelDialog<P>(owner, acModelName, modelType);
 		acModelDialog.setUpGUI();
 		return acModelDialog.getDialogObject();
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public static AbstractACModel showDialog(String acModelName, ACModelType modelType, SOABase context) throws Exception {
+
+	public static <P extends ACModelProperties> AbstractACModel<P> showDialog(String acModelName, ACModelType modelType, SOABase context) throws Exception {
 		return showDialog(null, acModelName, modelType, context);
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public static AbstractACModel showDialog(Window owner, String acModelName, ACModelType modelType, SOABase context) throws Exception {
-		ACModelDialog acModelDialog = new ACModelDialog(owner, acModelName, modelType, context);
+
+	public static <P extends ACModelProperties> AbstractACModel<P> showDialog(Window owner, String acModelName, ACModelType modelType, SOABase context) throws Exception {
+		ACModelDialog<P> acModelDialog = new ACModelDialog<P>(owner, acModelName, modelType, context);
 		acModelDialog.setUpGUI();
 		return acModelDialog.getDialogObject();
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public static AbstractACModel showDialog(String acModelName, ACModelType modelType, SOABase context, Collection<SOABase> contextCandidates) throws Exception {
+
+	public static <P extends ACModelProperties> AbstractACModel<P> showDialog(String acModelName, ACModelType modelType, SOABase context, Collection<SOABase> contextCandidates) throws Exception {
 		return showDialog(null, acModelName, modelType, context, contextCandidates);
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public static AbstractACModel showDialog(Window owner, String acModelName, ACModelType modelType, SOABase context, Collection<SOABase> contextCandidates) throws Exception {
-		ACModelDialog acModelDialog = new ACModelDialog(owner, acModelName, modelType, context, contextCandidates);
+
+	public static <P extends ACModelProperties> AbstractACModel<P> showDialog(Window owner, String acModelName, ACModelType modelType, SOABase context, Collection<SOABase> contextCandidates) throws Exception {
+		ACModelDialog<P> acModelDialog = new ACModelDialog<P>(owner, acModelName, modelType, context, contextCandidates);
 		acModelDialog.setUpGUI();
 		return acModelDialog.getDialogObject();
 	}
 	
-	@SuppressWarnings("rawtypes")
-	public static void showDialog(AbstractACModel acModel) throws Exception {
+	public static <P extends ACModelProperties> void showDialog(AbstractACModel<P> acModel) throws Exception {
 		showDialog(null, acModel);
 	}
 	
-	@SuppressWarnings("rawtypes")
-	public static void showDialog(Window owner, AbstractACModel acModel) throws Exception {
-		ACModelDialog acModelDialog = new ACModelDialog(owner, acModel);
+	public static <P extends ACModelProperties> void showDialog(Window owner, AbstractACModel<P> acModel) throws Exception {
+		ACModelDialog<P> acModelDialog = new ACModelDialog<P>(owner, acModel);
 		acModelDialog.setUpGUI();
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public static void showDialog(AbstractACModel acModel, Collection<SOABase> contextCandidates) throws Exception {
+
+	public static <P extends ACModelProperties> void showDialog(AbstractACModel<P> acModel, Collection<SOABase> contextCandidates) throws Exception {
 		showDialog(null, acModel, contextCandidates);
 	}
-	
-	@SuppressWarnings("rawtypes")
-	public static void showDialog(Window owner, AbstractACModel acModel, Collection<SOABase> contextCandidates) throws Exception {
-		ACModelDialog acModelDialog = new ACModelDialog(owner, acModel, contextCandidates);
+
+	public static <P extends ACModelProperties> void showDialog(Window owner, AbstractACModel<P> acModel, Collection<SOABase> contextCandidates) throws Exception {
+		ACModelDialog<P> acModelDialog = new ACModelDialog<P>(owner, acModel, contextCandidates);
 		acModelDialog.setUpGUI();
 	}
 	
@@ -500,6 +489,7 @@ public class ACModelDialog extends AbstractEditCreateDialog<AbstractACModel<?>> 
 ////		du1.setACModel(m);
 ////		ACModelDialog.showDialog(null, m);
 //		ACModelDialog.showDialog(null, "ACModel1", ACModelType.RBAC, c1, Arrays.asList(c1,c2));
+		@SuppressWarnings("rawtypes")
 		AbstractACModel model = ACModelDialog.showDialog("Gerd", ACModelType.ACL);
 		System.out.println(model);
 	}

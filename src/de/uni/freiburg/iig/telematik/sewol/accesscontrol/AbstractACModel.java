@@ -27,7 +27,7 @@ import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelType;
 
 
 
-public abstract class AbstractACModel<P extends ACModelProperties> implements SOABaseListener, ACModelListener, Cloneable, DialogObject<AbstractACModel<P>> {
+public abstract class AbstractACModel<T extends ACModelProperties> implements SOABaseListener, ACModelListener, Cloneable, DialogObject<AbstractACModel<T>> {
 	
 	public static final String DEFAULT_AC_MODEL_NAME = "ACModel";
 	
@@ -54,7 +54,7 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 		setContext(context);
 	}
 	
-	protected AbstractACModel(P properties, SOABase context) throws PropertyException {
+	protected AbstractACModel(T properties, SOABase context) throws PropertyException {
 		Validate.notNull(properties);
 		Validate.notNull(context);
 		if(!properties.getContextName().equals(context.getName()))
@@ -64,7 +64,7 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 		initialize(properties);
 	}
 	
-	protected void initialize(P properties) throws PropertyException {
+	protected void initialize(T properties) throws PropertyException {
 		setName(properties.getName());
 		setSubjectDescriptor(properties.getSubjectDescriptor());
 		this.type = properties.getType();
@@ -169,8 +169,8 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 	
 	public abstract boolean hasObjectPermissions();
 	
-	public P getProperties() throws PropertyException {
-		P result = createNewProperties();
+	public T getProperties() throws PropertyException {
+		T result = createNewProperties();
 		result.setName(getName());
 		result.setContextName(context.getName());
 		result.setSubjectDescriptor(getSubjectDescriptor());
@@ -178,7 +178,7 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 		return result;
 	}
 	
-	protected abstract P createNewProperties();
+	protected abstract T createNewProperties();
 	
 	
 	
@@ -389,9 +389,9 @@ public abstract class AbstractACModel<P extends ACModelProperties> implements SO
 	public void executionPermissionRemoved(AbstractACModel sender, String subject, String transaction) {}
 	
 	@Override
-	public abstract AbstractACModel<P> clone();
+	public abstract AbstractACModel<T> clone();
 	
-	public abstract void takeoverValues(AbstractACModel<P> other) throws Exception;
+	public abstract void takeoverValues(AbstractACModel<T> other) throws Exception;
 	
 	public abstract void resetPermissions();
 }
