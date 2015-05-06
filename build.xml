@@ -82,6 +82,15 @@
 			<fileset dir="${src.dir}">
 				<include name="**/*.java" />
 			</fileset>
+			<fileset dir="${TOVAL.location}/src">
+				<include name="**/*.java" />
+			</fileset>
+			<fileset dir="${TOVAL.location}/res">
+				<include name="**/*.java" />
+			</fileset>
+			<fileset dir="${JAGAL.location}/src">
+				<include name="**/*.java" />
+			</fileset>
 		</javadoc>
 
 		<echo>Creating new JARs...</echo>
