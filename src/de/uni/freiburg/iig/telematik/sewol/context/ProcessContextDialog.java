@@ -102,7 +102,7 @@ public class ProcessContextDialog extends SOABaseDialog {
 			btnSetACModel.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					try {
-						AbstractACModel acModel = getDialogObject().getACModel();
+						AbstractACModel<?> acModel = getDialogObject().getACModel();
 						if(acModel != null){
 							try {
 								ACModelDialog.showDialog(ProcessContextDialog.this, acModel);

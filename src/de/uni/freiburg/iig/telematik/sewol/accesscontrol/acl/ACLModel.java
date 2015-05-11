@@ -503,9 +503,8 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void validUsageModesChanged(AbstractACModel sender, Set<DataUsage> oldModes, Set<DataUsage> newModes) {
+	public void validUsageModesChanged(AbstractACModel<?> sender, Set<DataUsage> oldModes, Set<DataUsage> newModes) {
 		Set<DataUsage> removedModes = new HashSet<DataUsage>(oldModes);
 		removedModes.removeAll(newModes);
 		for(String subject: context.getSubjects()){

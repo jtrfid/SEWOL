@@ -1,22 +1,16 @@
 package de.uni.freiburg.iig.telematik.sewol.context;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import de.invation.code.toval.constraint.AbstractConstraint;
-import de.invation.code.toval.constraint.NumberConstraint;
 import de.invation.code.toval.misc.soabase.SOABase;
-import de.invation.code.toval.misc.soabase.SOABaseProperties;
 import de.invation.code.toval.properties.PropertyException;
-import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
 
 /**
  * This class provides context information for process execution.<br>
@@ -44,9 +38,8 @@ public class ProcessConstraintContext extends ProcessContext {
 	
 	/**
 	 * Creates a new context using the given activity names.
-	 * @param activities Names of process activities.
-	 * @throws ParameterException 
-	 * @throws Exception If activity list is <code>null</code> or empty.
+	 * @param name Names of process activities.
+	 * @throws ParameterException
 	 */
 	public ProcessConstraintContext(String name){
 		super(name);

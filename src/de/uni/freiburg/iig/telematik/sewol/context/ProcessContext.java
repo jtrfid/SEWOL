@@ -47,7 +47,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	/**
 	 * Access control model used to decide which subjects can execute which activities.
 	 */
-	protected AbstractACModel acModel;
+	protected AbstractACModel<?> acModel;
 	
 	protected List<DataUsage> validUsageModes;
 	
@@ -61,9 +61,8 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	
 	/**
 	 * Creates a new context using the given activity names.
-	 * @param activities Names of process activities.
-	 * @throws ParameterException 
-	 * @throws Exception If activity list is <code>null</code> or empty.
+	 * @param name Names of process activities.
+	 * @throws ParameterException
 	 */
 	public ProcessContext(String name){
 		super(name);
@@ -280,7 +279,6 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * Sets the context attributes.<br>
 	 * When context attributes are set, data usage is also reset.
 	 * @param attributes A list of attribute names.
-	 * @see #clearAttributes()
 	 */
 	public void setAttributes(Set<String> attributes){
 		setObjects(attributes);
@@ -397,7 +395,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * authorized subjects for activity execution.
 	 * @return The access control model of the context.
 	 */
-	public AbstractACModel getACModel(){
+	public AbstractACModel<?> getACModel(){
 		return acModel;
 	}
 	
@@ -409,7 +407,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * 
 	 * @param acModel An access control model.
 	 */
-	public void setACModel(AbstractACModel acModel) {
+	public void setACModel(AbstractACModel<?> acModel) {
 		setACModel(acModel, true);
 	}
 	
@@ -421,7 +419,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * 
 	 * @param acModel An access control model.
 	 */
-	public void setACModel(AbstractACModel acModel, boolean notifyListeners) {
+	public void setACModel(AbstractACModel<?> acModel, boolean notifyListeners) {
 		Validate.notNull(acModel);
 		if(this.acModel == acModel)
 			return;
@@ -445,7 +443,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 		}
 	}
 	
-	public boolean isCompatible(AbstractACModel acModel){
+	public boolean isCompatible(AbstractACModel<?> acModel){
 		try {
 			validateACModel(acModel);
 			return true;
@@ -510,9 +508,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * @throws CompatibilityException 
 	 * @throws IllegalArgumentException If the given activity/attributes are not known.
 	 * @throws NullPointerException If the attribute set is <code>null</code>.
-	 * @see {@link #getActivities()}
 	 * @see #getAttributes()
-	 * @see #setAttributes(List)
 	 */
 	public void setDataFor(String activity, Set<String> attributes) throws CompatibilityException{
 		validateActivity(activity);
@@ -537,10 +533,10 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * @throws CompatibilityException 
 	 * @throws IllegalArgumentException If the given activity/attributes are not known.
 	 * @throws NullPointerException If the data usage set is <code>null</code> 
-	 * @see {@link DataUsage}
+	 * @see DataUsage
 	 * @see #getActivities()
 	 * @see #getAttributes()
-	 * @see #setAttributes(List)
+	 * @see #setAttributes(Set)
 	 */
 	public void setDataUsageFor(String activity, Map<String, Set<DataUsage>> dataUsage) throws CompatibilityException{
 		validateActivity(activity);
@@ -578,9 +574,9 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * @throws ParameterException 
 	 * @throws CompatibilityException 
 	 * @throws IllegalArgumentException If the given activity/attributes are not known.
-	 * @see {@link #getActivities()}
+	 * @see #getActivities()
 	 * @see #getAttributes()
-	 * @see #setAttributes(List)
+	 * @see #setAttributes(Set)
 	 */
 	public void addDataUsageFor(String activity, String attribute) throws CompatibilityException{
 		setDataUsageFor(activity, attribute, new HashSet<DataUsage>(validUsageModes));
@@ -597,9 +593,9 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * @throws ParameterException 
 	 * @throws CompatibilityException 
 	 * @throws IllegalArgumentException IllegalArgumentException If the given activity/attributes are not known.
-	 * @see {@link #getActivities()}
+	 * @see #getActivities()
 	 * @see #getAttributes()
-	 * @see #setAttributes(List)
+	 * @see #setAttributes(Set)
 	 */
 	public void addDataUsageFor(String activity, String attribute, DataUsage dataUsage) throws CompatibilityException{
 		validateActivity(activity);
@@ -643,9 +639,9 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * @param dataUsage Usage of the data attribute by the given activities.
 	 * @throws ParameterException 
 	 * @throws IllegalArgumentException IllegalArgumentException If the given activities/attributes are not known.
-	 * @see {@link #getActivities()}
+	 * @see #getActivities()
 	 * @see #getAttributes()
-	 * @see #setAttributes(List)
+	 * @see #setAttributes(Set)
 	 */
 	public void addDataUsageForAll(Collection<String> activities, String attribute, DataUsage dataUsage){
 		Validate.notNull(activities);
@@ -667,7 +663,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * @throws ParameterException 
 	 * @throws CompatibilityException 
 	 * @throws IllegalArgumentException IllegalArgumentException If the given activity/attribute is not known.
-	 * @see {@link #getActivities()}
+	 * @see #getActivities()
 	 * @see #getAttributes()
 	 */
 	public Set<DataUsage> getDataUsageFor(String activity, String attribute) throws CompatibilityException{
@@ -694,7 +690,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * @throws ParameterException 
 	 * @throws CompatibilityException 
 	 * @throws IllegalArgumentException IllegalArgumentException If the given activity is not known.
-	 * @see {@link #getActivities()}
+	 * @see #getActivities()
 	 */
 	public Map<String, Set<DataUsage>> getDataUsageFor(String activity) throws CompatibilityException{
 		validateActivity(activity);
@@ -722,7 +718,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * @throws ParameterException 
 	 * @throws CompatibilityException 
 	 * @throws IllegalArgumentException IllegalArgumentException If the given activity is not known.
-	 * @see {@link #getActivities()}
+	 * @see #getActivities()
 	 */
 	public Set<String> getAttributesFor(String activity) throws CompatibilityException{
 		validateActivity(activity);
@@ -745,8 +741,6 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * <code>false</code> otherwise.
 	 * @throws ParameterException 
 	 * @throws CompatibilityException 
-	 * @throws Exception If the activity or subject are not known,<br>
-	 * or if the access control model throws an exception.
 	 */
 	public boolean isAuthorized(String subject, String activity) throws CompatibilityException{
 		if(!subjects.contains(subject))
@@ -787,8 +781,6 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * <code>false</code> otherwise.
 	 * @throws ParameterException 
 	 * @throws CompatibilityException 
-	 * @throws Exception If the activity is not known,<br>
-	 * or if the access control model throws an exception.
 	 */
 	public boolean isExecutable(String activity) throws CompatibilityException{
 		validateActivity(activity);
@@ -836,7 +828,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 			throw new ParameterException(ErrorCode.INCOMPATIBILITY, "Invalid usage mode. Permitted values: " + validUsageModes);
 	}
 	
-	public void validateACModel(AbstractACModel acModel) throws InconsistencyException{
+	public void validateACModel(AbstractACModel<?> acModel) throws InconsistencyException{
 		Validate.notNull(acModel);
 		if(!SetUtils.containSameElements(new HashSet<DataUsage>(getValidUsageModes()), new HashSet<DataUsage>(acModel.getValidUsageModes())))
 			throw new InconsistencyException("Incompatible access control model: Different set of valid data usage modes.");
@@ -867,7 +859,6 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 	 * @param originatorCount The number of desired originators.
 	 * @param roles The roles to use.
 	 * @return A new randomly generated Context.
-	 * @throws Exception 
 	 */
 	public static ProcessContext createRandomContext(Set<String> activities, int originatorCount, List<String> roles){
 		Validate.notNull(activities);
@@ -1035,7 +1026,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 		
 		//Set AC Model
 		acModel = null;
-		AbstractACModel otherACModel = context.getACModel();
+		AbstractACModel<?> otherACModel = context.getACModel();
 		if(otherACModel != null){
 			setACModel(otherACModel, notifyListeners);
 		}

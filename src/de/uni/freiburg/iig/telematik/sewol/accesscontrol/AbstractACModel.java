@@ -203,8 +203,6 @@ public abstract class AbstractACModel<T extends ACModelProperties> implements SO
 	
 	/**
 	 * An Access Control Model is considered valid, if all transactions are executable.
-	 * @return <code>true</code> if all transactions are executable;<br>
-	 * <code>false</code> otherwise.
 	 */
 	public void checkValidity() throws ACMValidationException{
 		if(context == null)
@@ -364,29 +362,23 @@ public abstract class AbstractACModel<T extends ACModelProperties> implements SO
 		return "AC model " + getName();
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void validUsageModesChanged(AbstractACModel sender, Set<DataUsage> oldModes, Set<DataUsage> newModes) {}
-	
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void contextChanged(AbstractACModel sender, SOABase context) {}
+	public void validUsageModesChanged(AbstractACModel<?> sender, Set<DataUsage> oldModes, Set<DataUsage> newModes) {}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void accessPermissionAdded(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {}
+	public void contextChanged(AbstractACModel<?> sender, SOABase context) {}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void accessPermissionRemoved(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {}
+	public void accessPermissionAdded(AbstractACModel<?> sender, String subject, String object, Collection<DataUsage> dataUsageModes) {}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void executionPermissionAdded(AbstractACModel sender, String subject, String transaction) {}
+	public void accessPermissionRemoved(AbstractACModel<?> sender, String subject, String object, Collection<DataUsage> dataUsageModes) {}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void executionPermissionRemoved(AbstractACModel sender, String subject, String transaction) {}
+	public void executionPermissionAdded(AbstractACModel<?> sender, String subject, String transaction) {}
+
+	@Override
+	public void executionPermissionRemoved(AbstractACModel<?> sender, String subject, String transaction) {}
 	
 	@Override
 	public abstract AbstractACModel<T> clone();

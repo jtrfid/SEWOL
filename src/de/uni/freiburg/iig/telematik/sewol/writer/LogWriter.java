@@ -3,8 +3,6 @@ package de.uni.freiburg.iig.telematik.sewol.writer;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import javax.naming.ConfigurationException;
-
 import de.invation.code.toval.file.EOLType;
 import de.invation.code.toval.file.FileWriter;
 import de.invation.code.toval.validate.CompatibilityException;
@@ -206,7 +204,7 @@ public class LogWriter extends FileWriter{
 	 * It ensures the proper creation of the output file and writes the file header.
 	 * @param logFormat
 	 * @throws IOException if output file creation or header writing cause an exception.
-	 * @throws ConfigurationException if the charset of the log writer is not supported by the log format.
+	 * @throws CompatibilityException if the charset of the log writer is not supported by the log format.
 	 * @throws PerspectiveException if the log format does not support the writers' log perspective.
 	 */
 	protected void initialize(AbstractLogFormat logFormat) throws PerspectiveException, IOException, CompatibilityException {

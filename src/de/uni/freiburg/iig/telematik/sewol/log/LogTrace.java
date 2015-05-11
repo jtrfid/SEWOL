@@ -50,7 +50,6 @@ public class LogTrace<E extends LogEntry> {
 	/**
 	 * Returns all log entries of this trace whose activities are in the given activity set.
 	 * @param activities
-	 * @return
 	 */
 	public List<E> getEntriesForActivities(Set<String> activities){
 		Validate.noNullElements(activities);

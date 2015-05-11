@@ -416,7 +416,6 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	 * Returns all users with the given role.<br>
 	 * It is assumed that the caller ensures parameter validity.
 	 * @param roles
-	 * @return
 	 */
 	private List<String> getUsersFor(Collection<String> roles){
 		HashList<String> users = new HashList<String>();
@@ -431,7 +430,6 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	 * Returns all users with the given role.<br>
 	 * It is assumed that the caller ensures parameter validity.
 	 * @param roles
-	 * @return
 	 */
 	private List<String> getUsersFor(String... roles){
 		HashList<String> users = new HashList<String>();
@@ -450,7 +448,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	 * @param users The set of users.
 	 * @param roles The set of roles.
 	 * @return A new RBAC model with random role assignments.
-	 * @ 
+	 * @throws ParameterException 
 	 */
 	public static RBACModel createRandomModel(Collection<String> users, Collection<String> transactions, Collection<String> roles){
 		Validate.notNull(transactions);
@@ -747,17 +745,15 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	@Override
 	public void nameChanged(String oldName, String newName) {}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void accessPermissionAdded(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {
+	public void accessPermissionAdded(AbstractACModel<?> sender, String subject, String object, Collection<DataUsage> dataUsageModes) {
 		if(sender == rolePermissions){
 			acModelListenerSupport.notifyAccessPermissionAdded(subject, object, dataUsageModes);
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public void accessPermissionRemoved(AbstractACModel sender, String subject, String object, Collection<DataUsage> dataUsageModes) {
+	public void accessPermissionRemoved(AbstractACModel<?> sender, String subject, String object, Collection<DataUsage> dataUsageModes) {
 		if(sender == rolePermissions){
 			acModelListenerSupport.notifyAccessPermissionRemoved(subject, object, dataUsageModes);
 		}

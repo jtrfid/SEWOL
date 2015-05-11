@@ -101,7 +101,7 @@ public class RoleLattice implements Cloneable, DialogObject<RoleLattice>{
 	 * Returns all roles within the lattice that dominate the given role.
 	 * @param role A role of the lattice
 	 * @return All dominating roles.
-	 * @throws Exception If the role is not known.
+	 * @throws CompatibilityException If the role is not known.
 	 */
 	public Set<String> getDominatingRolesFor(String role) throws CompatibilityException{
 		return getDominatingRolesFor(role, true);
@@ -131,7 +131,7 @@ public class RoleLattice implements Cloneable, DialogObject<RoleLattice>{
 	 * Returns all roles within the lattice that are dominated by the given role.
 	 * @param role A role of the lattice
 	 * @return All dominated roles.
-	 * @throws Exception If the role is not known.
+	 * @throws CompatibilityException If the role is not known.
 	 */
 	public Set<String> getDominatedRolesFor(String role) throws CompatibilityException{
 		return getDominatedRolesFor(role, true);

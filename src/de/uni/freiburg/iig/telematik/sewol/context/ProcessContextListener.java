@@ -8,7 +8,7 @@ import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
 
 public interface ProcessContextListener extends SOABaseListener {
 	
-	public void acModelSet(AbstractACModel acModel);
+	public void acModelSet(AbstractACModel<?> acModel);
 	
 	public void acModelRemoved();
 	

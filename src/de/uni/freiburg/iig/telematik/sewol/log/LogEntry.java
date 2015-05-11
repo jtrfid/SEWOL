@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.Set;
 
 import de.invation.code.toval.time.TimeValue;
+import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 
 
@@ -228,7 +229,7 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable{
 	 * @return <code>true</code> if {@link #originator} was modified;<br>
 	 * <code>false</code> otherwise.
 	 */
-	public boolean setOriginator(String originator) throws LockingException{
+	public boolean setOriginator(String originator) throws LockingException {
 		Validate.notNull(originator);
 		Validate.notEmpty(originator);
 		

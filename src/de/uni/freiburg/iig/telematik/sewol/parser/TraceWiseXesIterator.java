@@ -15,21 +15,6 @@ import de.invation.code.toval.validate.Validate;
  * The fragment size has a direct impact on the memory usage and the performance of the following parsing process. By choosing a large fragment size, the parser might need a lot of memory and might need to write out some shadow maps for swapping (see NikeFS of OpenXES). For a low fragment size one must keep in mind that the parser reloads the extensions regularly, what slows down the parsing process enormously and also fills up the shadow maps. For many
  * traces with few entries a fragment size of more than 10000 can be sufficient, where a fragment size of 1000 can bring a good performance with less very large traces. The default value of a fragment size of 5000 should bring a good tradeoff of memory usage and performance.
  * </p>
- * <p>
- * To use the TraceWiseXesIterator with the parser one can do the following:
- * 
- * <pre>
- * {@code
- * 	TraceWiseXesIterator traceIterator = new TraceWiseXesIterator(PATH_TO_XES, 1000);
- * 	XesXmlParser parser = new XesXmlParser();
- * 	while (traceIterator.hasNext()) {
- * 		List<XLog> logFragment = parser.parse(traceIterator.next());
- * 		// do something
- * 	}
- * }
- * </pre>
- * 
- * </p>
  * 
  * @version 1.0
  * @author Thomas Stocker

@@ -40,7 +40,7 @@ public class DULogEntry extends LogEntry {
 	}
 
 	/**
-	 * Returns the list of attributes ({@link #inputDataUsage}).<br>
+	 * Returns the list of attributes.<br>
 	 * Note that data attributes themselves are not copied or cloned.
 	 * 
 	 * @return A list containing the attributes.

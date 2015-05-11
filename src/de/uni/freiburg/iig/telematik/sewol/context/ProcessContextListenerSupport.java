@@ -11,7 +11,7 @@ public class ProcessContextListenerSupport extends AbstractListenerSupport<Proce
 
 	private static final long serialVersionUID = 7745740154715410397L;
 
-	public void notifyACModelSet(AbstractACModel acModel){
+	public void notifyACModelSet(AbstractACModel<?> acModel){
 		for(ProcessContextListener listener: listeners){
 			listener.acModelSet(acModel);
 		}

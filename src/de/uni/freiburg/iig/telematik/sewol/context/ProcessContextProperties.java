@@ -92,7 +92,7 @@ public class ProcessContextProperties extends SOABaseProperties{
 	 * and storing a string-representation of this data usage under this name.<br>
 	 * Additionally, the new data usage name is stored in the property field which is summing up all data usage names (ACTIVITY_DATA_USAGES).
 	 * @return The newly generated name for the data usage under which it is accessible.
-	 * @ if the given data usage parameters are invalid. 
+	 * @throws ParameterException if the given data usage parameters are invalid. 
 	 * @throws PropertyException if the data usage property name cannot be generated or the data usage cannot be stored.
 	 * @see #getNextDataUsageIndex()
 	 * @see #addDataUsageNameToList(String)
@@ -150,7 +150,7 @@ public class ProcessContextProperties extends SOABaseProperties{
 	/**
 	 * Adds an activity to the list of activities with data usage.
 	 * @param activity The name of the activity to add.
-	 * @ if the activity name is invalid.
+	 * @throws ParameterException if the activity name is invalid.
 	 */
 	private void addActivityWithDataUsage(String activity) {
 		Validate.notNull(activity);
@@ -179,7 +179,7 @@ public class ProcessContextProperties extends SOABaseProperties{
 	/**
 	 * Adds a new data usage property name to the list of data usage properties (DATA_USAGES-field).
 	 * @param dataUsageName The name of the data usage-property to add (e.g. DATA_USAGE_5).
-	 * @ if the given property name is invalid.
+	 * @throws ParameterException if the given property name is invalid.
 	 */
 	private void addDataUsageNameToList(String dataUsageName) {
 		validateStringValue(dataUsageName);
@@ -194,7 +194,7 @@ public class ProcessContextProperties extends SOABaseProperties{
 	 * When new data usages are added, the lowest unused index is used as property name.
 	 * @return The lowest free index to be used for data usage naming.
 	 * @throws PropertyException if the extraction of used indexes fails.
-	 * @see {@link #getDataUsageNameIndexes()}
+	 * @see #getDataUsageNameIndexes()
 	 */
 	private int getNextDataUsageIndex() throws PropertyException{
 		Set<Integer> usedIndexes = getDataUsageNameIndexes();
@@ -237,7 +237,7 @@ public class ProcessContextProperties extends SOABaseProperties{
 	 * These names are required to extract data usage property-values.
 	 * @param activity The name of the activity
 	 * @return A set of data usage property-names related to the given activity.
-	 * @ if the given activity name is <code>null</code or invalid.
+	 * @throws ParameterException if the given activity name is <code>null</code or invalid.
 	 */
 	private Set<String> getDataUsageNames(String activity) {
 		Validate.notNull(activity);

@@ -10,6 +10,7 @@ import de.invation.code.toval.constraint.StringConstraint;
 import de.invation.code.toval.misc.ArrayUtils;
 import de.invation.code.toval.misc.StringUtils;
 import de.invation.code.toval.properties.PropertyException;
+import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 
 public class ProcessConstraintContextProperties extends ProcessContextProperties{
@@ -33,7 +34,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	 * Adds a routing constraint for an activity.
 	 * @param activity The name of the activity for which the constraint is added.
 	 * @param constraint The routing constraint to add.
-	 * @ if the given parameters are invalid.
+	 * @throws ParameterException if the given parameters are invalid.
 	 * @throws PropertyException if the given constraint cannot be added as a property.
 	 * @see #addConstraint(AbstractConstraint)
 	 * @see #addActivityWithConstraints(String)
@@ -60,7 +61,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	/**
 	 * Adds an activity to the list of activities with routing constraints.
 	 * @param activity The name of the activity to add.
-	 * @ if the activity name is invalid.
+	 * @throws ParameterException if the activity name is invalid.
 	 */
 	private void addActivityWithConstraints(String activity) {
 		Validate.notNull(activity);
@@ -73,7 +74,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	/**
 	 * Removes an activity from the list of activities with routing constraints.
 	 * @param activity The name of the activity to remove.
-	 * @ if the activity name is invalid.
+	 * @throws ParameterException if the activity name is invalid.
 	 */
 	private void removeActivityWithConstraints(String activity) {
 		Validate.notNull(activity);
@@ -112,10 +113,9 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	 * Additionally, the new constraint name is stored in the property field which is summing up all constraint names (CONSTRAINTS).
 	 * @param constraint The routing constraint to add.
 	 * @return The newly generated name for the constraint under which it is accessible.
-	 * @ if the given routing constraint is <code>null</code>. 
+	 * @throws ParameterException if the given routing constraint is <code>null</code>. 
 	 * @throws PropertyException if the constraint property name cannot be generated or the constraint cannot be stored.
 	 * @see #getNextConstraintIndex()
-	 * @see #addConstraintName(String)
 	 */
 	private String addConstraint(AbstractConstraint<?> constraint) throws PropertyException{
 		Validate.notNull(constraint);
@@ -132,7 +132,6 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	 * When new constraints are added, the lowest unused index is used as property name.
 	 * @return The lowest free index to be used for constraint naming.
 	 * @throws PropertyException if the extraction of used indexes fails.
-	 * @see {@link #getConstraintNameIndexes()}
 	 */
 	private int getNextConstraintIndex() throws PropertyException{
 		Set<Integer> usedIndexes = getConstraintNameIndexes();
@@ -173,7 +172,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	/**
 	 * Adds a new constraint property name to the list of constraint properties (CONSTRAINTS-field).
 	 * @param constraintName The name of the constraint-property to add (e.g. CONSTRAINT_5).
-	 * @ if the given property name is invalid.
+	 * @throws ParameterException if the given property name is invalid.
 	 */
 	private void addConstraintNameToList(String constraintName) {
 		validateStringValue(constraintName);
@@ -185,7 +184,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	/**
 	 * Removes the constraint property with the given name from the list of constraint properties (CONSTRAINTS-field).
 	 * @param constraintName The name of the constraint-property to remove (e.g. CONSTRAINT_5).
-	 * @ if the given property name is invalid.
+	 * @throws ParameterException if the given property name is invalid.
 	 */
 	private void removeConstraintNameFromList(String constraintName) {
 		validateStringValue(constraintName);
@@ -217,7 +216,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	 * 
 	 * @param activity The name of the activity whose routing constraints are requested.
 	 * @return A possibly empty set of routing constraints.
-	 * @ if the activity name is <code>null</code> or empty.
+	 * @throws ParameterException if the activity name is <code>null</code> or empty.
 	 * @throws PropertyException if corresponding constraint-properties cannot be extracted.
 	 * @see #getConstraintNames(String)
 	 * @see #getConstraint(String)
@@ -236,7 +235,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	 * These names are required to extract constraint property-values.
 	 * @param activity The name of the activity
 	 * @return A set of constraint property-names related to the given activity.
-	 * @ if the given activity name is <code>null</code or invalid.
+	 * @throws ParameterException if the given activity name is <code>null</code or invalid.
 	 */
 	private Set<String> getConstraintNames(String activity) {
 		Validate.notNull(activity);

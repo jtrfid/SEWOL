@@ -71,7 +71,7 @@ public class XESLogParser extends AbstractLogParser {
 	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
 	 * @throws ParameterException
 	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
-	 * @throws IOException
+	 * @throws ParserException
 	 *             Gets thrown if the file under the given path can't be read, is a directory, or doesn't exist.
 	 */
 	public List<List<LogTrace<LogEntry>>> parse(String filePath, ParsingMode parsingMode) throws ParameterException, ParserException {
@@ -89,7 +89,7 @@ public class XESLogParser extends AbstractLogParser {
 	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
 	 * @throws ParameterException
 	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
-	 * @throws IOException
+	 * @throws ParserException
 	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
 	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode, ParserFileFormat fileFormat) throws ParameterException, ParserException {
@@ -188,7 +188,7 @@ public class XESLogParser extends AbstractLogParser {
 	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
 	 * @throws ParameterException
 	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
-	 * @throws IOException
+	 * @throws ParserException
 	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
 	@Override
