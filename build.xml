@@ -53,6 +53,8 @@
 	<path id="JAGAL.classpath">
 		<pathelement location="${JAGAL.location}/bin/classes" />
 		<path refid="TOVAL.classpath" />
+		<pathelement location="${JAGAL.location}/lib/junit/junit-4.11.jar" />
+		<pathelement location="${JAGAL.location}/lib/jgraphXwithsources.jar" />
 	</path>
 
 	<path id="SEWOL.classpath">
