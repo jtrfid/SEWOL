@@ -33,6 +33,7 @@
 
 	<!-- Source and destination directories -->
 	<property name="src.dir" value="${basedir}/src" />
+	<property name="ext.dir" value="${basedir}/ext" />
 	<property name="test.dir" value="${basedir}/test" />
 	<property name="target.dir" value="${basedir}/bin" />
 	<property name="target.dir.jar" value="${target.dir}/${artifact.name}-${version.name}" />
@@ -62,13 +63,13 @@
 		<pathelement location="${tests.target.dir}" />
 		<path refid="TOVAL.classpath" />
 		<path refid="JAGAL.classpath" />
-		<pathelement location="lib/openxes/OpenXES.jar" />
-		<pathelement location="lib/openxes/guava-16.0.1.jar" />
+		<pathelement location="lib/guava-16.0.1.jar" />
 		<pathelement location="lib/collections-generic-4.01.jar" />
 		<pathelement location="lib/jung-algorithms-2.0.1.jar" />
 		<pathelement location="lib/jung-api-2.0.1.jar" />
 		<pathelement location="lib/jung-graph-impl-2.0.1.jar" />
 		<pathelement location="lib/jung-visualization-2.0.1.jar" />
+		<pathelement location="lib/xstream-1.4.8.jar" />
 	</path>
 
 	<!-- Package JARs -->
@@ -82,6 +83,9 @@
 		<echo>Generating javadoc files...</echo>
 		<javadoc sourcepath="${src.dir}" destdir="${docs.temp.dir}">
 			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+			</fileset>
+			<fileset dir="${ext.dir}">
 				<include name="**/*.java" />
 			</fileset>
 			<fileset dir="${TOVAL.location}/src">
@@ -101,7 +105,11 @@
 				<attribute name="X-Date" value="${touch.time}" />
 			</manifest>
 		</jar>
-		<jar jarfile="${target.dir.jar}/${jar.sources.file.name}.jar" includes="**/*.java" basedir="${src.dir}">
+		<jar jarfile="${target.dir.jar}/${jar.sources.file.name}.jar">
+			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+			</fileset>
+			<fileset dir="${ext.dir}" />
 			<manifest>
 				<attribute name="X-Date" value="${touch.time}" />
 			</manifest>
@@ -131,13 +139,13 @@
 			<fileset dir="${classes.target.dir}" />
 			<fileset dir="${TOVAL.location}/bin/classes" />
 			<fileset dir="${JAGAL.location}/bin/classes" />
-			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/openxes/OpenXES.jar" />
-			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/openxes/guava-16.0.1.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/guava-16.0.1.jar" />
 			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/collections-generic-4.01.jar" />
 			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/jung-algorithms-2.0.1.jar" />
 			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/jung-api-2.0.1.jar" />
 			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/jung-graph-impl-2.0.1.jar" />
 			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/jung-visualization-2.0.1.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/xstream-1.4.8.jar" />
 		</jar>
 	</target>
 
@@ -145,6 +153,7 @@
 		<echo>Compile classes...</echo>
 		<javac destdir="${classes.target.dir}" includeantruntime="false">
 			<src path="${src.dir}" />
+			<src path="${ext.dir}" />
 			<classpath refid="SEWOL.classpath" />
 		</javac>
 		<echo>Compile tests...</echo>
@@ -173,6 +182,9 @@
 		<mkdir dir="${tests.target.dir}" />
 		<copy includeemptydirs="false" todir="${classes.target.dir}">
 			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+			<fileset dir="${ext.dir}">
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
