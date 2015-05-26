@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.invation.code.toval.file.FileFormat;
+import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
 import de.uni.freiburg.iig.telematik.sewol.writer.PerspectiveException;
@@ -27,10 +28,13 @@ public abstract class AbstractLogFormat extends FileFormat{
 	private Locale locale;
 	protected SimpleDateFormat dateFormat;
 	
+	protected String logName;
+	protected String processName;
+	
 	public AbstractLogFormat(){
 		initialize(DEFAULT_PERSPECTIVE);
 	}
-
+	
 	public AbstractLogFormat(LogPerspective logPerspective) throws PerspectiveException {
 		super();
 		initialize(logPerspective);
@@ -50,6 +54,16 @@ public abstract class AbstractLogFormat extends FileFormat{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	protected void setLogName(String logName){
+		Validate.notNull(logName);
+		this.logName = logName;
+	}
+	
+	protected void setProcessName(String processName){
+		Validate.notNull(processName);
+		this.processName = processName;
 	}
 	
 	public String getDatePattern(){

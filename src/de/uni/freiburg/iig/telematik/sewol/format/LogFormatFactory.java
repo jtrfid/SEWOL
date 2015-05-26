@@ -5,7 +5,7 @@ import de.uni.freiburg.iig.telematik.sewol.writer.PerspectiveException;
 public class LogFormatFactory {
 
 	public static AbstractLogFormat MXML(){
-		return new MXMLLogFormat();
+		return new MXMLLogFormat("");
 	}
 	
 	public static AbstractLogFormat XES(){

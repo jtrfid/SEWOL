@@ -24,7 +24,7 @@ import de.uni.freiburg.iig.telematik.sewol.writer.PerspectiveException;
 public class MXMLLogFormat extends AbstractLogFormat {
 
 	private static final String DEFAULT_LINE_SEPARATOR = "\n";
-	private static final String FILE_HEADER_FORMAT = "<?xml version=\"1.0\" encoding=\"%%s\"?>%s<WorkflowLog>%s<Process id=\"process1\">%s";
+	private static final String FILE_HEADER_FORMAT = "<?xml version=\"1.0\" encoding=\"%%s\"?>%s<WorkflowLog>%s<Process id=\"%%s\">%s";
 	private static final String FILE_HEADER = String.format(FILE_HEADER_FORMAT, DEFAULT_LINE_SEPARATOR, DEFAULT_LINE_SEPARATOR, DEFAULT_LINE_SEPARATOR);
 	private static final String FILE_FOOTER_FORMAT = "</Process>%s</WorkflowLog>%s";
 	private static final String FILE_FOOTER = String.format(FILE_FOOTER_FORMAT, DEFAULT_LINE_SEPARATOR, DEFAULT_LINE_SEPARATOR);
@@ -51,23 +51,24 @@ public class MXMLLogFormat extends AbstractLogFormat {
 	
 //	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 	
-	public MXMLLogFormat() {
+	public MXMLLogFormat(String processName) {
 		super();
 		try {
 			setLogPerspective(LogPerspective.TRACE_PERSPECTIVE);
 		} catch (PerspectiveException e) {
 			e.printStackTrace();
 		}
+		setProcessName(processName);
+	}
+	
+	public MXMLLogFormat(Charset charset, String processName) {
+		this(processName);
+		setCharset(charset);
 	}
 	
 	@Override
 	public String getDatePattern(){
 		return MXML_DATEPATTERN;
-	}
-	
-	public MXMLLogFormat(Charset charset) {
-		this();
-		setCharset(charset);
 	}
 	
 	@Override
@@ -96,7 +97,7 @@ public class MXMLLogFormat extends AbstractLogFormat {
 	
 	@Override
 	public String getFileHeader() {
-		return String.format(FILE_HEADER, charset.name());
+		return String.format(FILE_HEADER, charset.name(), processName);
 	}
 	
 	@Override

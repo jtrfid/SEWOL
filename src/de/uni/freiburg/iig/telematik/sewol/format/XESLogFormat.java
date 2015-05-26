@@ -60,7 +60,7 @@ public class XESLogFormat extends AbstractLogFormat {
 
 	private static final String XES_DATEPATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-	private String logName;
+	
 
 	public XESLogFormat(String logName) {
 		super();
@@ -69,7 +69,7 @@ public class XESLogFormat extends AbstractLogFormat {
 		} catch (PerspectiveException e) {
 			e.printStackTrace();
 		}
-		this.logName = logName;
+		setLogName(logName);
 	}
 
 	@Override

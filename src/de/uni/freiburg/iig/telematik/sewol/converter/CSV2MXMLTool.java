@@ -97,7 +97,7 @@ public class CSV2MXMLTool extends JFrame {
 	protected JPanel interpretationPanel = null;
 	protected JPanel interpretations = new JPanel();
 	protected ArrayList<String> columnNames;
-	protected AbstractLogFormat logFormat = new MXMLLogFormat();
+	protected AbstractLogFormat logFormat = new MXMLLogFormat("");
 
 	public CSV2MXMLTool() {
 		setContentPane(getContentPane());
