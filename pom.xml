@@ -2,12 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.uni.freiburg.iig.telematik.sewol</groupId>
+	<parent>
+		<groupId>de.uni.freiburg.iig.telematik</groupId>
+		<artifactId>tools</artifactId>
+		<version>0.1.6-SNAPSHOT</version>
+	</parent>
 	<artifactId>SEWOL</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1.5</version>
 
-	<name>SEWOL</name>
+	<name>SEWOL: Security-oriented Workflow Lib</name>
 	<description>SEWOL provides support for the handling of workflow traces. Specifically it allows to specify the shape and content of process traces in terms of entries representing the execution of a specific workflow activity. SEWOL also allows to write these traces on disk as a log file with the help of a special file writer for process logs. Currently it supports plain text, Petrify, MXML and XES log file types. In order to specify security-related context information, SEWOL provides access control models such as access control lists (ACL) and role-based access control models (RBAC). All types of models can be conveniently edited with the help of appropriate dialogs.</description>
 	<url>https://sourceforge.net/projects/jawl/</url>
 	<organization>
@@ -33,20 +36,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>de.invation.code.toval</groupId>
+			<groupId>de.uni.freiburg.iig.telematik</groupId>
 			<artifactId>TOVAL</artifactId>
-			<version>0.1.5</version>
+			<version>0.1.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>de.uni.freiburg.iig.telematik.jagal</groupId>
+			<groupId>de.uni.freiburg.iig.telematik</groupId>
 			<artifactId>JAGAL</artifactId>
-			<version>0.1.5</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
+			<version>0.1.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -76,6 +73,7 @@
 		<outputDirectory>bin/classes</outputDirectory>
 		<testOutputDirectory>bin/tests</testOutputDirectory>
 		<directory>bin</directory>
+
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -96,100 +94,23 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.6</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.sonatype.plugins</groupId>
+					<artifactId>nexus-staging-maven-plugin</artifactId>
+					<version>1.6.5</version>
+					<extensions>true</extensions>
+					<configuration>
+						<serverId>ossrh</serverId>
+						<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+						<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
-	<profiles>
-		<profile>
-			<id>withoutDocLint</id>
-			<activation>
-				<jdk>[1.6,1.7]</jdk>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.10.3</version>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<excludePackageNames>org.deckfour.*</excludePackageNames>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>withDocLint</id>
-			<activation>
-				<jdk>1.8</jdk>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.10.3</version>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-								<configuration>
-									<additionalparam>-Xdoclint:none</additionalparam>
-								</configuration>
-							</execution>
-						</executions>
-						<configuration>
-							<excludePackageNames>org.deckfour.*</excludePackageNames>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>
