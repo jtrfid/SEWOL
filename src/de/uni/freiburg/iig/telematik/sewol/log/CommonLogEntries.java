@@ -11,7 +11,7 @@ import de.invation.code.toval.validate.Validate;
 
 public class CommonLogEntries<E extends LogEntry> {
 	
-	Map<String, Map<LogTrace<E>, List<E>>> commonEntries = new HashMap<String, Map<LogTrace<E>, List<E>>>();;
+	Map<String, Map<LogTrace<E>, List<E>>> commonEntries = new HashMap<>();;
 	
 	public CommonLogEntries(LogTrace<E>...traces) throws ParameterException{
 		Validate.noNullElements(traces);
@@ -21,12 +21,12 @@ public class CommonLogEntries<E extends LogEntry> {
 			if(commonEntries.isEmpty()){
 				//First run
 				for(String activity: traceEntries.keySet()){
-					Map<LogTrace<E>, List<E>> newMap = new HashMap<LogTrace<E>, List<E>>();
+					Map<LogTrace<E>, List<E>> newMap = new HashMap<>();
 					newMap.put(trace, traceEntries.get(activity));
 					commonEntries.put(activity, newMap);
 				}
 			} else {
-				Set<String> keysToRemove = new HashSet<String>(); 
+				Set<String> keysToRemove = new HashSet<>(); 
 				for(String activity: commonEntries.keySet()){
 					if(traceEntries.keySet().contains(activity)){
 						commonEntries.get(activity).put(trace, trace.getEntriesForActivity(activity));
@@ -42,7 +42,7 @@ public class CommonLogEntries<E extends LogEntry> {
 	}
 	
 	public Map<String, List<E>> getEntryActivityMap(LogTrace<E> trace) throws ParameterException{
-		Map<String, List<E>> result = new HashMap<String, List<E>>();
+		Map<String, List<E>> result = new HashMap<>();
 		for(String activity: trace.getDistinctActivities()){
 			result.put(activity, trace.getEntriesForActivity(activity));
 		}

@@ -6,7 +6,7 @@ import de.invation.code.toval.validate.ParameterException;
 public class TraceUtils {
 	
 	public static <E extends LogEntry> CommonLogEntries<E> getCommonActivities(LogTrace<E>... traces) throws ParameterException{
-		return new CommonLogEntries<E>(traces);
+		return new CommonLogEntries<>(traces);
 	}
 	
 //	public static void main(String[] args) throws ParameterException{

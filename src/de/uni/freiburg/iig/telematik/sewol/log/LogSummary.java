@@ -11,10 +11,10 @@ import de.invation.code.toval.validate.Validate;
 
 public class LogSummary<E extends LogEntry> {
 	
-	private Set<String> activities = new HashSet<String>();
-	private Set<String> originators = new HashSet<String>();
-	private Set<String> roles = new HashSet<String>();
-	private Observation traceLength = new Observation();
+	private final Set<String> activities = new HashSet<>();
+	private final Set<String> originators = new HashSet<>();
+	private final Set<String> roles = new HashSet<>();
+	private final Observation traceLength = new Observation();
 	
 	public LogSummary() {}
 

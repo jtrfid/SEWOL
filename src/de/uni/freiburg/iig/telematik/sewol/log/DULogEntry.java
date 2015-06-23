@@ -147,7 +147,7 @@ public class DULogEntry extends LogEntry {
 			return false;
 		} else {
 			if (dataUsage.get(attribute) == null) {
-				dataUsage.put(attribute, new HashSet<DataUsage>());
+				dataUsage.put(attribute, new HashSet<>());
 			}
 			if (usage != null) {
 				dataUsage.get(attribute).add(usage);
@@ -173,7 +173,7 @@ public class DULogEntry extends LogEntry {
 	protected void copyFieldValues(LogEntry clone) throws LockingException, ParameterException {
 		super.copyFieldValues(clone);
 		for(DataAttribute att: dataUsage.keySet()){
-			((DULogEntry) clone).setDataUsageFor(att, new HashSet<DataUsage>(dataUsage.get(att)));
+			((DULogEntry) clone).setDataUsageFor(att, new HashSet<>(dataUsage.get(att)));
 		}
 	}
 
@@ -221,7 +221,7 @@ public class DULogEntry extends LogEntry {
 			throw new ParserException("Cannot parse log entry \""+entryString+"\". Required format: " + stringPattern);
 		int bracketIndex = entryString.indexOf('(');
 		boolean containsDataUsage = bracketIndex != -1;
-		String activityName = null;
+		String activityName;
 		if(!containsDataUsage){
 			activityName = entryString;
 		} else {
@@ -235,7 +235,7 @@ public class DULogEntry extends LogEntry {
 				String nextDataUsage = tokenizer.nextToken();
 				String attributeName = nextDataUsage.substring(0, nextDataUsage.indexOf(':'));
 				String dataUsageCodes = nextDataUsage.substring(nextDataUsage.indexOf(':')+1);
-				Set<DataUsage> dataUsageModes = new HashSet<DataUsage>();
+				Set<DataUsage> dataUsageModes = new HashSet<>();
 				for(int i=0; i<dataUsageCodes.length(); i++){
 					dataUsageModes.add(DataUsage.fromAbbreviation(String.valueOf(dataUsageCodes.charAt(i)).toUpperCase()));
 				}
