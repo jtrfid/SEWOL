@@ -133,9 +133,10 @@ public class ProcessContextDialog extends SOABaseDialog {
 		return contextDialog.getDialogObject();
 	}
 
-	public static void showDialog(Window parentWindow, ProcessContext context) throws Exception {
+	public static boolean showDialog(Window parentWindow, ProcessContext context) throws Exception {
 		ProcessContextDialog contextDialog = new ProcessContextDialog(parentWindow, context);
 		contextDialog.setUpGUI();
+                return contextDialog.getDialogObject() != null;
 	}
 
 	public static void main(String[] args) throws Exception {
