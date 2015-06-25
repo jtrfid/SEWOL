@@ -1,5 +1,19 @@
 package de.uni.freiburg.iig.telematik.sewol.accesscontrol.graphic;
 
+import de.invation.code.toval.graphic.dialog.AbstractEditCreateDialog;
+import de.invation.code.toval.misc.soabase.SOABase;
+import de.invation.code.toval.misc.soabase.SOABaseComboBox;
+import de.invation.code.toval.validate.ParameterException;
+import de.invation.code.toval.validate.Validate;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.graphic.permission.PermissionDialog;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACMValidationException;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelProperties;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelType;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.RBACModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.graphic.RoleLatticeDialog;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.graphic.RoleMembershipDialog;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,7 +24,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collection;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -24,22 +37,10 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import de.invation.code.toval.graphic.dialog.AbstractEditCreateDialog;
-import de.invation.code.toval.misc.soabase.SOABase;
-import de.invation.code.toval.misc.soabase.SOABaseComboBox;
-import de.invation.code.toval.validate.ParameterException;
-import de.invation.code.toval.validate.ParameterException.ErrorCode;
-import de.invation.code.toval.validate.Validate;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.graphic.permission.PermissionDialog;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACMValidationException;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelProperties;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelType;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.RBACModel;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.graphic.RoleLatticeDialog;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.lattice.graphic.RoleMembershipDialog;
-
+/**
+ *
+ * @author stocker
+ */
 public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCreateDialog<AbstractACModel<P>> {
 
     private static final long serialVersionUID = -2689725669752188740L;
@@ -80,7 +81,7 @@ public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCrea
     public ACModelDialog(Window owner, String acModelName, ACModelType targetModelType, SOABase context, Collection<SOABase> contextCandidates) throws Exception {
         this(owner, acModelName, targetModelType, context);
         if (!contextCandidates.contains(context)) {
-            throw new ParameterException(ErrorCode.INCONSISTENCY, "Context candidates must contain actually assigned context");
+            throw new ParameterException(ParameterException.ErrorCode.INCONSISTENCY, "Context candidates must contain actually assigned context");
         }
         this.contextCandidates = contextCandidates;
     }
@@ -92,7 +93,7 @@ public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCrea
     public ACModelDialog(Window owner, AbstractACModel<P> acModel, Collection<SOABase> contextCandidates) throws Exception {
         this(owner, acModel);
         if (!contextCandidates.contains(acModel.getContext())) {
-            throw new ParameterException(ErrorCode.INCONSISTENCY, "Context candidates must contain actually assigned context");
+            throw new ParameterException(ParameterException.ErrorCode.INCONSISTENCY, "Context candidates must contain actually assigned context");
         }
         this.contextCandidates = contextCandidates;
     }
@@ -142,7 +143,7 @@ public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCrea
     }
 
     @Override
-    protected void validateAndSetFieldValues() throws Exception {
+    protected boolean validateAndSetFieldValues() throws Exception {
         if (getDialogObject().getContext().isEmpty()) {
             throw new ParameterException("Empty context");
         }
@@ -159,6 +160,7 @@ public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCrea
         } catch (ACMValidationException e1) {
             throw new ParameterException("Invalid AC Model\nReason: " + e1.getMessage());
         }
+        return true;
     }
 
     @Override
@@ -334,7 +336,7 @@ public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCrea
                         RoleMembershipDialog.showDialog(ACModelDialog.this, (RBACModel) getDialogObject());
                         updateTextArea();
                     } catch (Exception e1) {
-                        internalExceptionMessage("Cannot launch role membership dialog.\nReason: " + e1.getMessage());
+                        internalException("Cannot launch role membership dialog.", e1);
                     }
                 }
             });
@@ -353,7 +355,7 @@ public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCrea
                             context.showDialog(ACModelDialog.this);
                             updateTextArea();
                         } catch (Exception e1) {
-                            internalExceptionMessage("Cannot launch context dialog.\nReason: " + e1.getMessage());
+                            internalException("Cannot launch context dialog.", e1);
                         }
                     }
                 }
@@ -379,7 +381,8 @@ public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCrea
                             PermissionDialog.showDialog(ACModelDialog.this, "Edit role permissions", ((RBACModel) getDialogObject()).getRolePermissions());
                         }
                     } catch (Exception ex) {
-                        internalExceptionMessage("<html>Cannot launch permission dialog.<br>Reason: " + ex.getMessage() + "</html>");
+                        internalException("Cannot launch permission dialog.", ex);
+                        return;
                     }
                     updateTextArea();
                 }
@@ -414,7 +417,8 @@ public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCrea
                     try {
                         RoleLatticeDialog.showDialog(ACModelDialog.this, ((RBACModel) getDialogObject()).getRoleLattice());
                     } catch (Exception e1) {
-                        internalExceptionMessage("<html>Cannot launch role lattice dialog:<br>Reason: " + e1.getMessage() + "</html>");
+                        internalException("Cannot launch role lattice dialog.", e1);
+                        return;
                     }
                     updateTextArea();
                 }

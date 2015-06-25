@@ -1,4 +1,4 @@
-package de.uni.freiburg.iig.telematik.sewol.context;
+package de.uni.freiburg.iig.telematik.sewol.context.process;
 
 public enum ProcessContextProperty {
 	

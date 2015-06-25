@@ -224,7 +224,6 @@ public class ACLModelProperties extends ACModelProperties {
 		object_permission.put("obj1", modes);
 		p.setObjectPermission("subj1", object_permission);
 		p.store("/Users/stocker/Desktop/ACL");
-		
 	}
 
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.invation.code.toval.graphic.dialog.DialogObject;
+import de.invation.code.toval.misc.NamedComponent;
 import de.invation.code.toval.misc.soabase.SOABase;
 import de.invation.code.toval.misc.soabase.SOABaseChangeReply;
 import de.invation.code.toval.misc.soabase.SOABaseListener;
@@ -27,7 +28,7 @@ import de.uni.freiburg.iig.telematik.sewol.accesscontrol.properties.ACModelType;
 
 
 
-public abstract class AbstractACModel<T extends ACModelProperties> implements SOABaseListener, ACModelListener, Cloneable, DialogObject<AbstractACModel<T>> {
+public abstract class AbstractACModel<T extends ACModelProperties> implements NamedComponent, SOABaseListener, ACModelListener, Cloneable, DialogObject<AbstractACModel<T>> {
 	
 	public static final String DEFAULT_AC_MODEL_NAME = "ACModel";
 	

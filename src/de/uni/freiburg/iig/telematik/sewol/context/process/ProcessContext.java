@@ -1,4 +1,4 @@
-package de.uni.freiburg.iig.telematik.sewol.context;
+package de.uni.freiburg.iig.telematik.sewol.context.process;
 
 import java.awt.Window;
 import java.util.ArrayList;
@@ -13,8 +13,10 @@ import java.util.Set;
 
 import de.invation.code.toval.misc.SetUtils;
 import de.invation.code.toval.misc.soabase.SOABase;
+import static de.invation.code.toval.misc.soabase.SOABase.createFromProperties;
 import de.invation.code.toval.misc.soabase.SOABaseChangeReply;
 import de.invation.code.toval.misc.soabase.SOABaseListener;
+import de.invation.code.toval.misc.soabase.SOABaseProperties;
 import de.invation.code.toval.properties.PropertyException;
 import de.invation.code.toval.types.DataUsage;
 import de.invation.code.toval.validate.CompatibilityException;
@@ -24,6 +26,7 @@ import de.invation.code.toval.validate.ParameterException.ErrorCode;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.RBACModel;
+import java.io.File;
 
 /**
  * This class provides context information for process execution.<br>
@@ -55,10 +58,10 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 
     protected List<DataUsage> validUsageModes;
 
-    protected ProcessContextListenerSupport duContextListenerSupport;
+    protected ProcessContextListenerSupport processContextListenerSupport;
 
 	//------- Constructors ------------------------------------------------------------------
-    protected ProcessContext() {
+    public ProcessContext() {
         super();
     }
 
@@ -95,17 +98,17 @@ public class ProcessContext extends SOABase implements SOABaseListener {
     @Override
     protected void initialize() {
         super.initialize();
-        duContextListenerSupport = new ProcessContextListenerSupport();
+        processContextListenerSupport = new ProcessContextListenerSupport();
         activityDataUsage = new HashMap<String, Map<String, Set<DataUsage>>>();
         validUsageModes = new ArrayList<DataUsage>(Arrays.asList(DataUsage.values()));
     }
 
-    public boolean addContextListener(ProcessContextListener listener) {
-        return contextListenerSupport.addListener(listener) && duContextListenerSupport.addListener(listener);
+    public boolean addProcessContextListener(ProcessContextListener listener) {
+        return contextListenerSupport.addListener(listener) && processContextListenerSupport.addListener(listener);
     }
 
-    public boolean removeContextListener(ProcessContextListener listener) {
-        return contextListenerSupport.removeListener(listener) && duContextListenerSupport.removeListener(listener);
+    public boolean removeProcessContextListener(ProcessContextListener listener) {
+        return contextListenerSupport.removeListener(listener) && processContextListenerSupport.removeListener(listener);
     }
 
 	//------- Activities ------------------------------------------------------------
@@ -155,6 +158,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         return removeActivity(activity, false);
     }
 
+    @Override
     public boolean removeActivity(String activity, boolean removeFromACModel) {
         return removeActivity(activity, removeFromACModel, true);
     }
@@ -438,7 +442,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         this.acModel = acModel;
         acModel.getContext().addContextListener(this);
         if (notifyListeners) {
-            duContextListenerSupport.notifyACModelSet(acModel);
+            processContextListenerSupport.notifyACModelSet(acModel);
         }
     }
 
@@ -450,7 +454,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         this.acModel.getContext().removeContextListener(this);
         this.acModel = null;
         if (notifyListeners) {
-            duContextListenerSupport.notifyACModelRemoved();
+            processContextListenerSupport.notifyACModelRemoved();
         }
     }
 
@@ -504,7 +508,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         this.validUsageModes.clear();
         this.validUsageModes.addAll(validUsageModes);
         if (notifyListeners) {
-            duContextListenerSupport.notifyValidUsageModesChange(validUsageModes);
+            processContextListenerSupport.notifyValidUsageModesChange(validUsageModes);
         }
     }
 
@@ -629,26 +633,28 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         activityDataUsage.get(activity).get(attribute).add(dataUsage);
     }
 
-    public void removeDataUsageFor(String activity, String attribute, DataUsage dataUsage) throws CompatibilityException {
+    public boolean removeDataUsageFor(String activity, String attribute, DataUsage dataUsage) throws CompatibilityException {
         validateActivity(activity);
         validateAttribute(attribute);
         Validate.notNull(dataUsage);
         if (!activityDataUsage.containsKey(activity)) {
-            return;
+            return false;
         }
         if (!activityDataUsage.get(activity).containsKey(attribute)) {
-            return;
+            return false;
         }
         activityDataUsage.get(activity).get(attribute).remove(dataUsage);
+        return true;
     }
 
-    public void removeDataUsageFor(String activity, String attribute) throws CompatibilityException {
+    public boolean removeDataUsageFor(String activity, String attribute) throws CompatibilityException {
         validateActivity(activity);
         validateAttribute(attribute);
         if (!activityDataUsage.containsKey(activity)) {
-            return;
+            return false;
         }
         activityDataUsage.get(activity).remove(attribute);
+        return true;
     }
 
     /**
@@ -739,6 +745,17 @@ public class ProcessContext extends SOABase implements SOABaseListener {
     public boolean hasDataUsage(String activity) throws CompatibilityException {
         validateActivity(activity);
         return activityDataUsage.containsKey(activity);
+    }
+    
+    public boolean hasDataUsage(String activity, String attribute) throws CompatibilityException{
+        if(!hasDataUsage())
+            return false;
+        validateAttribute(attribute);
+       
+        if (!activityDataUsage.get(activity).containsKey(attribute))
+            return false;
+        
+        return true;
     }
 
     /**
@@ -1072,9 +1089,11 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         return properties;
     }
 
-    public void takeOverValues(ProcessContext context, boolean notifyListeners) throws Exception {
-        super.takeoverValues(context, notifyListeners);
+    @Override
+    public void takeoverValues(SOABase soaBase, boolean notifyListeners) throws Exception {
+        super.takeoverValues(soaBase, notifyListeners);
 
+        ProcessContext context = (ProcessContext) soaBase;
         //Set AC Model
         acModel = null;
         AbstractACModel<?> otherACModel = context.getACModel();
@@ -1093,19 +1112,6 @@ public class ProcessContext extends SOABase implements SOABaseListener {
                 setDataUsageFor(activity, attribute, new HashSet<DataUsage>(dataUsage.get(attribute)));
             }
         }
-    }
-
-    @Override
-    public ProcessContext clone() {
-        ProcessContext result = null;
-        try {
-            result = new ProcessContext(getName());
-            result.takeOverValues(this, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        return result;
     }
 
     @Override
@@ -1205,6 +1211,16 @@ public class ProcessContext extends SOABase implements SOABaseListener {
     @Override
     public boolean showDialog(Window parent) throws Exception {
         return ProcessContextDialog.showDialog(parent, this);
+    }
+    
+    public static ProcessContext createFromFile(File file) throws Exception {
+        SOABaseProperties properties = ProcessContextProperties.loadPropertiesFromFile(file);
+        if(!(properties instanceof ProcessContextProperties))
+           throw new Exception("Loaded properties are not compatible with process context");
+        SOABase newContext = createFromProperties(properties);
+        if(!(newContext instanceof ProcessContext))
+            throw new Exception("Created context of wrong type, expected \"ProcessContext\" but was \"" + newContext.getClass().getSimpleName() + "\"");
+        return (ProcessContext) newContext;
     }
 
 //	public static void main(String[] args) throws Exception {

@@ -21,7 +21,7 @@ import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.permission.ObjectPermissionItemEvent;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.permission.ObjectPermissionItemListener;
-import de.uni.freiburg.iig.telematik.sewol.context.ProcessContext;
+import de.uni.freiburg.iig.telematik.sewol.context.process.ProcessContext;
 
 
 

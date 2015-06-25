@@ -22,7 +22,7 @@ import de.invation.code.toval.validate.ParameterException.ErrorCode;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.acl.ACLModel;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.rbac.RBACModel;
-import de.uni.freiburg.iig.telematik.sewol.context.ProcessContext;
+import de.uni.freiburg.iig.telematik.sewol.context.process.ProcessContext;
 
 
 

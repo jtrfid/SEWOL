@@ -1,4 +1,4 @@
-package de.uni.freiburg.iig.telematik.sewol.context;
+package de.uni.freiburg.iig.telematik.sewol.context.constraint;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,19 +12,20 @@ import de.invation.code.toval.misc.StringUtils;
 import de.invation.code.toval.properties.PropertyException;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
+import de.uni.freiburg.iig.telematik.sewol.context.process.ProcessContextProperties;
 
-public class ProcessConstraintContextProperties extends ProcessContextProperties{
+public class ConstraintContextProperties extends ProcessContextProperties{
 	
-	private final String CONSTRAINT_FORMAT = ProcessConstraintContextProperty.CONSTRAINT + "_%s";
-	private final String ACTIVITY_CONSTRAINTS_FORMAT = ProcessConstraintContextProperty.ACTIVITY_CONSTRAINTS + "_%s";
+	private final String CONSTRAINT_FORMAT = ConstraintContextProperty.CONSTRAINT + "_%s";
+	private final String ACTIVITY_CONSTRAINTS_FORMAT = ConstraintContextProperty.ACTIVITY_CONSTRAINTS + "_%s";
 	
 	//------- Property setting -------------------------------------------------------------
 	
-	private void setProperty(ProcessConstraintContextProperty contextProperty, Object value){
+	private void setProperty(ConstraintContextProperty contextProperty, Object value){
 		props.setProperty(contextProperty.toString(), value.toString());
 	}
 	
-	private String getProperty(ProcessConstraintContextProperty contextProperty){
+	private String getProperty(ConstraintContextProperty contextProperty){
 		return props.getProperty(contextProperty.toString());
 	}
 	
@@ -68,7 +69,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 		Validate.notEmpty(activity);
 		Set<String> currentActivities = getActivitiesWithRoutingConstraints();
 		currentActivities.add(activity);
-		setProperty(ProcessConstraintContextProperty.ACTIVITIES_WITH_CONSTRAINTS, ArrayUtils.toString(currentActivities.toArray()));
+		setProperty(ConstraintContextProperty.ACTIVITIES_WITH_CONSTRAINTS, ArrayUtils.toString(currentActivities.toArray()));
 	}
 	
 	/**
@@ -81,7 +82,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 		Validate.notEmpty(activity);
 		Set<String> currentActivities = getActivitiesWithRoutingConstraints();
 		currentActivities.remove(activity);
-		setProperty(ProcessConstraintContextProperty.ACTIVITIES_WITH_CONSTRAINTS, ArrayUtils.toString(currentActivities.toArray()));
+		setProperty(ConstraintContextProperty.ACTIVITIES_WITH_CONSTRAINTS, ArrayUtils.toString(currentActivities.toArray()));
 	}
 	
 	/**
@@ -90,7 +91,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	 */
 	public Set<String> getActivitiesWithRoutingConstraints(){
 		Set<String> result = new HashSet<String>();
-		String propertyValue = getProperty(ProcessConstraintContextProperty.ACTIVITIES_WITH_CONSTRAINTS);
+		String propertyValue = getProperty(ConstraintContextProperty.ACTIVITIES_WITH_CONSTRAINTS);
 		if(propertyValue == null)
 			return result;
 		StringTokenizer activityTokens = StringUtils.splitArrayString(propertyValue, " ");
@@ -157,12 +158,12 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 		for(String constraintName: constraintNames){
 			int separatorIndex = constraintName.lastIndexOf("_");
 			if(separatorIndex == -1 || (constraintName.length() == separatorIndex + 1))
-				throw new PropertyException(ProcessConstraintContextProperty.CONSTRAINT, constraintName, "Corrupted property file (invalid constraint name)");
+				throw new PropertyException(ConstraintContextProperty.CONSTRAINT, constraintName, "Corrupted property file (invalid constraint name)");
 			Integer index = null;
 			try {
 				index = Integer.parseInt(constraintName.substring(separatorIndex+1));
 			} catch(Exception e){
-				throw new PropertyException(ProcessConstraintContextProperty.CONSTRAINT, constraintName, "Corrupted property file (invalid constraint name)");
+				throw new PropertyException(ConstraintContextProperty.CONSTRAINT, constraintName, "Corrupted property file (invalid constraint name)");
 			}
 			result.add(index);
 		}
@@ -178,7 +179,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 		validateStringValue(constraintName);
 		Set<String> currentValues = getConstraintNameList();
 		currentValues.add(constraintName);
-		setProperty(ProcessConstraintContextProperty.ALL_CONSTRAINTS, ArrayUtils.toString(currentValues.toArray()));
+		setProperty(ConstraintContextProperty.ALL_CONSTRAINTS, ArrayUtils.toString(currentValues.toArray()));
 	}
 	
 	/**
@@ -190,7 +191,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 		validateStringValue(constraintName);
 		Set<String> currentValues = getConstraintNameList();
 		currentValues.remove(constraintName);
-		setProperty(ProcessConstraintContextProperty.ALL_CONSTRAINTS, ArrayUtils.toString(currentValues.toArray()));
+		setProperty(ConstraintContextProperty.ALL_CONSTRAINTS, ArrayUtils.toString(currentValues.toArray()));
 	}
 	
 	/**
@@ -200,7 +201,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	 */
 	private Set<String> getConstraintNameList(){
 		Set<String> result = new HashSet<String>();
-		String propertyValue = getProperty(ProcessConstraintContextProperty.ALL_CONSTRAINTS);
+		String propertyValue = getProperty(ConstraintContextProperty.ALL_CONSTRAINTS);
 		if(propertyValue == null)
 			return result;
 		StringTokenizer attributeTokens = StringUtils.splitArrayString(propertyValue, String.valueOf(ArrayUtils.VALUE_SEPARATION));
@@ -261,7 +262,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 	private AbstractConstraint<?> getConstraint(String constraintName) throws PropertyException{
 		String constraintString = props.getProperty(constraintName);
 		if(constraintString == null)
-			throw new PropertyException(ProcessConstraintContextProperty.CONSTRAINT, constraintName, "Unparseable constraint");
+			throw new PropertyException(ConstraintContextProperty.CONSTRAINT, constraintName, "Unparseable constraint");
 		AbstractConstraint<?> result = null;
 		try{
 			result = NumberConstraint.parse(constraintString);
@@ -269,7 +270,7 @@ public class ProcessConstraintContextProperties extends ProcessContextProperties
 			try{
 				result = StringConstraint.parse(constraintString);
 			}catch(Exception e1){
-				throw new PropertyException(ProcessConstraintContextProperty.CONSTRAINT, constraintName, "Unparseable constraint");
+				throw new PropertyException(ConstraintContextProperty.CONSTRAINT, constraintName, "Unparseable constraint");
 			}
 		}
 		return result;
