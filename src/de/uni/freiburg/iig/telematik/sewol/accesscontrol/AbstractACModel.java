@@ -33,7 +33,7 @@ public abstract class AbstractACModel<T extends ACModelProperties> implements Na
 	public static final String DEFAULT_AC_MODEL_NAME = "ACModel";
 	
 	protected String name;
-	protected List<DataUsage> validUsageModes;
+	protected Set<DataUsage> validUsageModes;
 	protected String subjectDescriptor = "Subjects";
 	protected SOABase context;
 	protected ACModelType type = null;
@@ -60,7 +60,7 @@ public abstract class AbstractACModel<T extends ACModelProperties> implements Na
 		Validate.notNull(context);
 		if(!properties.getContextName().equals(context.getName()))
 			throw new ParameterException(ErrorCode.INCOMPATIBILITY, "Name of given context does not match stored context name.");
-		initialize();
+                initialize();
 		setContext(context);
 		initialize(properties);
 	}
@@ -72,7 +72,7 @@ public abstract class AbstractACModel<T extends ACModelProperties> implements Na
 	}
 	
 	protected void initialize() {
-		validUsageModes = new ArrayList<DataUsage>(Arrays.asList(DataUsage.values()));
+		validUsageModes = new HashSet<DataUsage>(Arrays.asList(DataUsage.values()));
 		acModelListenerSupport = new ACModelListenerSupport(this);
 		acModelListenerSupport.addListener(this);
 	}
@@ -130,8 +130,8 @@ public abstract class AbstractACModel<T extends ACModelProperties> implements Na
 		return subjectDescriptor;
 	}
 	
-	public List<DataUsage> getValidUsageModes(){
-		return Collections.unmodifiableList(validUsageModes);
+	public Set<DataUsage> getValidUsageModes(){
+		return Collections.unmodifiableSet(validUsageModes);
 	}
 	
 	public void setValidUsageModes(Collection<DataUsage> validUsageModes) {

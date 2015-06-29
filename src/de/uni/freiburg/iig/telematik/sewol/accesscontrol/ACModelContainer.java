@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.uni.freiburg.iig.telematik.sewol.accesscontrol.parser;
+package de.uni.freiburg.iig.telematik.sewol.accesscontrol;
 
 import de.invation.code.toval.debug.SimpleDebugger;
 import de.invation.code.toval.misc.soabase.AbstractSOABaseContainer;
@@ -11,10 +11,9 @@ import de.invation.code.toval.misc.soabase.SOABase;
 import de.invation.code.toval.misc.soabase.SOABaseProperties;
 import de.invation.code.toval.misc.wd.AbstractComponentContainer;
 import de.invation.code.toval.validate.Validate;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.AbstractACModel;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.parser.ACModelParsing;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,9 +23,11 @@ import java.util.Set;
  */
 public class ACModelContainer<C extends SOABase, P extends SOABaseProperties> extends AbstractComponentContainer<AbstractACModel> {
 
-    private static final String DESCRIPTOR = "AC-Model";
+    public static final String ACMODEL_DESCRIPTOR = "AC-Model";
+    public static final boolean DEFAULT_VALIDATE_PARSED_ACMODELS = false;
     private AbstractSOABaseContainer<C,P> availableContexts;
     private SimpleDebugger debugger = null;
+    private boolean validateParsedACModels = DEFAULT_VALIDATE_PARSED_ACMODELS;
 
     public ACModelContainer(String serializationPath, AbstractSOABaseContainer<C,P> availableContexts) {
         this(serializationPath, availableContexts, null);
@@ -37,6 +38,10 @@ public class ACModelContainer<C extends SOABase, P extends SOABaseProperties> ex
         Validate.notNull(availableContexts);
         this.availableContexts = availableContexts;
     }
+    
+    public void setValidateParsedACModels(boolean validateParsedACModels){
+        this.validateParsedACModels = validateParsedACModels;
+    }
 
     @Override
     protected void serializeComponent(AbstractACModel component, String serializationPath, String fileName) throws Exception {
@@ -46,17 +51,12 @@ public class ACModelContainer<C extends SOABase, P extends SOABaseProperties> ex
 
     @Override
     protected AbstractACModel loadComponentFromFile(String file) throws Exception {
-        return ACModelParsing.loadACModel(file, availableContexts.getComponentMap());
-    }
-
-    @Override
-    public Set<String> getAcceptedFileEndings() {
-        return new HashSet<String>(Arrays.asList(""));
+        return ACModelParsing.loadACModel(file, availableContexts.getComponentMap(), validateParsedACModels);
     }
 
     @Override
     public String getComponentDescriptor() {
-        return DESCRIPTOR;
+        return ACMODEL_DESCRIPTOR;
     }
 
 }

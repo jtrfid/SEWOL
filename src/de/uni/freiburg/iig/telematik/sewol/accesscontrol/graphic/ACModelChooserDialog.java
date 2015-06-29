@@ -50,24 +50,24 @@ public class ACModelChooserDialog extends AbstractDialog {
 	private JButton btnEditModel;
 	private JTextArea areaPreview;
 
-	public ACModelChooserDialog(Window owner, Collection<AbstractACModel> acModels) {
+	public ACModelChooserDialog(Window owner, Collection<? extends AbstractACModel> acModels) {
 		super(owner);
 		Validate.notNull(acModels);
 		Validate.noNullElements(acModels);
-		this.acModels = new HashSet<AbstractACModel>(acModels);
-		contexts = new HashSet<SOABase>();
+		this.acModels = new HashSet<>(acModels);
+		contexts = new HashSet<>();
 		for(AbstractACModel acModel: acModels){
 			contexts.add(acModel.getContext());
 		}
 		setPreferredSize(PREFERRED_SIZE);
 	}
 	
-	public ACModelChooserDialog(Window owner, Collection<AbstractACModel> acModels, Collection<SOABase> contexts) {
+	public ACModelChooserDialog(Window owner, Collection<? extends AbstractACModel> acModels, Collection<? extends SOABase> contexts) {
 		this(owner, acModels);
 		Validate.notNull(contexts);
 		Validate.notEmpty(contexts);
 		Validate.noNullElements(contexts);
-		this.contexts = contexts;
+		this.contexts = new HashSet<>(contexts);
 	}
 
 	@Override

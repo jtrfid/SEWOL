@@ -6,7 +6,7 @@
 package de.uni.freiburg.iig.telematik.sewol.context.process;
 
 import de.invation.code.toval.debug.SimpleDebugger;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.parser.ACModelContainer;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.ACModelContainer;
 
 /**
  *
@@ -14,16 +14,24 @@ import de.uni.freiburg.iig.telematik.sewol.accesscontrol.parser.ACModelContainer
  */
 public class ProcessContextContainer extends AbstractProcessContextContainer<ProcessContext,ProcessContextProperties>{
 
+    public ProcessContextContainer(String serializationPath) {
+        super(serializationPath);
+    }
+
+    public ProcessContextContainer(String serializationPath, SimpleDebugger debugger) {
+        super(serializationPath, debugger);
+    }
+
     public ProcessContextContainer(String serializationPath, ACModelContainer availableACModels) {
         super(serializationPath, availableACModels);
     }
 
-    public ProcessContextContainer(String serializationPath, ACModelContainer availableACModels, SimpleDebugger debugger) {
-        super(serializationPath, availableACModels, debugger);
+    public ProcessContextContainer(String serializationPath, SimpleDebugger debugger, ACModelContainer availableACModels) {
+        super(serializationPath, debugger, availableACModels);
     }
 
     @Override
-    protected ProcessContextProperties crearteNewProperties() throws Exception {
+    protected ProcessContextProperties createNewProperties() throws Exception {
         return new ProcessContextProperties();
     }
 

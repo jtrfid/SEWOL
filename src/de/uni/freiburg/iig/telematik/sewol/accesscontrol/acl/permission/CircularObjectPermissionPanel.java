@@ -14,6 +14,8 @@ import de.invation.code.toval.graphic.misc.CircularPointGroup;
 import de.invation.code.toval.graphic.misc.PColor;
 import de.invation.code.toval.graphic.misc.Position;
 import de.invation.code.toval.types.DataUsage;
+import java.util.HashSet;
+import java.util.Set;
 
 
 
@@ -26,7 +28,7 @@ public class CircularObjectPermissionPanel extends ObjectPermissionPanel {
 	private int minY = 0;
 	private int maxY = 0;
 
-	public CircularObjectPermissionPanel(String name, List<DataUsage> validDataUsageModes){
+	public CircularObjectPermissionPanel(String name, Set<DataUsage> validDataUsageModes){
 		super(name, validDataUsageModes);
 	}
 	
@@ -61,7 +63,7 @@ public class CircularObjectPermissionPanel extends ObjectPermissionPanel {
 
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
-		List<DataUsage> testset = new ArrayList<DataUsage>(Arrays.asList(DataUsage.values()));
+		Set<DataUsage> testset = new HashSet<DataUsage>(Arrays.asList(DataUsage.values()));
 //		testset.remove(DataUsage.CREATE);
 //		testset.remove(DataUsage.DELETE);
 		CircularObjectPermissionPanel panel = new CircularObjectPermissionPanel("eee", testset);

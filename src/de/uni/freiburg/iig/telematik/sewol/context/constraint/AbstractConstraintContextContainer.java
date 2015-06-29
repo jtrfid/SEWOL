@@ -7,7 +7,7 @@ package de.uni.freiburg.iig.telematik.sewol.context.constraint;
 
 import de.invation.code.toval.constraint.AbstractConstraint;
 import de.invation.code.toval.debug.SimpleDebugger;
-import de.uni.freiburg.iig.telematik.sewol.accesscontrol.parser.ACModelContainer;
+import de.uni.freiburg.iig.telematik.sewol.accesscontrol.ACModelContainer;
 import de.uni.freiburg.iig.telematik.sewol.context.process.AbstractProcessContextContainer;
 
 /**
@@ -18,12 +18,20 @@ public abstract class AbstractConstraintContextContainer<C extends ConstraintCon
 
     private static final String CONSTRAINT_CONTEXT_DESCRIPTOR = "Constraint Context";
 
+    public AbstractConstraintContextContainer(String serializationPath) {
+        super(serializationPath);
+    }
+
+    public AbstractConstraintContextContainer(String serializationPath, SimpleDebugger debugger) {
+        super(serializationPath, debugger);
+    }
+
     public AbstractConstraintContextContainer(String serializationPath, ACModelContainer availableACModels) {
         super(serializationPath, availableACModels);
     }
 
-    public AbstractConstraintContextContainer(String serializationPath, ACModelContainer availableACModels, SimpleDebugger debugger) {
-        super(serializationPath, availableACModels, debugger);
+    public AbstractConstraintContextContainer(String serializationPath, SimpleDebugger debugger, ACModelContainer availableACModels) {
+        super(serializationPath, debugger, availableACModels);
     }
 
     @Override

@@ -22,6 +22,8 @@ import de.uni.freiburg.iig.telematik.sewol.writer.PerspectiveException;
  *
  */
 public class MXMLLogFormat extends AbstractLogFormat {
+    
+        public static final String MXML_EXTENSION = "mxml";
 
 	private static final String DEFAULT_LINE_SEPARATOR = "\n";
 	private static final String FILE_HEADER_FORMAT = "<?xml version=\"1.0\" encoding=\"%%s\"?>%s<WorkflowLog>%s<Process id=\"%%s\">%s";
@@ -78,7 +80,7 @@ public class MXMLLogFormat extends AbstractLogFormat {
 	
 	@Override
 	public String getFileExtension() {
-		return "mxml";
+		return MXML_EXTENSION;
 	}
 	
 	@Override

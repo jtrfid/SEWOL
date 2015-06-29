@@ -63,7 +63,7 @@ public class ACModelParsing {
 //        if(debugger != null) debugger.newLine();
 //        return result;
 //    }
-    public static <C extends SOABase> AbstractACModel loadACModel(String acFile, Map<String, C> availableContexts) throws PropertyException, IOException {
+    public static <C extends SOABase> AbstractACModel loadACModel(String acFile, Map<String, C> availableContexts, boolean validateModel) throws Exception {
         ACModelProperties testProperties = new ACModelProperties();
         try {
             testProperties.load(acFile);
@@ -71,7 +71,12 @@ public class ACModelParsing {
             throw new IOException("Cannot load properties file: " + acFile + ".");
         }
 
-        String contextName = testProperties.getContextName();
+        String contextName = null;
+        try {
+            contextName = testProperties.getContextName();
+        } catch (Exception e) {
+            throw new Exception("Exception while extracting context name from AC model properties", e);
+        }
         if (contextName == null) {
             throw new PropertyException(ACModelProperty.CONTEXT_NAME, null, "Cannot extract context name from AC model properties");
         }
@@ -79,21 +84,33 @@ public class ACModelParsing {
             throw new PropertyException(ACModelProperty.CONTEXT_NAME, contextName, "No context with adequate name available.");
         }
 
+        // Check if suitable context is available
+        if (!availableContexts.containsKey(contextName)) {
+            throw new Exception("Required SOABase \"" + contextName + "\" is not available");
+        }
+
+        SOABase context = availableContexts.get(contextName);
+        if (context == null) {
+            throw new Exception("Required SOABase \"" + contextName + "\" is NULL");
+        }
+
         // Check ACModel type
         AbstractACModel newModel = null;
-        if (testProperties.getType().equals(ACModelType.ACL)) {
+        if (testProperties.getType() == ACModelType.ACL) {
             ACLModelProperties aclProperties = new ACLModelProperties();
             aclProperties.load(acFile);
-            newModel = new ACLModel(aclProperties, availableContexts.get(contextName));
+            newModel = new ACLModel(aclProperties, context);
         } else {
             RBACModelProperties rbacProperties = new RBACModelProperties();
             rbacProperties.load(acFile);
-            newModel = new RBACModel(rbacProperties, availableContexts.get(contextName));
+            newModel = new RBACModel(rbacProperties, context);
         }
-        try {
-            newModel.checkValidity();
-        } catch (ACMValidationException e) {
-            throw new ParameterException(e.getMessage());
+        if (validateModel) {
+            try {
+                newModel.checkValidity();
+            } catch (ACMValidationException e) {
+                throw new ParameterException("Parsed AC-model is not valid", e);
+            }
         }
         return newModel;
 

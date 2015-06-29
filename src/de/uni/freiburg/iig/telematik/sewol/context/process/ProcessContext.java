@@ -56,11 +56,15 @@ public class ProcessContext extends SOABase implements SOABaseListener {
      */
     protected AbstractACModel<?> acModel;
 
-    protected List<DataUsage> validUsageModes;
+    protected Set<DataUsage> validUsageModes;
 
     protected ProcessContextListenerSupport processContextListenerSupport;
 
-	//------- Constructors ------------------------------------------------------------------
+    public static final boolean DEFAULT_INCLUDE_ACMODEL_IN_HASHCODE_AND_EQUALS = false;
+
+    private boolean includeACModelInHashCodeAndEquals = DEFAULT_INCLUDE_ACMODEL_IN_HASHCODE_AND_EQUALS;
+
+    //------- Constructors ------------------------------------------------------------------
     public ProcessContext() {
         super();
     }
@@ -100,7 +104,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         super.initialize();
         processContextListenerSupport = new ProcessContextListenerSupport();
         activityDataUsage = new HashMap<String, Map<String, Set<DataUsage>>>();
-        validUsageModes = new ArrayList<DataUsage>(Arrays.asList(DataUsage.values()));
+        validUsageModes = new HashSet<DataUsage>(Arrays.asList(DataUsage.values()));
     }
 
     public boolean addProcessContextListener(ProcessContextListener listener) {
@@ -111,7 +115,11 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         return contextListenerSupport.removeListener(listener) && processContextListenerSupport.removeListener(listener);
     }
 
-	//------- Activities ------------------------------------------------------------
+    public void setIncludeACModelInHashCodeAndEquals(boolean includeACModelInHashCodeAndEquals) {
+        this.includeACModelInHashCodeAndEquals = includeACModelInHashCodeAndEquals;
+    }
+
+    //------- Activities ------------------------------------------------------------
     @Override
     public boolean addActivity(String activity) {
         return addActivity(activity, false);
@@ -178,7 +186,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         return true;
     }
 
-	//------- Subjects --------------------------------------------------------------
+    //------- Subjects --------------------------------------------------------------
     @Override
     public boolean addSubject(String subject) {
         return addSubject(subject, false);
@@ -243,7 +251,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         return true;
     }
 
-	//------- Attributes ------------------------------------------------------------
+    //------- Attributes ------------------------------------------------------------
 //	@Override
 //	public void setObjects(Collection<String> objects) {
 //		throw new UnsupportedOperationException();
@@ -400,7 +408,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         return true;
     }
 
-	//-------- AC-Model -----------------------------------------------------------------------
+    //-------- AC-Model -----------------------------------------------------------------------
     /**
      * Returns the access control model which is used to determine authorized
      * subjects for activity execution.
@@ -467,9 +475,9 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         }
     }
 
-	//------- Valid Usage Modes -----------------------------------------------------------------------------------------
-    public List<DataUsage> getValidUsageModes() {
-        return Collections.unmodifiableList(validUsageModes);
+    //------- Valid Usage Modes -----------------------------------------------------------------------------------------
+    public Set<DataUsage> getValidUsageModes() {
+        return Collections.unmodifiableSet(validUsageModes);
     }
 
     public void setValidUsageModes(Collection<DataUsage> validUsageModes) {
@@ -512,7 +520,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         }
     }
 
-	//------- Data Usge -------------------------------------------------------------------------------------------------
+    //------- Data Usge -------------------------------------------------------------------------------------------------
     /**
      * Sets the data attributes used by the given activity.<br>
      * The given activity/attributes have to be known by the context, i.e. be
@@ -746,15 +754,17 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         validateActivity(activity);
         return activityDataUsage.containsKey(activity);
     }
-    
-    public boolean hasDataUsage(String activity, String attribute) throws CompatibilityException{
-        if(!hasDataUsage())
+
+    public boolean hasDataUsage(String activity, String attribute) throws CompatibilityException {
+        if (!hasDataUsage()) {
             return false;
+        }
         validateAttribute(attribute);
-       
-        if (!activityDataUsage.get(activity).containsKey(attribute))
+
+        if (!activityDataUsage.get(activity).containsKey(attribute)) {
             return false;
-        
+        }
+
         return true;
     }
 
@@ -780,7 +790,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         return Collections.unmodifiableSet(activityDataUsage.get(activity).keySet());
     }
 
-	//------- Authorization -----------------------------------------------------------------------------------------
+    //------- Authorization -----------------------------------------------------------------------------------------
     /**
      * Checks if the given subject is authorized to execute the given
      * activity.<br>
@@ -846,7 +856,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         return acModel != null && acModel.isExecutable(activity);
     }
 
-	//------- Helper methods ----------------------------------------------------------------
+    //------- Helper methods ----------------------------------------------------------------
     /**
      * Checks if the given attribute is known, i.e. is contained in the
      * attribute list.
@@ -916,7 +926,7 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         }
     }
 
-	//------- Static methods ----------------------------------------------------------------
+    //------- Static methods ----------------------------------------------------------------
     /**
      * Creates a new context using an RBAC access control model.<br>
      * Users and permissions to execute transactions are randomly assigned to
@@ -996,6 +1006,10 @@ public class ProcessContext extends SOABase implements SOABaseListener {
         }
 
         if (hasDataUsage()) {
+            builder.append('\n');
+            builder.append("Valid usage modes: ");
+            builder.append(getValidUsageModes().toString());
+            builder.append('\n');
             builder.append('\n');
             builder.append(getActivityDescriptorSingular().toLowerCase());
             builder.append(" data usage:");
@@ -1118,7 +1132,9 @@ public class ProcessContext extends SOABase implements SOABaseListener {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((acModel == null) ? 0 : acModel.hashCode());
+        if (includeACModelInHashCodeAndEquals) {
+            result = prime * result + ((acModel == null) ? 0 : acModel.getName().hashCode());
+        }
         result = prime * result + ((activityDataUsage == null) ? 0 : activityDataUsage.hashCode());
         result = prime * result + ((validUsageModes == null) ? 0 : validUsageModes.hashCode());
         return result;
@@ -1136,12 +1152,14 @@ public class ProcessContext extends SOABase implements SOABaseListener {
             return false;
         }
         ProcessContext other = (ProcessContext) obj;
-        if (acModel == null) {
-            if (other.acModel != null) {
+        if (includeACModelInHashCodeAndEquals) {
+            if (acModel == null) {
+                if (other.acModel != null) {
+                    return false;
+                }
+            } else if (!acModel.getName().equals(other.acModel.getName())) {
                 return false;
             }
-        } else if (!acModel.equals(other.acModel)) {
-            return false;
         }
         if (activityDataUsage == null) {
             if (other.activityDataUsage != null) {
@@ -1212,50 +1230,52 @@ public class ProcessContext extends SOABase implements SOABaseListener {
     public boolean showDialog(Window parent) throws Exception {
         return ProcessContextDialog.showDialog(parent, this);
     }
-    
+
     public static ProcessContext createFromFile(File file) throws Exception {
         SOABaseProperties properties = ProcessContextProperties.loadPropertiesFromFile(file);
-        if(!(properties instanceof ProcessContextProperties))
-           throw new Exception("Loaded properties are not compatible with process context");
+        if (!(properties instanceof ProcessContextProperties)) {
+            throw new Exception("Loaded properties are not compatible with process context");
+        }
         SOABase newContext = createFromProperties(properties);
-        if(!(newContext instanceof ProcessContext))
+        if (!(newContext instanceof ProcessContext)) {
             throw new Exception("Created context of wrong type, expected \"ProcessContext\" but was \"" + newContext.getClass().getSimpleName() + "\"");
+        }
         return (ProcessContext) newContext;
     }
 
-//	public static void main(String[] args) throws Exception {
-//	Map<String, Set<DataUsage>> usage1 = new HashMap<String, Set<DataUsage>>();
-//	Set<DataUsage> modes1 = new HashSet<DataUsage>(Arrays.asList(DataUsage.READ, DataUsage.WRITE));
-//	usage1.put("attribute1", modes1);
-//	
-//	Map<String, Set<DataUsage>> usage2 = new HashMap<String, Set<DataUsage>>();
-//	Set<DataUsage> modes2 = new HashSet<DataUsage>(Arrays.asList(DataUsage.READ, DataUsage.CREATE));
-//	usage2.put("attribute2", modes2);
-//	
-//	Set<String> activities = new HashSet<String>(Arrays.asList("act1", "act2"));
-//	Set<String> attributes = new HashSet<String>(Arrays.asList("attribute1", "attribute2"));
-//	Set<String> subjects = new HashSet<String>(Arrays.asList("s1", "s2"));
-//	ProcessContext c = new ProcessContext("c1");
-//	c.setActivities(activities);
-//	c.addAttributes(attributes);
-//	c.addSubjects(subjects);
-//	c.setDataUsageFor("act1", usage1);
-//	c.setDataUsageFor("act2", usage2);
-//	
-//	ACLModel acModel = new ACLModel("acl1", c);
-//	acModel.setName("acmodel1");
-//	acModel.setActivityPermission("s1", activities);
-//	c.setACModel(acModel);
-//	
-//	System.out.println(c);
-//	c.getProperties().store("/Users/stocker/Desktop/processContext");
-//	
-//	ProcessContextProperties properties = new ProcessContextProperties();
-//	properties.load("/Users/stocker/Desktop/processContext");
-//	SOABase c1 = SOABaseProperties.createFromProperties(properties);
-//	System.out.println(c1);
-//	System.out.println(c1.equals(c));
-//	System.out.println(properties.getBaseClass());
-//	System.out.println(c1.getClass());
-//}
+    public static void main(String[] args) throws Exception {
+        Map<String, Set<DataUsage>> usage1 = new HashMap<String, Set<DataUsage>>();
+        Set<DataUsage> modes1 = new HashSet<DataUsage>(Arrays.asList(DataUsage.READ, DataUsage.WRITE));
+        usage1.put("attribute1", modes1);
+
+        Map<String, Set<DataUsage>> usage2 = new HashMap<String, Set<DataUsage>>();
+        Set<DataUsage> modes2 = new HashSet<DataUsage>(Arrays.asList(DataUsage.READ, DataUsage.CREATE));
+        usage2.put("attribute2", modes2);
+
+        Set<String> activities = new HashSet<String>(Arrays.asList("act1", "act2"));
+        Set<String> attributes = new HashSet<String>(Arrays.asList("attribute1", "attribute2"));
+        Set<String> subjects = new HashSet<String>(Arrays.asList("s1", "s2"));
+        ProcessContext c = new ProcessContext("c1");
+        c.setActivities(activities);
+        c.addAttributes(attributes);
+        c.addSubjects(subjects);
+        c.setDataUsageFor("act1", usage1);
+        c.setDataUsageFor("act2", usage2);
+
+//        ACLModel acModel = new ACLModel("acl1", c);
+//        acModel.setName("acmodel1");
+//        acModel.setActivityPermission("s1", activities);
+//        c.setACModel(acModel);
+
+        System.out.println(c);
+        c.getProperties().store("/Users/stocker/Desktop/processContext");
+
+        ProcessContextProperties properties = new ProcessContextProperties();
+        properties.load("/Users/stocker/Desktop/processContext");
+        ProcessContext c1 = new ProcessContext(properties);
+        System.out.println(c1);
+        System.out.println(c1.equals(c));
+        System.out.println(properties.getBaseClass());
+        System.out.println(c1.getClass());
+    }
 }

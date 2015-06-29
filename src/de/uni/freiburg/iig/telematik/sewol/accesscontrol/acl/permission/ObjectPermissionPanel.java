@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 
 import de.invation.code.toval.graphic.misc.Position;
 import de.invation.code.toval.types.DataUsage;
+import java.util.Set;
 
 
 
@@ -32,13 +33,13 @@ private static final long serialVersionUID = -6781176581026547212L;
 	protected Map<DataUsage,JCheckBox> checkBoxes = new HashMap<DataUsage,JCheckBox>();
 	protected int selectedBoxes = 0;
 	protected List<Position> positions = new ArrayList<Position>();
-	protected List<DataUsage> validDataUsageModes = null;
+	protected Set<DataUsage> validDataUsageModes = null;
 	
 	private boolean initializing = false;
 	
 	private ObjectPermissionListenerSupport permissionListenerSupport = new ObjectPermissionListenerSupport();
 	
-	public ObjectPermissionPanel(String attribute, List<DataUsage> validDataUsageModes){
+	public ObjectPermissionPanel(String attribute, Set<DataUsage> validDataUsageModes){
 		super();
 		this.attribute = attribute;
 		this.validDataUsageModes = validDataUsageModes;
