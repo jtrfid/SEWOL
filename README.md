@@ -24,3 +24,25 @@ SEWOL builds upon and encloses the following tools:
 ### Documentation
 
 A detailled documentation of SEWOL can be found under [http://doku.telematik.uni-freiburg.de/sewol](http://doku.telematik.uni-freiburg.de/sewol "http://doku.telematik.uni-freiburg.de/sewol").
+
+### Latest Release
+
+The most recent release is SEWOL 1.0.0, released July 29, 2015.
+
+* [sewol-1.0.0.jar](https://github.com/iig-uni-freiburg/SEWOL/releases/download/v1.0.0/sewol-1.0.0.jar)
+* [sewol-1.0.0-sources.jar](https://github.com/iig-uni-freiburg/SEWOL/releases/download/v1.0.0/sewol-1.0.0-sources.jar)
+* [sewol-1.0.0-javadoc.jar](https://github.com/iig-uni-freiburg/SEWOL/releases/download/v1.0.0/sewol-1.0.0-javadoc.jar)
+
+To add a dependency on SEWOL using Maven, use the following:
+
+```xml
+<dependency>
+  <groupId>de.uni.freiburg.iig.telematik</groupId>
+  <artifactId>SEWOL</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+### Older Releases
+
+Older releases can be found under [https://github.com/iig-uni-freiburg/SEWOL/releases](https://github.com/iig-uni-freiburg/SEWOL/releases).

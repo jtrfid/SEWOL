@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>de.uni.freiburg.iig.telematik</groupId>
 		<artifactId>tools</artifactId>
-		<version>0.1.6-SNAPSHOT</version>
+		<version>1.0.0</version>
 	</parent>
 	<artifactId>SEWOL</artifactId>
 	<packaging>jar</packaging>
 
 	<name>SEWOL: Security-oriented Workflow Lib</name>
 	<description>SEWOL provides support for the handling of workflow traces. Specifically it allows to specify the shape and content of process traces in terms of entries representing the execution of a specific workflow activity. SEWOL also allows to write these traces on disk as a log file with the help of a special file writer for process logs. Currently it supports plain text, Petrify, MXML and XES log file types. In order to specify security-related context information, SEWOL provides access control models such as access control lists (ACL) and role-based access control models (RBAC). All types of models can be conveniently edited with the help of appropriate dialogs.</description>
-	<url>https://sourceforge.net/projects/jawl/</url>
+	<url>https://github.com/iig-uni-freiburg/SEWOL</url>
 	<organization>
 		<name>Institute of Computer Science and Social Studies, Department of Telematics</name>
 		<url>http://www.telematik.uni-freiburg.de/</url>
@@ -27,7 +27,7 @@
 	</licenses>
 
 	<scm>
-		<url>http://svn.code.sf.net/p/jawl/code-0/trunk</url>
+		<url>https://github.com/iig-uni-freiburg/SEWOL.git</url>
 	</scm>
 
 	<properties>
@@ -38,12 +38,12 @@
 		<dependency>
 			<groupId>de.uni.freiburg.iig.telematik</groupId>
 			<artifactId>TOVAL</artifactId>
-			<version>0.1.6-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>de.uni.freiburg.iig.telematik</groupId>
 			<artifactId>JAGAL</artifactId>
-			<version>0.1.6-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
