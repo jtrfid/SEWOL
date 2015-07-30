@@ -5,7 +5,7 @@ Java Library for workflow handling
 
 ### About
 
-The Security-oriented Workflow Library (SEWOL) provides support for the handling of workflow traces. It allows to specify the shape and content of process traces in terms of entries representing the execution of a specific workflow activity. SEWOL also allows to write these traces on disk. For this it uses a specific file writer for process logs. Currently it supports plain text, Petrify, MXML and XES log file types.
+<img align="right" src="http://iig-uni-freiburg.github.io/images/tools/sewol.png">The Security-oriented Workflow Library (SEWOL) provides support for the handling of workflow traces. It allows to specify the shape and content of process traces in terms of entries representing the execution of a specific workflow activity. SEWOL also allows to write these traces on disk. For this it uses a specific file writer for process logs. Currently it supports plain text, Petrify, MXML and XES log file types.
 
 In order to specify security-related context information, SEWOL provides access control models such as access control lists (ACL) and role-based access control models (RBAC). All types of models can be conveniently edited with the help of appropriate dialogues.
 
