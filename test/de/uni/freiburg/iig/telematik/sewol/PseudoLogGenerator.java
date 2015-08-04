@@ -1,4 +1,4 @@
-package de.uni.freiburg.iig.telematik.jawl;
+package de.uni.freiburg.iig.telematik.sewol;
 
 import java.io.IOException;
 
