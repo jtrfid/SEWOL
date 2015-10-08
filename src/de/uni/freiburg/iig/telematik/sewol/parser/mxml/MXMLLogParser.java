@@ -254,12 +254,13 @@ public class MXMLLogParser extends AbstractLogParser {
                         if (value == null || value.isEmpty()) {
                                 return null;
                         }
+                        String sanitizedDateString = value.replaceAll(":(\\d\\d)$", "$1");
                         Date date = null;
 //                        String sanitizedDateString = value.replaceAll(":(\\d\\d)$", "$1");
                         for (ParserDateFormat pdf : ParserDateFormat.values()) {
                                 if (date == null) {
                                         try {
-                                                date = ParserDateFormat.getDateFormat(pdf).parse(value);
+                                                date = ParserDateFormat.getDateFormat(pdf).parse(sanitizedDateString);
                                         } catch (ParseException e) {
                                                 // is allowed to happen
                                         } catch (ParameterException e) {
