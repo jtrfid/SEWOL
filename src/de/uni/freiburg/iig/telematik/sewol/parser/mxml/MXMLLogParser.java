@@ -10,6 +10,8 @@ import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.format.MXMLLogFormat;
+import de.uni.freiburg.iig.telematik.sewol.log.EventType;
+import de.uni.freiburg.iig.telematik.sewol.log.LockingException;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogSummary;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
@@ -18,6 +20,8 @@ import de.uni.freiburg.iig.telematik.sewol.parser.ParserFileFormat;
 import de.uni.freiburg.iig.telematik.sewol.parser.ParsingMode;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -136,7 +140,8 @@ public class MXMLLogParser extends AbstractLogParser {
                 private LogTrace<LogEntry> currentTrace = null;
                 private LogEntry currentEntry = null;
                 private LogSummary<LogEntry> currentSummary = null;
-                private String lastCharacters = null;
+                private final StringBuilder lastCharacters = new StringBuilder();
+                private boolean recordCharacters = false;
 
                 private static final Pattern INT_PATTERN = Pattern.compile("^(\\d+)$");
                 private static final Pattern NON_INT_PATTERN = Pattern.compile("(\\D+)");
@@ -167,33 +172,71 @@ public class MXMLLogParser extends AbstractLogParser {
                                 case MXMLLogFormat.ELEMENT_ENTRY:
                                         currentEntry = new LogEntry();
                                         break;
+                                case MXMLLogFormat.ELEMENT_ACTIVITY:
+                                case MXMLLogFormat.ELEMENT_TYPE:
+                                case MXMLLogFormat.ELEMENT_TIME:
+                                case MXMLLogFormat.ELEMENT_ORIGINATOR:
+                                case MXMLLogFormat.ELEMENT_DATA:
+                                        lastCharacters.setLength(0);
+                                        recordCharacters = true;
+                                        break;
                         }
                 }
 
                 @Override
                 public void endElement(String uri, String localName, String qName) throws SAXException {
-                        switch (qName) {
-                                case MXMLLogFormat.ELEMENT_LOG:
-                                        summaries.add(currentSummary);
-                                        logs.add(currentLog);
-                                        break;
-                                case MXMLLogFormat.ELEMENT_TRACE:
-                                        currentLog.add(currentTrace);
-                                        currentSummary.addTrace(currentTrace);
-                                        break;
-                                case MXMLLogFormat.ELEMENT_ENTRY:
-                                        currentTrace.addEntry(currentEntry);
-                                        break;
+                        {
+                                try {
+                                        switch (qName) {
+                                                case MXMLLogFormat.ELEMENT_LOG:
+                                                        summaries.add(currentSummary);
+                                                        logs.add(currentLog);
+                                                        break;
+                                                case MXMLLogFormat.ELEMENT_TRACE:
+                                                        currentLog.add(currentTrace);
+                                                        currentSummary.addTrace(currentTrace);
+                                                        break;
+                                                case MXMLLogFormat.ELEMENT_ENTRY:
+                                                        currentTrace.addEntry(currentEntry);
+                                                        break;
+                                                case MXMLLogFormat.ELEMENT_ACTIVITY:
+                                                        currentEntry.setActivity(lastCharacters.toString());
+                                                        recordCharacters = false;
+                                                        break;
+                                                case MXMLLogFormat.ELEMENT_TYPE:
+                                                        currentEntry.setEventType(EventType.parse(lastCharacters.toString()));
+                                                        recordCharacters = false;
+                                                        break;
+                                                case MXMLLogFormat.ELEMENT_TIME:
+                                                        String dateStr = lastCharacters.toString();
+                                                        // TODO parse date
+                                                        //currentEntry.setEventType(EventType.parse(lastCharacters.toString()));
+                                                        recordCharacters = false;
+                                                        break;
+                                                case MXMLLogFormat.ELEMENT_ORIGINATOR:
+                                                        currentEntry.setOriginator(lastCharacters.toString());
+                                                        recordCharacters = false;
+                                                        break;
+                                                case MXMLLogFormat.ELEMENT_DATA:
+                                                        // TODO
+                                                        recordCharacters = false;
+                                                        break;
+                                        }
+                                } catch (LockingException ex) {
+                                        throw new RuntimeException(ex);
+                                }
                         }
                 }
 
                 @Override
                 public void characters(char[] ch, int start, int length) throws SAXException {
-                        StringBuilder str = new StringBuilder();
-                        for (int i = 0; i < length; i++) {
-                                str.append(ch[start + i]);
+                        if (recordCharacters) {
+                                StringBuilder str = new StringBuilder();
+                                for (int i = 0; i < length; i++) {
+                                        str.append(ch[start + i]);
+                                }
+                                lastCharacters.append(str);
                         }
-                        lastCharacters = str.toString();
                 }
 
                 @Override
