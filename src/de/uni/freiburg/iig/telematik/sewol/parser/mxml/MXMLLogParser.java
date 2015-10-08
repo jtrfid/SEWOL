@@ -16,12 +16,13 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogSummary;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
 import de.uni.freiburg.iig.telematik.sewol.parser.AbstractLogParser;
+import de.uni.freiburg.iig.telematik.sewol.parser.ParserDateFormat;
 import de.uni.freiburg.iig.telematik.sewol.parser.ParserFileFormat;
 import de.uni.freiburg.iig.telematik.sewol.parser.ParsingMode;
 import java.io.FileNotFoundException;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Date;
 import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -176,7 +177,7 @@ public class MXMLLogParser extends AbstractLogParser {
                                 case MXMLLogFormat.ELEMENT_TYPE:
                                 case MXMLLogFormat.ELEMENT_TIME:
                                 case MXMLLogFormat.ELEMENT_ORIGINATOR:
-                                case MXMLLogFormat.ELEMENT_DATA:
+                                        // TODO case MXMLLogFormat.ELEMENT_DATA:
                                         lastCharacters.setLength(0);
                                         recordCharacters = true;
                                         break;
@@ -209,18 +210,18 @@ public class MXMLLogParser extends AbstractLogParser {
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_TIME:
                                                         String dateStr = lastCharacters.toString();
-                                                        // TODO parse date
-                                                        //currentEntry.setEventType(EventType.parse(lastCharacters.toString()));
+                                                        Date date = parseTimestamp(dateStr);
+                                                        currentEntry.setTimestamp(date);
                                                         recordCharacters = false;
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_ORIGINATOR:
                                                         currentEntry.setOriginator(lastCharacters.toString());
                                                         recordCharacters = false;
                                                         break;
-                                                case MXMLLogFormat.ELEMENT_DATA:
-                                                        // TODO
-                                                        recordCharacters = false;
-                                                        break;
+                                                //case MXMLLogFormat.ELEMENT_DATA:
+                                                //        // TODO
+                                                //        recordCharacters = false;
+                                                //        break;
                                         }
                                 } catch (LockingException ex) {
                                         throw new RuntimeException(ex);
@@ -247,6 +248,28 @@ public class MXMLLogParser extends AbstractLogParser {
                 @Override
                 public void warning(SAXParseException e) throws SAXException {
                         throw e;
+                }
+
+                private Date parseTimestamp(String value) {
+                        if (value == null || value.isEmpty()) {
+                                return null;
+                        }
+                        Date date = null;
+//                        String sanitizedDateString = value.replaceAll(":(\\d\\d)$", "$1");
+                        for (ParserDateFormat pdf : ParserDateFormat.values()) {
+                                if (date == null) {
+                                        try {
+                                                date = ParserDateFormat.getDateFormat(pdf).parse(value);
+                                        } catch (ParseException e) {
+                                                // is allowed to happen
+                                        } catch (ParameterException e) {
+                                                // cannot happen.
+                                                throw new RuntimeException(e);
+                                        }
+                                }
+                        }
+
+                        return date;
                 }
 
                 private static int idStrToInt(String idString) {
