@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import org.deckfour.xes.extension.XExtension;
 import org.deckfour.xes.in.XParser;
@@ -31,6 +30,7 @@ import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.log.DULogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.DataAttribute;
 import de.uni.freiburg.iig.telematik.sewol.log.EventType;
+import de.uni.freiburg.iig.telematik.sewol.log.LockingException;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogSummary;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
@@ -38,13 +38,14 @@ import de.uni.freiburg.iig.telematik.sewol.parser.AbstractLogParser;
 import de.uni.freiburg.iig.telematik.sewol.parser.ParserDateFormat;
 import de.uni.freiburg.iig.telematik.sewol.parser.ParserFileFormat;
 import de.uni.freiburg.iig.telematik.sewol.parser.ParsingMode;
+import java.io.FileNotFoundException;
 
 /**
  * <p>
- * A parser class for MXML and XES files for the JAWL log classes.
+ * A parser class for MXML and XES files for the SEWOL log classes.
  * </p>
  * <p>
- * The {@link XParserRegistry} from OpenXES is used, as it helps choosing the right parser. Because of the transformation of the files to an OpenXES log format and the subsequent transformation to the JAWL log format, the complexity in time and space ends up in O(2n). An own implementation without the OpenXES classes could result in O(n).
+ * The {@link XParserRegistry} from OpenXES is used, as it helps choosing the right parser. Because of the transformation of the files to an OpenXES log format and the subsequent transformation to the SEWOL log format, the complexity in time and space ends up in O(2n). An own implementation without the OpenXES classes could result in O(n).
  * </p>
  * 
  * @author Adrian Lange
@@ -53,6 +54,8 @@ public class XESLogParser extends AbstractLogParser {
 
 	/**
 	 * Checks whether the given file can be parsed by the file extension.
+         * @param file
+         * @return 
 	 */
 	public boolean canParse(File file) {
 		for (XParser parser : XParserRegistry.instance().getAvailable()) {
@@ -68,6 +71,7 @@ public class XESLogParser extends AbstractLogParser {
 	 * 
 	 * @param filePath
 	 *            Path to file to parse
+         * @param parsingMode
 	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
 	 * @throws ParameterException
 	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
@@ -84,6 +88,7 @@ public class XESLogParser extends AbstractLogParser {
 	 * 
 	 * @param inputStream
 	 *            {@link InputStream} to parse
+         * @param parsingMode
 	 * @param fileFormat
 	 *            Format of the {@link InputStream} as it can't be determined automatically
 	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
@@ -109,15 +114,14 @@ public class XESLogParser extends AbstractLogParser {
 		if (logs == null)
 			throw new ParserException("No suitable parser could have been found!");
 
-		parsedLogFiles = new ArrayList<List<LogTrace<LogEntry>>>(logs.size());
-		int logNumber = 0;
-		Set<List<String>> activitySequencesSet = new HashSet<List<String>>();
-		Set<LogTrace<LogEntry>> traceSet = new HashSet<LogTrace<LogEntry>>();
+		parsedLogFiles = new ArrayList<>(logs.size());
+		Set<List<String>> activitySequencesSet = new HashSet<>();
+		Set<LogTrace<LogEntry>> traceSet = new HashSet<>();
 		for (XLog log : logs) {
 			activitySequencesSet.clear();
 			traceSet.clear();
 			Class<?> logEntryClass = null;
-			List<LogTrace<LogEntry>> logTraces = new ArrayList<LogTrace<LogEntry>>();
+			List<LogTrace<LogEntry>> logTraces = new ArrayList<>();
 			if (containsDataUsageExtension(log)) {
 				logEntryClass = DULogEntry.class;
 			} else {
@@ -146,7 +150,7 @@ public class XESLogParser extends AbstractLogParser {
 					throw new ParserException("Cannot extract case-id");
 
 				// Build new log trace
-				LogTrace<LogEntry> logTrace = new LogTrace<LogEntry>(traceID);
+				LogTrace<LogEntry> logTrace = new LogTrace<>(traceID);
 
 				// Check for similar instances
 				Collection<Integer> similarInstances = getSimilarInstances(trace);
@@ -173,8 +177,7 @@ public class XESLogParser extends AbstractLogParser {
 				
 			}
 			parsedLogFiles.add(logTraces);
-			summaries.put(logNumber, new LogSummary<LogEntry>(logTraces));
-			logNumber++;
+			summaries.add(new LogSummary<>(logTraces));
 		}
 
 		return parsedLogFiles;
@@ -185,6 +188,7 @@ public class XESLogParser extends AbstractLogParser {
 	 * 
 	 * @param file
 	 *            File to parse
+         * @param parsingMode
 	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
 	 * @throws ParameterException
 	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
@@ -201,7 +205,7 @@ public class XESLogParser extends AbstractLogParser {
 			try {
 				InputStream is = new FileInputStream(file);
 				return parse(is, parsingMode, ParserFileFormat.getFileFormat(file));
-			} catch (Exception e) {
+			} catch (FileNotFoundException | ParameterException | ParserException e) {
 				throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
 			}
 		} catch (Exception e) {
@@ -224,29 +228,35 @@ public class XESLogParser extends AbstractLogParser {
 		LogEntry logEntry;
 		try {
 			logEntry = (LogEntry) logEntryClass.newInstance();
-		} catch (Exception e) {
+		} catch (InstantiationException | IllegalAccessException e) {
 			throw new ParameterException("Cannot instantiate log entry class: " + e.getMessage());
 		}
 		for (Map.Entry<String, XAttribute> attribute : xesEvent.getAttributes().entrySet()) {
 			String key = attribute.getKey();
-			if (key.equals("concept:name")) {
-				addName(logEntry, attribute.getValue().toString());
-			} else if (key.equals("org:resource")) {
-				addOriginator(logEntry, attribute.getValue().toString());
-			} else if (key.equals("Role")) {
-				addRole(logEntry, attribute.getValue().toString());
-			} else if (key.equals("lifecycle:transition")) {
-				addEventType(logEntry, attribute.getValue().toString());
-			} else if (key.equals("time:timestamp")) {
-				addTimestamp(logEntry, attribute.getValue().toString());
-			} else {
-				// If the key is unknown, a meta attribute or a data attribute with the key/value pair is added
-				if (attribute.getValue().getAttributes().containsKey("dataUsage:usage")) {
-					addDataUsage(logEntry, attribute);
-				} else {
-					addMetaInformation(logEntry, attribute);
-				}
-			}
+                        switch (key) {
+                                case "concept:name":
+                                        addName(logEntry, attribute.getValue().toString());
+                                        break;
+                                case "org:resource":
+                                        addOriginator(logEntry, attribute.getValue().toString());
+                                        break;
+                                case "Role":
+                                        addRole(logEntry, attribute.getValue().toString());
+                                        break;
+                                case "lifecycle:transition":
+                                        addEventType(logEntry, attribute.getValue().toString());
+                                        break;
+                                case "time:timestamp":
+                                        addTimestamp(logEntry, attribute.getValue().toString());
+                                        break;
+                                default:
+                                        // If the key is unknown, a meta attribute or a data attribute with the key/value pair is added
+                                        if (attribute.getValue().getAttributes().containsKey("dataUsage:usage")) {
+                                                addDataUsage(logEntry, attribute);
+                                        } else {
+                                                addMetaInformation(logEntry, attribute);
+                                        }       break;
+                        }
 		}
 		return logEntry;
 	}
@@ -269,7 +279,6 @@ public class XESLogParser extends AbstractLogParser {
 				entry.setOriginator(value);
 			entry.setOriginator(value);
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new ParserException("Cannot set originator of log entry: " + e.getMessage());
 		}
 	}
@@ -281,8 +290,7 @@ public class XESLogParser extends AbstractLogParser {
 			if (entry.getRole() == null || !entry.getRole().equals(value))
 				entry.setRole(value);
 			entry.setRole(value);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (LockingException e) {
 			throw new ParserException("Cannot set role of log entry: " + e.getMessage());
 		}
 	}
@@ -313,7 +321,7 @@ public class XESLogParser extends AbstractLogParser {
 					// is allowed to happen
 				} catch (ParameterException e) {
 					// cannot happen.
-					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
 			}
 		}
@@ -344,7 +352,7 @@ public class XESLogParser extends AbstractLogParser {
 				for (DataUsage dataUsage : dataUsageList) {
 					try {
 						((DULogEntry) entry).addDataUsage(dataAttribute, dataUsage);
-					} catch (Exception e) {
+					} catch (ParameterException | LockingException e) {
 						throw new ParserException("Cannot add data usage information to log entry: " + e.getMessage());
 					}
 				}
@@ -378,14 +386,14 @@ public class XESLogParser extends AbstractLogParser {
 			if (groupedIdentifiersSplitted.length != numSimilarInstances)
 				System.err.println("The amount of similar instances differ in \"numSimilarInstances\" and \"GroupedIdentifiers\".");
 
-			Collection<Integer> groupedIdentifiersArray = new Vector<Integer>(groupedIdentifiersSplitted.length);
-			for (int i = 0; i < groupedIdentifiersSplitted.length; i++) {
-				try {
-					groupedIdentifiersArray.add(Integer.parseInt(groupedIdentifiersSplitted[i].trim()));
-				} catch (NumberFormatException e) {
-					throw new ParserException("The given identifier \"" + groupedIdentifiersSplitted[i] + "\" is not of the integer type: " + e.getMessage());
-				}
-			}
+			Collection<Integer> groupedIdentifiersArray = new ArrayList<>(groupedIdentifiersSplitted.length);
+                        for (String groupedIdentifiersSplitted1 : groupedIdentifiersSplitted) {
+                                try {
+                                        groupedIdentifiersArray.add(Integer.parseInt(groupedIdentifiersSplitted1.trim()));
+                                } catch (NumberFormatException e) {
+                                        throw new ParserException("The given identifier \"" + groupedIdentifiersSplitted1 + "\" is not of the integer type: " + e.getMessage());
+                                }
+                        }
 			if (groupedIdentifiersArray.size() > 0)
 				return groupedIdentifiersArray;
 		}
@@ -422,7 +430,7 @@ public class XESLogParser extends AbstractLogParser {
 	 */
 	private static List<DataUsage> parseDataUsageString(String dataUsageString) throws ParameterException {
 		List<String> dataUsageStrings = Arrays.asList(dataUsageString.split("\\s*,\\s*"));
-		List<DataUsage> dataUsageList = new Vector<DataUsage>(dataUsageStrings.size());
+		List<DataUsage> dataUsageList = new ArrayList<>(dataUsageStrings.size());
 		for (String d : dataUsageStrings) {
 			DataUsage dataUsage = DataUsage.parse(d);
 			if (!dataUsageList.contains(dataUsage))

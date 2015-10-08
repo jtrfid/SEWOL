@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.parser.ParserException.ErrorCode;
+import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
@@ -85,10 +86,22 @@ public class LogParser {
 	
 	public static LogParsingFormat guessFormat(File file){
 		for(LogParsingFormat format: LogParsingFormat.values()){
-			if(file.getName().endsWith(format.getFileFormat().getFileExtension())){
+			if(file.getName().endsWith(format.fileFormat.getFileExtension())){
 				return format;
 			}
 		}
 		return null;
 	}
+
+        // TODO remove
+        public static void main(String[] args) throws ParameterException, ParserException, IOException {
+                List<List<LogTrace<LogEntry>>> loglist = new XESLogParser().parse("/home/alange/Downloads/a12_delete1_1000.mxml", ParsingMode.COMPLETE);
+                //List<List<LogTrace<LogEntry>>> loglist = LogParser.parse("/home/alange/B1large.mxml");
+
+                for (List<LogTrace<LogEntry>> logs : loglist) {
+                        for (LogTrace<LogEntry> trace : logs) {
+                                System.out.println(trace);
+                        }
+                }
+        }
 }

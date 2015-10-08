@@ -22,54 +22,54 @@ import de.uni.freiburg.iig.telematik.sewol.parser.ParsingMode;
 
 public class PetrifyParser extends AbstractLogParser {
 
-	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode) throws IOException, ParameterException, ParserException {
-		try {
-			inputStream.available();
-		} catch (IOException e) {
-			throw new ParameterException("Unable to read input file: " + e.getMessage());
-		}
+        public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode) throws IOException, ParameterException, ParserException {
+                try {
+                        inputStream.available();
+                } catch (IOException e) {
+                        throw new ParameterException("Unable to read input file: " + e.getMessage());
+                }
 
-		parsedLogFiles = new ArrayList<List<LogTrace<LogEntry>>>();
-		
-		List<LogTrace<LogEntry>> traceList = new ArrayList<LogTrace<LogEntry>>();
+                parsedLogFiles = new ArrayList<>();
+
+                List<LogTrace<LogEntry>> traceList = new ArrayList<>();
 //		Set<LogTrace<LogEntry>> traceSet = new HashSet<LogTrace<LogEntry>>();
-		parsedLogFiles.add(traceList);
+                parsedLogFiles.add(traceList);
 
-		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-		BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-		String nextLine = null;
-		int traceCount = 0;
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String nextLine = null;
+                int traceCount = 0;
 
-		Set<List<String>> activitySequences = new HashSet<List<String>>();
-		while ((nextLine = bufferedReader.readLine()) != null) {
-			LogTrace<LogEntry> newTrace = new LogTrace<LogEntry>(++traceCount);
-			StringTokenizer tokenizer = new StringTokenizer(nextLine);
-			while (tokenizer.hasMoreTokens()) {
-				String nextToken = tokenizer.nextToken();
-				if (nextToken != null && !nextToken.isEmpty()) {
-					newTrace.addEntry(new LogEntry(nextToken));
-				}
-			}
-			switch(parsingMode){
-			case COMPLETE:
-				traceList.add(newTrace);
-				break;
-			case DISTINCT_ACTIVITY_SEQUENCES:
+                Set<List<String>> activitySequences = new HashSet<>();
+                while ((nextLine = bufferedReader.readLine()) != null) {
+                        LogTrace<LogEntry> newTrace = new LogTrace<>(++traceCount);
+                        StringTokenizer tokenizer = new StringTokenizer(nextLine);
+                        while (tokenizer.hasMoreTokens()) {
+                                String nextToken = tokenizer.nextToken();
+                                if (nextToken != null && !nextToken.isEmpty()) {
+                                        newTrace.addEntry(new LogEntry(nextToken));
+                                }
+                        }
+                        switch (parsingMode) {
+                                case COMPLETE:
+                                        traceList.add(newTrace);
+                                        break;
+                                case DISTINCT_ACTIVITY_SEQUENCES:
 //			case DISTINCT_TRACES:
-				if(activitySequences.add(newTrace.getActivities())){
-					newTrace.reduceToActivities();
-					traceList.add(newTrace);
-				}
-				break;
-			}
-		}
-		summaries.put(0, new LogSummary<LogEntry>(traceList));
-		return parsedLogFiles;
-	}
+                                        if (activitySequences.add(newTrace.getActivities())) {
+                                                newTrace.reduceToActivities();
+                                                traceList.add(newTrace);
+                                        }
+                                        break;
+                        }
+                }
+                summaries.add(new LogSummary<>(traceList));
+                return parsedLogFiles;
+        }
 
-	@Override
-	public List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
-		InputStream inputStream = new FileInputStream(file);
-		return parse(inputStream, parsingMode);
-	}
+        @Override
+        public List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws IOException, ParserException, ParameterException {
+                InputStream inputStream = new FileInputStream(file);
+                return parse(inputStream, parsingMode);
+        }
 }

@@ -1,0 +1,219 @@
+package de.uni.freiburg.iig.telematik.sewol.parser.mxml;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+import de.invation.code.toval.parser.ParserException;
+import de.invation.code.toval.validate.ParameterException;
+import de.invation.code.toval.validate.Validate;
+import de.uni.freiburg.iig.telematik.sewol.format.MXMLLogFormat;
+import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
+import de.uni.freiburg.iig.telematik.sewol.log.LogSummary;
+import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
+import de.uni.freiburg.iig.telematik.sewol.parser.AbstractLogParser;
+import de.uni.freiburg.iig.telematik.sewol.parser.ParserFileFormat;
+import de.uni.freiburg.iig.telematik.sewol.parser.ParsingMode;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
+
+/**
+ * <p>
+ * A parser class for MXML files for the SEWOL log classes.
+ * </p>
+ *
+ * @author Adrian Lange
+ */
+public class MXMLLogParser extends AbstractLogParser {
+
+        /**
+         * Parses the specified log file path and returns a collection of
+         * processes.
+         *
+         * @param filePath Path to file to parse
+         * @param parsingMode
+         * @return Collection of processes, which consist of a collection of
+         * instances, which again consist of a collection of {@link LogTrace}
+         * objects.
+         * @throws ParameterException Gets thrown if there's a discrepancy in
+         * how the file should be interpreted.
+         * @throws ParserException Gets thrown if the file under the given path
+         * can't be read, is a directory, or doesn't exist.
+         */
+        public List<List<LogTrace<LogEntry>>> parse(String filePath, ParsingMode parsingMode) throws ParameterException, ParserException {
+                Validate.notNull(filePath);
+                return parse(new File(filePath), parsingMode);
+        }
+
+        /**
+         * Parses the specified log file and returns a collection of processes.
+         *
+         * @param inputStream {@link InputStream} to parse
+         * @param parsingMode
+         * @param fileFormat Format of the {@link InputStream} as it can't be
+         * determined automatically
+         * @return Collection of processes, which consist of a collection of
+         * instances, which again consist of a collection of {@link LogTrace}
+         * objects.
+         * @throws ParameterException Gets thrown if there's a discrepancy in
+         * how the file should be interpreted.
+         * @throws ParserException Gets thrown if the given file can't be read,
+         * is a directory, or doesn't exist.
+         */
+        public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode, ParserFileFormat fileFormat) throws ParameterException, ParserException {
+                try {
+                        inputStream.available();
+                } catch (IOException e) {
+                        throw new ParameterException("Unable to read input file: " + e.getMessage());
+                }
+
+                try {
+                        SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+                        MXMLSAXHandler handler = new MXMLSAXHandler();
+                        parser.parse(inputStream, handler);
+
+                        summaries.addAll(handler.summaries);
+                        parsedLogFiles = handler.logs;
+                        return parsedLogFiles;
+                } catch (ParserConfigurationException | SAXException | IOException ex) {
+                        throw new ParserException(ex);
+                }
+        }
+
+        /**
+         * Parses the specified log file and returns a collection of processes.
+         *
+         * @param file File to parse
+         * @param parsingMode
+         * @return Collection of processes, which consist of a collection of
+         * instances, which again consist of a collection of {@link LogTrace}
+         * objects.
+         * @throws ParameterException Gets thrown if there's a discrepancy in
+         * how the file should be interpreted.
+         * @throws ParserException Gets thrown if the given file can't be read,
+         * is a directory, or doesn't exist.
+         */
+        @Override
+        public List<List<LogTrace<LogEntry>>> parse(File file, ParsingMode parsingMode) throws ParameterException, ParserException {
+                Validate.noDirectory(file);
+                if (!file.canRead()) {
+                        throw new ParameterException("Unable to read input file!");
+                }
+
+                try {
+                        try {
+                                InputStream is = new FileInputStream(file);
+                                return parse(is, parsingMode, ParserFileFormat.getFileFormat(file));
+                        } catch (FileNotFoundException | ParameterException | ParserException e) {
+                                throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
+                        }
+                } catch (Exception e) {
+                        throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
+                }
+        }
+
+        // TODO remove
+        public static void main(String[] args) throws ParameterException, ParserException {
+                new MXMLLogParser().parse("/home/alange/validLogExample.mxml", ParsingMode.COMPLETE);
+        }
+
+        private static class MXMLSAXHandler extends DefaultHandler {
+
+                private final List<List<LogTrace<LogEntry>>> logs = new ArrayList<>();
+                private final List<LogSummary<LogEntry>> summaries = new ArrayList<>();
+
+                private List<LogTrace<LogEntry>> currentLog = null;
+                private LogTrace<LogEntry> currentTrace = null;
+                private LogEntry currentEntry = null;
+                private LogSummary<LogEntry> currentSummary = null;
+                private String lastCharacters = null;
+
+                private static final Pattern INT_PATTERN = Pattern.compile("^(\\d+)$");
+                private static final Pattern NON_INT_PATTERN = Pattern.compile("(\\D+)");
+
+                @Override
+                public void startDocument() throws SAXException {
+                }
+
+                @Override
+                public void endDocument() throws SAXException {
+                }
+
+                @Override
+                public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+                        switch (qName) {
+                                case MXMLLogFormat.ELEMENT_LOG:
+                                        currentLog = new ArrayList<>();
+                                        currentSummary = new LogSummary<>();
+                                        break;
+                                case MXMLLogFormat.ELEMENT_TRACE:
+                                        if (attributes.getIndex(MXMLLogFormat.ATTRIBUTE_ID) >= 0) {
+                                                String idString = attributes.getValue(attributes.getIndex(MXMLLogFormat.ATTRIBUTE_ID));
+                                                currentTrace = new LogTrace<>(idStrToInt(idString));
+                                        } else {
+                                                currentTrace = new LogTrace<>();
+                                        }
+                                        break;
+                                case MXMLLogFormat.ELEMENT_ENTRY:
+                                        currentEntry = new LogEntry();
+                                        break;
+                        }
+                }
+
+                @Override
+                public void endElement(String uri, String localName, String qName) throws SAXException {
+                        switch (qName) {
+                                case MXMLLogFormat.ELEMENT_LOG:
+                                        summaries.add(currentSummary);
+                                        logs.add(currentLog);
+                                        break;
+                                case MXMLLogFormat.ELEMENT_TRACE:
+                                        currentLog.add(currentTrace);
+                                        currentSummary.addTrace(currentTrace);
+                                        break;
+                                case MXMLLogFormat.ELEMENT_ENTRY:
+                                        currentTrace.addEntry(currentEntry);
+                                        break;
+                        }
+                }
+
+                @Override
+                public void characters(char[] ch, int start, int length) throws SAXException {
+                        StringBuilder str = new StringBuilder();
+                        for (int i = 0; i < length; i++) {
+                                str.append(ch[start + i]);
+                        }
+                        lastCharacters = str.toString();
+                }
+
+                @Override
+                public void error(SAXParseException e) throws SAXException {
+                        throw e;
+                }
+
+                @Override
+                public void warning(SAXParseException e) throws SAXException {
+                        throw e;
+                }
+
+                private static int idStrToInt(String idString) {
+                        if (idString.matches(INT_PATTERN.pattern())) {
+                                return Integer.parseInt(idString);
+                        } else if (idString.replaceAll(NON_INT_PATTERN.pattern(), "").matches(INT_PATTERN.pattern())) {
+                                return Integer.parseInt(idString.replaceAll(NON_INT_PATTERN.pattern(), ""));
+                        } else {
+                                return idString.hashCode();
+                        }
+                }
+        }
+}

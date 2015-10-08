@@ -18,7 +18,7 @@ public class LogFormatFactory {
 			result = new PlainTraceLogFormat(LogPerspective.TRACE_PERSPECTIVE);
 		} catch (PerspectiveException e) {
 			// Cannot happen, since PlainTraceLogFormat accepts trace perspective.
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return result;
 	}
@@ -42,5 +42,4 @@ public class LogFormatFactory {
 			return LogFormatType.PLAIN;
 		return null;
 	}
-
 }

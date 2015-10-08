@@ -34,8 +34,8 @@ public class PlainParser extends AbstractLogParser {
 			throw new ParameterException("Unable to read input file: " + e.getMessage());
 		}
 		
-		parsedLogFiles = new ArrayList<List<LogTrace<LogEntry>>>();
-		List<LogTrace<LogEntry>> traceList = new ArrayList<LogTrace<LogEntry>>();
+		parsedLogFiles = new ArrayList<>();
+		List<LogTrace<LogEntry>> traceList = new ArrayList<>();
 		parsedLogFiles.add(traceList);
 
 		InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -43,9 +43,9 @@ public class PlainParser extends AbstractLogParser {
 		String nextLine = null;
 		int traceCount = 0;
 
-		Set<List<String>> activitySequences = new HashSet<List<String>>();
+		Set<List<String>> activitySequences = new HashSet<>();
 		while ((nextLine = bufferedReader.readLine()) != null) {
-			LogTrace<LogEntry> newTrace = new LogTrace<LogEntry>(++traceCount);
+			LogTrace<LogEntry> newTrace = new LogTrace<>(++traceCount);
 			for (String nextToken : nextLine.split(delimiter)) {
 				if (nextToken != null && !nextToken.isEmpty()) {
 					newTrace.addEntry(new LogEntry(nextToken));
@@ -65,7 +65,7 @@ public class PlainParser extends AbstractLogParser {
 			}
 		}
 		
-		summaries.put(0, new LogSummary<LogEntry>(traceList));
+		summaries.add(new LogSummary<>(traceList));
 		return parsedLogFiles;
 	}
 
