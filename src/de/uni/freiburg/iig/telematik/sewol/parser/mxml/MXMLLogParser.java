@@ -10,6 +10,7 @@ import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.format.MXMLLogFormat;
+import de.uni.freiburg.iig.telematik.sewol.log.DataAttribute;
 import de.uni.freiburg.iig.telematik.sewol.log.EventType;
 import de.uni.freiburg.iig.telematik.sewol.log.LockingException;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
@@ -17,7 +18,6 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogSummary;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
 import de.uni.freiburg.iig.telematik.sewol.parser.AbstractLogParser;
 import de.uni.freiburg.iig.telematik.sewol.parser.ParserDateFormat;
-import de.uni.freiburg.iig.telematik.sewol.parser.ParserFileFormat;
 import de.uni.freiburg.iig.telematik.sewol.parser.ParsingMode;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
@@ -37,6 +37,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * A parser class for MXML files for the SEWOL log classes.
  * </p>
  *
+ * @version 1.0.2
+ * @since 1.0.2
  * @author Adrian Lange
  */
 public class MXMLLogParser extends AbstractLogParser {
@@ -65,8 +67,6 @@ public class MXMLLogParser extends AbstractLogParser {
          *
          * @param inputStream {@link InputStream} to parse
          * @param parsingMode
-         * @param fileFormat Format of the {@link InputStream} as it can't be
-         * determined automatically
          * @return Collection of processes, which consist of a collection of
          * instances, which again consist of a collection of {@link LogTrace}
          * objects.
@@ -75,7 +75,7 @@ public class MXMLLogParser extends AbstractLogParser {
          * @throws ParserException Gets thrown if the given file can't be read,
          * is a directory, or doesn't exist.
          */
-        public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode, ParserFileFormat fileFormat) throws ParameterException, ParserException {
+        public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode) throws ParameterException, ParserException {
                 try {
                         inputStream.available();
                 } catch (IOException e) {
@@ -118,18 +118,13 @@ public class MXMLLogParser extends AbstractLogParser {
                 try {
                         try {
                                 InputStream is = new FileInputStream(file);
-                                return parse(is, parsingMode, ParserFileFormat.getFileFormat(file));
+                                return parse(is, parsingMode);
                         } catch (FileNotFoundException | ParameterException | ParserException e) {
-                                throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
+                                throw new ParserException(e);
                         }
                 } catch (Exception e) {
-                        throw new ParserException("Error while parsing log with OpenXES-Parser: " + e.getMessage());
+                        throw new ParserException(e);
                 }
-        }
-
-        // TODO remove
-        public static void main(String[] args) throws ParameterException, ParserException {
-                new MXMLLogParser().parse("/home/alange/validLogExample.mxml", ParsingMode.COMPLETE);
         }
 
         private static class MXMLSAXHandler extends DefaultHandler {
@@ -141,6 +136,7 @@ public class MXMLLogParser extends AbstractLogParser {
                 private LogTrace<LogEntry> currentTrace = null;
                 private LogEntry currentEntry = null;
                 private LogSummary<LogEntry> currentSummary = null;
+                private DataAttribute currentAttribute = null;
                 private final StringBuilder lastCharacters = new StringBuilder();
                 private boolean recordCharacters = false;
 
@@ -177,10 +173,19 @@ public class MXMLLogParser extends AbstractLogParser {
                                 case MXMLLogFormat.ELEMENT_TYPE:
                                 case MXMLLogFormat.ELEMENT_TIME:
                                 case MXMLLogFormat.ELEMENT_ORIGINATOR:
-                                        // TODO case MXMLLogFormat.ELEMENT_DATA:
                                         lastCharacters.setLength(0);
                                         recordCharacters = true;
                                         break;
+                                case MXMLLogFormat.ELEMENT_ATTRIBUTE:
+                                        lastCharacters.setLength(0);
+                                        recordCharacters = true;
+                                        if (attributes.getIndex(MXMLLogFormat.ATTRIBUTE_NAME) >= 0) {
+                                                String nameString = attributes.getValue(attributes.getIndex(MXMLLogFormat.ATTRIBUTE_NAME));
+                                                currentAttribute = new DataAttribute(nameString);
+                                        }
+                                        break;
+//                                case MXMLLogFormat.ELEMENT_DATA:
+//                                        break;
                         }
                 }
 
@@ -205,23 +210,36 @@ public class MXMLLogParser extends AbstractLogParser {
                                                         recordCharacters = false;
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_TYPE:
-                                                        currentEntry.setEventType(EventType.parse(lastCharacters.toString()));
+                                                        EventType type = EventType.parse(lastCharacters.toString());
+                                                        if (type != null) {
+                                                                currentEntry.setEventType(type);
+                                                        }
                                                         recordCharacters = false;
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_TIME:
                                                         String dateStr = lastCharacters.toString();
                                                         Date date = parseTimestamp(dateStr);
-                                                        currentEntry.setTimestamp(date);
+                                                        if (date != null) {
+                                                                currentEntry.setTimestamp(date);
+                                                        }
                                                         recordCharacters = false;
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_ORIGINATOR:
                                                         currentEntry.setOriginator(lastCharacters.toString());
                                                         recordCharacters = false;
                                                         break;
-                                                //case MXMLLogFormat.ELEMENT_DATA:
-                                                //        // TODO
-                                                //        recordCharacters = false;
-                                                //        break;
+                                                case MXMLLogFormat.ELEMENT_ATTRIBUTE:
+                                                        if (currentAttribute != null) {
+                                                                currentAttribute.value = lastCharacters.toString();
+                                                                currentEntry.addMetaAttribute(currentAttribute);
+                                                                currentAttribute = null;
+                                                        }
+                                                        recordCharacters = false;
+                                                        break;
+//                                                case MXMLLogFormat.ELEMENT_DATA:
+//                                                        // TODO
+//                                                        recordCharacters = false;
+//                                                        break;
                                         }
                                 } catch (LockingException ex) {
                                         throw new RuntimeException(ex);

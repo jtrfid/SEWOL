@@ -9,6 +9,8 @@ import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.sewol.format.AbstractLogFormat;
 import de.uni.freiburg.iig.telematik.sewol.format.LogPerspective;
+import de.uni.freiburg.iig.telematik.sewol.format.MXMLLogFormat;
+import de.uni.freiburg.iig.telematik.sewol.log.DataAttribute;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
 import de.uni.freiburg.iig.telematik.sewol.writer.PerspectiveException.PerspectiveError;
@@ -214,7 +216,7 @@ public class LogWriter extends FileWriter{
 		} catch (ParameterException e) {
 			// Is only thrown if setEOLString() is called with a null-parameter.
 			// Cannot happen, since EOLType.LF is not null
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -223,7 +225,9 @@ public class LogWriter extends FileWriter{
 	
 	/**
 	 * This method is only allowed in the trace perspective.
+         * @param <E>
 	 * @param logTrace The log trace to write.
+         * @throws PerspectiveException
 	 * @throws IOException 
 	 */
 	public <E extends LogEntry> void writeTrace(LogTrace<E> logTrace) throws PerspectiveException, IOException{
@@ -241,6 +245,8 @@ public class LogWriter extends FileWriter{
 	/**
 	 * This method is only allowed in the activity perspective.
 	 * @param logEntry The log entry to write.
+         * @param caseNumber
+         * @throws PerspectiveException
 	 * @throws IOException 
 	 */
 	public void writeEntry(LogEntry logEntry, int caseNumber) throws PerspectiveException, IOException{
@@ -271,11 +277,12 @@ public class LogWriter extends FileWriter{
 //		LogEntry en1 = new LogEntry("A");
 //		LogEntry en2 = new LogEntry("B");
 //		LogEntry en3 = new LogEntry("C");
+//                en3.addMetaAttribute(new DataAttribute("key", "val"));
 //		LogTrace tr1 = new LogTrace(1);
 //		tr1.addEntry(en1);
 //		tr1.addEntry(en2);
 //		tr1.addEntry(en3);
-//		LogWriter writer = new LogWriter(new MXMLLogFormat(), "WriterTest");
+//		LogWriter writer = new LogWriter(new MXMLLogFormat("bla"), "/home/alange/WriterTest");
 //		writer.writeTrace(tr1);
 //		writer.closeFile();
 //	}

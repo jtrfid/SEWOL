@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.List;
 import de.invation.code.toval.parser.ParserException;
 import de.invation.code.toval.parser.ParserException.ErrorCode;
-import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
@@ -103,18 +102,5 @@ public class LogParser {
                         }
                 }
                 return null;
-        }
-
-        // TODO remove
-        public static void main(String[] args) throws ParameterException, ParserException, IOException {
-                //List<List<LogTrace<LogEntry>>> loglist = new MXMLLogParser().parse("/home/alange/validLogExample.mxml", ParsingMode.COMPLETE);
-                //List<List<LogTrace<LogEntry>>> loglist = LogParser.parse("/home/alange/B1large.mxml");
-                List<List<LogTrace<LogEntry>>> loglist = LogParser.parse("/home/alange/validLogExample.mxml");
-
-                for (List<LogTrace<LogEntry>> logs : loglist) {
-                        for (LogTrace<LogEntry> trace : logs) {
-                                System.out.println(trace);
-                        }
-                }
         }
 }

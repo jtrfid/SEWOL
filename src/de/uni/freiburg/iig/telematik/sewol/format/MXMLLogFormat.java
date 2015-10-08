@@ -13,10 +13,10 @@ import de.uni.freiburg.iig.telematik.sewol.writer.PerspectiveException;
 import java.util.List;
 
 /**
- * Weil die Zeilenumbr�che hardcoded in den String-Konstanten sind muss darauf
+ * Weil die Zeilenumbrüche hardcoded in den String-Konstanten sind muss darauf
  * geachtet werden, dass immer dasselbe Zeilenumbruchs-Zeichen verwendet wird.
  * Die einzuhaltende Konvention ist '\n'. LogWriter ist dementsprechend
- * implementiert und erwartet ausschlie�lich solche Zeilenumbr�che.
+ * implementiert und erwartet ausschließlich solche Zeilenumbrüche.
  *
  * @author ts552
  *
@@ -36,6 +36,7 @@ public class MXMLLogFormat extends AbstractLogFormat {
         public static final String ELEMENT_DATA = "Data";
         public static final String ELEMENT_ATTRIBUTE = "Attribute";
         public static final String ATTRIBUTE_ID = "id";
+        public static final String ATTRIBUTE_NAME = "name";
 
         private static final String DEFAULT_LINE_SEPARATOR = "\n";
         private static final String FILE_HEADER_FORMAT = "<?xml version=\"1.0\" encoding=\"%%s\"?>%s<" + ELEMENT_ROOT + ">%s<" + ELEMENT_LOG + " id=\"%%s\">%s";
