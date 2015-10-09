@@ -158,7 +158,7 @@ public class XESLogFormat extends AbstractLogFormat {
         }
 
         @Override
-        public <E extends LogEntry> String getEntryAsString(E entry, int caseNumber) {
+        public <E extends LogEntry> String getEntryAsString(E entry, long caseNumber) {
                 StringBuilder builder = new StringBuilder();
 
                 builder.append(EVENT_START);

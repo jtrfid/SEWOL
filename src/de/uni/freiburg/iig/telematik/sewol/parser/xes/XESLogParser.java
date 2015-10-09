@@ -153,7 +153,7 @@ public class XESLogParser extends AbstractLogParser {
 				LogTrace<LogEntry> logTrace = new LogTrace<>(traceID);
 
 				// Check for similar instances
-				Collection<Integer> similarInstances = getSimilarInstances(trace);
+				Collection<Long> similarInstances = getSimilarInstances(trace);
 				if (similarInstances != null) {
 					logTrace.setSimilarInstances(similarInstances);
 				}
@@ -364,7 +364,7 @@ public class XESLogParser extends AbstractLogParser {
 		entry.addMetaAttribute(new DataAttribute(attribute.getKey(), attribute.getValue()));
 	}
 
-	private Collection<Integer> getSimilarInstances(XTrace trace) throws ParserException {
+	private Collection<Long> getSimilarInstances(XTrace trace) throws ParserException {
 		// Check for similar instances
 		Integer numSimilarInstances = null;
 		String groupedIdentifiers = null;
@@ -386,10 +386,10 @@ public class XESLogParser extends AbstractLogParser {
 			if (groupedIdentifiersSplitted.length != numSimilarInstances)
 				System.err.println("The amount of similar instances differ in \"numSimilarInstances\" and \"GroupedIdentifiers\".");
 
-			Collection<Integer> groupedIdentifiersArray = new ArrayList<>(groupedIdentifiersSplitted.length);
+			Collection<Long> groupedIdentifiersArray = new ArrayList<>(groupedIdentifiersSplitted.length);
                         for (String groupedIdentifiersSplitted1 : groupedIdentifiersSplitted) {
                                 try {
-                                        groupedIdentifiersArray.add(Integer.parseInt(groupedIdentifiersSplitted1.trim()));
+                                        groupedIdentifiersArray.add(Long.parseLong(groupedIdentifiersSplitted1.trim()));
                                 } catch (NumberFormatException e) {
                                         throw new ParserException("The given identifier \"" + groupedIdentifiersSplitted1 + "\" is not of the integer type: " + e.getMessage());
                                 }

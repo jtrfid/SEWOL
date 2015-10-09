@@ -68,7 +68,7 @@ public class PlainTraceLogFormat extends AbstractLogFormat {
 	}
 
 	@Override
-	public <E extends LogEntry> String getEntryAsString(E entry, int caseNumber) {
+	public <E extends LogEntry> String getEntryAsString(E entry, long caseNumber) {
 		return entry.getActivity();
 	}
 

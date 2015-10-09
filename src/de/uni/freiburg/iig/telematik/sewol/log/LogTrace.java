@@ -15,13 +15,13 @@ import de.invation.code.toval.validate.Validate;
 public class LogTrace<E extends LogEntry> {
 
     private final List<E> logEntries = new ArrayList<>();
-    private int caseNumber = -1;
-    private final Set<Integer> similarInstances = new HashSet<>();
+    private long caseNumber = -1;
+    private final Set<Long> similarInstances = new HashSet<>();
 
     public LogTrace() {
     }
 
-    public LogTrace(Integer caseNumber) {
+    public LogTrace(long caseNumber) {
         Validate.notNegative(caseNumber);
         this.caseNumber = caseNumber;
     }
@@ -77,7 +77,7 @@ public class LogTrace<E extends LogEntry> {
         return result;
     }
 
-    public List<E> getFirstKEntries(Integer k) {
+    public List<E> getFirstKEntries(int k) {
         Validate.notNegative(k);
         if (k > size()) {
             throw new ParameterException("Trace does only contain " + size() + " entries!");
@@ -95,14 +95,14 @@ public class LogTrace<E extends LogEntry> {
     public List<E> getSucceedingEntries(E entry) {
         Validate.notNull(entry);
         List<E> result = new ArrayList<>();
-        Integer index = null;
+        int index = -1;
         for (E traceEntry : logEntries) {
             if (traceEntry == entry) {
                 index = logEntries.indexOf(traceEntry);
                 break;
             }
         }
-        if (index != null && index < logEntries.size() - 1) {
+        if (index > -1 && index < logEntries.size() - 1) {
             for (int i = index + 1; i < logEntries.size(); i++) {
                 result.add(logEntries.get(i));
             }
@@ -112,14 +112,14 @@ public class LogTrace<E extends LogEntry> {
 
     public E getDirectSuccessor(E entry) {
         Validate.notNull(entry);
-        Integer index = null;
+        int index = -1;
         for (E traceEntry : logEntries) {
             if (traceEntry == entry) {
                 index = logEntries.indexOf(traceEntry);
                 break;
             }
         }
-        if (index != null && index < logEntries.size() - 1) {
+        if (index > -1 && index < logEntries.size() - 1) {
             return logEntries.get(index + 1);
         }
         return null;
@@ -128,14 +128,14 @@ public class LogTrace<E extends LogEntry> {
     public List<E> getPreceedingEntries(E entry) {
         Validate.notNull(entry);
         List<E> result = new ArrayList<>();
-        Integer index = null;
+        int index = -1;
         for (E traceEntry : logEntries) {
             if (traceEntry == entry) {
                 index = logEntries.indexOf(traceEntry);
                 break;
             }
         }
-        if (index != null && index > 0) {
+        if (index > 0) {
             for (int i = 0; i < index; i++) {
                 result.add(logEntries.get(i));
             }
@@ -145,14 +145,14 @@ public class LogTrace<E extends LogEntry> {
 
     public E getDirectPredecessor(E entry) {
         Validate.notNull(entry);
-        Integer index = null;
+        int index = -1;
         for (E traceEntry : logEntries) {
             if (traceEntry == entry) {
                 index = logEntries.indexOf(traceEntry);
                 break;
             }
         }
-        if (index != null && index > 0) {
+        if (index > 0) {
             return logEntries.get(index - 1);
         }
         return null;
@@ -178,7 +178,7 @@ public class LogTrace<E extends LogEntry> {
         this.caseNumber = caseNumber;
     }
 
-    public int getCaseNumber() {
+    public long getCaseNumber() {
         return caseNumber;
     }
 
@@ -186,7 +186,7 @@ public class LogTrace<E extends LogEntry> {
         return logEntries.size();
     }
 
-    public Set<Integer> getSimilarInstances() {
+    public Set<Long> getSimilarInstances() {
         return Collections.unmodifiableSet(similarInstances);
     }
 
@@ -194,12 +194,12 @@ public class LogTrace<E extends LogEntry> {
         return similarInstances.size();
     }
 
-    public void addSimilarInstance(Integer similarInstance) {
+    public void addSimilarInstance(long similarInstance) {
         Validate.notNull(similarInstance);
         this.similarInstances.add(similarInstance);
     }
 
-    public void setSimilarInstances(Collection<Integer> similarInstances) {
+    public void setSimilarInstances(Collection<Long> similarInstances) {
         Validate.notNull(similarInstances);
         this.similarInstances.clear();
         this.similarInstances.addAll(similarInstances);

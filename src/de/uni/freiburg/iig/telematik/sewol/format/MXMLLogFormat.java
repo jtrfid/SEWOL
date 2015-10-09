@@ -127,7 +127,7 @@ public class MXMLLogFormat extends AbstractLogFormat {
         }
 
         @Override
-        public <E extends LogEntry> String getEntryAsString(E entry, int caseNumber) {
+        public <E extends LogEntry> String getEntryAsString(E entry, long caseNumber) {
                 StringBuilder builder = new StringBuilder();
                 builder.append(ENTRY_START_FORMAT);
                 List<Object> formatArgs = new ArrayList<>();

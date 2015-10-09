@@ -108,7 +108,7 @@ public abstract class AbstractLogFormat extends FileFormat {
 
         public abstract <E extends LogEntry> String getTraceAsString(LogTrace<E> trace);
 
-        public abstract <E extends LogEntry> String getEntryAsString(E entry, int caseNumber);
+        public abstract <E extends LogEntry> String getEntryAsString(E entry, long caseNumber);
 
         public abstract LogFormatType getLogFormatType();
 

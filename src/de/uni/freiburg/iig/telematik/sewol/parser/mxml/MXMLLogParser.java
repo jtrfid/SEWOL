@@ -311,11 +311,11 @@ public class MXMLLogParser extends AbstractLogParser {
                         return null;
                 }
 
-                private static int idStrToInt(String idString) {
+                private static long idStrToInt(String idString) {
                         if (idString.matches(INT_PATTERN)) {
-                                return Integer.parseInt(idString);
+                                return Long.parseLong(idString);
                         } else if (idString.replaceAll(NON_INT_PATTERN, "").matches(INT_PATTERN)) {
-                                return Integer.parseInt(idString.replaceAll(NON_INT_PATTERN, ""));
+                                return Long.parseLong(idString.replaceAll(NON_INT_PATTERN, ""));
                         } else {
                                 return idString.hashCode();
                         }
