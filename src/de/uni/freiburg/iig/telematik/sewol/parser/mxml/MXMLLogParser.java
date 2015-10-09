@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -139,9 +138,15 @@ public class MXMLLogParser extends AbstractLogParser {
                 private DataAttribute currentAttribute = null;
                 private final StringBuilder lastCharacters = new StringBuilder();
                 private boolean recordCharacters = false;
+                private Date date = null;
+                private static ParserDateFormat PARSER_DATE_FORMAT = null;
+                private static boolean PARSER_DATE_FORMAT_INITIALIZED = false;
+                private static boolean PARSER_DATE_FORMAT_SANITIZE = false;
 
-                private static final Pattern INT_PATTERN = Pattern.compile("^(\\d+)$");
-                private static final Pattern NON_INT_PATTERN = Pattern.compile("(\\D+)");
+                private static final String TIMESTAMP_ENDING_PATTERN = ":(\\d\\d)$";
+
+                private static final String INT_PATTERN = "^0*(\\d+)$";
+                private static final String NON_INT_PATTERN = "(\\D+)";
 
                 @Override
                 public void startDocument() throws SAXException {
@@ -180,7 +185,7 @@ public class MXMLLogParser extends AbstractLogParser {
                                         lastCharacters.setLength(0);
                                         recordCharacters = true;
                                         if (attributes.getIndex(MXMLLogFormat.ATTRIBUTE_NAME) >= 0) {
-                                                String nameString = attributes.getValue(attributes.getIndex(MXMLLogFormat.ATTRIBUTE_NAME));
+                                                String nameString = attributes.getValue(attributes.getIndex(MXMLLogFormat.ATTRIBUTE_NAME)).intern();
                                                 currentAttribute = new DataAttribute(nameString);
                                         }
                                         break;
@@ -206,31 +211,31 @@ public class MXMLLogParser extends AbstractLogParser {
                                                         currentTrace.addEntry(currentEntry);
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_ACTIVITY:
-                                                        currentEntry.setActivity(lastCharacters.toString());
+                                                        currentEntry.setActivity(lastCharacters.toString().intern());
                                                         recordCharacters = false;
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_TYPE:
-                                                        EventType type = EventType.parse(lastCharacters.toString());
+                                                        EventType type = EventType.parse(lastCharacters.toString().intern(), false);
                                                         if (type != null) {
                                                                 currentEntry.setEventType(type);
                                                         }
                                                         recordCharacters = false;
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_TIME:
-                                                        String dateStr = lastCharacters.toString();
-                                                        Date date = parseTimestamp(dateStr);
+                                                        String dateStr = lastCharacters.toString().intern();
+                                                        date = parseTimestamp(dateStr, true);
                                                         if (date != null) {
                                                                 currentEntry.setTimestamp(date);
                                                         }
                                                         recordCharacters = false;
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_ORIGINATOR:
-                                                        currentEntry.setOriginator(lastCharacters.toString());
+                                                        currentEntry.setOriginator(lastCharacters.toString().intern());
                                                         recordCharacters = false;
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_ATTRIBUTE:
                                                         if (currentAttribute != null) {
-                                                                currentAttribute.value = lastCharacters.toString();
+                                                                currentAttribute.value = lastCharacters.toString().intern();
                                                                 currentEntry.addMetaAttribute(currentAttribute);
                                                                 currentAttribute = null;
                                                         }
@@ -268,17 +273,23 @@ public class MXMLLogParser extends AbstractLogParser {
                         throw e;
                 }
 
-                private Date parseTimestamp(String value) {
+                private static Date parseTimestamp(String value, boolean sanitize) {
                         if (value == null || value.isEmpty()) {
                                 return null;
                         }
-                        String sanitizedDateString = value.replaceAll(":(\\d\\d)$", "$1");
-                        Date date = null;
-//                        String sanitizedDateString = value.replaceAll(":(\\d\\d)$", "$1");
-                        for (ParserDateFormat pdf : ParserDateFormat.values()) {
-                                if (date == null) {
+
+                        if (!PARSER_DATE_FORMAT_INITIALIZED) {
+                                String sanitizedValue = value.replaceAll(TIMESTAMP_ENDING_PATTERN, "$1");
+                                if (!sanitizedValue.equals(value)) {
+                                        PARSER_DATE_FORMAT_SANITIZE = true;
+                                        value = sanitize ? value = sanitizedValue : value;
+                                }
+                                PARSER_DATE_FORMAT_INITIALIZED = true;
+
+                                for (ParserDateFormat pdf : ParserDateFormat.values()) {
                                         try {
-                                                date = ParserDateFormat.getDateFormat(pdf).parse(sanitizedDateString);
+                                                ParserDateFormat.getDateFormat(pdf).parse(value);
+                                                PARSER_DATE_FORMAT = pdf;
                                         } catch (ParseException e) {
                                                 // is allowed to happen
                                         } catch (ParameterException e) {
@@ -288,17 +299,34 @@ public class MXMLLogParser extends AbstractLogParser {
                                 }
                         }
 
-                        return date;
+                        if (sanitize && PARSER_DATE_FORMAT_SANITIZE) {
+                                value = value.replaceAll(TIMESTAMP_ENDING_PATTERN, "$1");
+                        }
+
+                        try {
+                                return ParserDateFormat.getDateFormat(PARSER_DATE_FORMAT).parse(value);
+                        } catch (ParseException ex) {
+                                // is allowed to happen
+                        }
+                        return null;
                 }
 
                 private static int idStrToInt(String idString) {
-                        if (idString.matches(INT_PATTERN.pattern())) {
+                        if (idString.matches(INT_PATTERN)) {
                                 return Integer.parseInt(idString);
-                        } else if (idString.replaceAll(NON_INT_PATTERN.pattern(), "").matches(INT_PATTERN.pattern())) {
-                                return Integer.parseInt(idString.replaceAll(NON_INT_PATTERN.pattern(), ""));
+                        } else if (idString.replaceAll(NON_INT_PATTERN, "").matches(INT_PATTERN)) {
+                                return Integer.parseInt(idString.replaceAll(NON_INT_PATTERN, ""));
                         } else {
                                 return idString.hashCode();
                         }
                 }
         }
+
+//        public static void main(String[] args) throws ParameterException, ParserException {
+//                MXMLLogParser p = new MXMLLogParser();
+//                p.parse(new File("/home/alange/B1large.mxml"), ParsingMode.COMPLETE);
+//                p.parse(new File("/home/alange/WriterTest.mxml"), ParsingMode.COMPLETE);
+//                p.parse(new File("/home/alange/validLogExample.mxml"), ParsingMode.COMPLETE);
+//                System.out.println(p.summaries.get(0).getAverageTraceLength());
+//        }
 }
