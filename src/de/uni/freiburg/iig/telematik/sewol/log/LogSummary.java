@@ -22,7 +22,7 @@ public class LogSummary<E extends LogEntry> {
 		addTraces(traces);
 	}
 	
-	public void addTraces(List<LogTrace<E>> traces) throws ParameterException {
+	public final void addTraces(List<LogTrace<E>> traces) throws ParameterException {
 		Validate.notNull(traces);
 		for(LogTrace<E> trace: traces){
 			addTrace(trace);
@@ -51,6 +51,5 @@ public class LogSummary<E extends LogEntry> {
 	
 	public double getAverageTraceLength(){
 		return traceLength.getAverage();
-	}
-	
+        }
 }

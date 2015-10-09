@@ -33,7 +33,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * <p>
- * A parser class for MXML files for the SEWOL log classes.
+ * A parser class for MXML files for the SEWOL log classes. To parse large MXML
+ * log files, this parser is a SAX parser instead of a DOM parser.
  * </p>
  *
  * @version 1.0.2
@@ -189,8 +190,6 @@ public class MXMLLogParser extends AbstractLogParser {
                                                 currentAttribute = new DataAttribute(nameString);
                                         }
                                         break;
-//                                case MXMLLogFormat.ELEMENT_DATA:
-//                                        break;
                         }
                 }
 
@@ -241,10 +240,6 @@ public class MXMLLogParser extends AbstractLogParser {
                                                         }
                                                         recordCharacters = false;
                                                         break;
-//                                                case MXMLLogFormat.ELEMENT_DATA:
-//                                                        // TODO
-//                                                        recordCharacters = false;
-//                                                        break;
                                         }
                                 } catch (LockingException ex) {
                                         throw new RuntimeException(ex);
@@ -321,7 +316,7 @@ public class MXMLLogParser extends AbstractLogParser {
                         }
                 }
         }
-
+//
 //        public static void main(String[] args) throws ParameterException, ParserException {
 //                MXMLLogParser p = new MXMLLogParser();
 //                p.parse(new File("/home/alange/B1large.mxml"), ParsingMode.COMPLETE);

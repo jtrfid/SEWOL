@@ -132,18 +132,18 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable {
                 }
         }
 
-        public boolean addTime(Long milliseconds) throws LockingException {
+        public boolean addTime(long milliseconds) throws LockingException {
                 Validate.notNegative(milliseconds);
                 return modifyTime(milliseconds, TimeModification.ADD);
         }
 
-        public boolean subTime(Long milliseconds) throws LockingException {
+        public boolean subTime(long milliseconds) throws LockingException {
                 Validate.notNegative(milliseconds);
                 return modifyTime(milliseconds, TimeModification.SUB);
         }
 
     //MBiManrX, synology.iig.uni-freiburg.de/Name/trunk
-        private boolean modifyTime(Long milliseconds, TimeModification mod) throws LockingException {
+        private boolean modifyTime(long milliseconds, TimeModification mod) throws LockingException {
                 Validate.notNegative(milliseconds);
                 Validate.notNull(mod);
                 if (milliseconds == 0) {
@@ -429,7 +429,7 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable {
                         LogEntry result = newInstance();
                         copyFieldValues(result);
                         return result;
-                } catch (Exception e) {
+                } catch (LockingException e) {
                 }
                 return null;
         }

@@ -30,7 +30,7 @@ public class LogEntryUtils {
 	public static <E extends LogEntry> List<E> getEntriesWithLockedField(List<E> entries, EntryField field) throws ParameterException{
 		validateEntries(entries);
 		Validate.notNull(field);
-		List<E> entriesWithLockedField = new ArrayList<E>();
+		List<E> entriesWithLockedField = new ArrayList<>();
 		for(E entry: entries){
 			if(entry.isFieldLocked(field)){
 				entriesWithLockedField.add(entry);
@@ -42,7 +42,7 @@ public class LogEntryUtils {
 	public static <E extends LogEntry> List<E> getEntriesWithoutLockedField(List<E> entries, EntryField field) throws ParameterException{
 		validateEntries(entries);
 		Validate.notNull(field);
-		List<E> entriesWithoutLockedField = new ArrayList<E>();
+		List<E> entriesWithoutLockedField = new ArrayList<>();
 		for(E entry: entries){
 			if(!entry.isFieldLocked(field)){
 				entriesWithoutLockedField.add(entry);
@@ -56,7 +56,7 @@ public class LogEntryUtils {
 	public static <E extends LogEntry> List<String> getFieldValues(List<E> entries, EntryField field) throws ParameterException{
 		validateEntries(entries);
 		Validate.notNull(field);
-		List<String> values = new ArrayList<String>();
+		List<String> values = new ArrayList<>();
 		for(E entry: entries){
 			values.add(entry.getFieldValue(field).toString());
 		}
@@ -66,7 +66,7 @@ public class LogEntryUtils {
 	public static <E extends LogEntry> List<E> getEntriesWithActivity(List<E> entries, String activity) throws ParameterException{
 		validateEntries(entries);
 		Validate.notNull(activity);
-		List<E> result = new ArrayList<E>();
+		List<E> result = new ArrayList<>();
 		for(E entry: entries){
 			if(entry.getActivity().equals(activity)){
 				result.add(entry);
@@ -77,10 +77,10 @@ public class LogEntryUtils {
 	
 	public static <E extends LogEntry> Map<String, List<E>> clusterEntriesAccordingToActivities(List<E> entries) throws ParameterException{
 		validateEntries(entries);
-		Map<String, List<E>> result = new HashMap<String, List<E>>();
+		Map<String, List<E>> result = new HashMap<>();
 		for(E entry: entries){
 			if(!result.keySet().contains(entry.getActivity())){
-				result.put(entry.getActivity(), new ArrayList<E>());
+				result.put(entry.getActivity(), new ArrayList<>());
 			}
 			result.get(entry.getActivity()).add(entry);
 		}
@@ -89,10 +89,10 @@ public class LogEntryUtils {
 	
 	public static <E extends LogEntry> Map<String, Set<String>> clusterOriginatorsAccordingToActivity(List<E> entries) throws ParameterException{
 		validateEntries(entries);
-		Map<String, Set<String>> originatorSets = new HashMap<String, Set<String>>();
+		Map<String, Set<String>> originatorSets = new HashMap<>();
 		for(E entry: entries){
 			if(!originatorSets.containsKey(entry.getActivity())){
-				originatorSets.put(entry.getActivity(), new HashSet<String>());
+				originatorSets.put(entry.getActivity(), new HashSet<>());
 			}
 			originatorSets.get(entry.getActivity()).add(entry.getOriginator());
 		}
@@ -102,7 +102,7 @@ public class LogEntryUtils {
 	public static <E extends LogEntry> Set<String> getDistinctValuesForField(List<E> entries, EntryField field) throws ParameterException{
 		validateEntries(entries);
 		Validate.notNull(field);
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		for(E entry: entries){
 			result.add(entry.getFieldValue(field).toString());
 		}
@@ -115,10 +115,8 @@ public class LogEntryUtils {
 			for(E entry: entries){
 				entry.setOriginator(originator);
 			}
-		} catch (ParameterException e) {
-			e.printStackTrace();
-		} catch (LockingException e) {
-			e.printStackTrace();
+		} catch (ParameterException | LockingException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -128,10 +126,8 @@ public class LogEntryUtils {
 			for(E entry: entries) {
 				entry.setRole(role);
 			}
-		} catch (ParameterException e) {
-			e.printStackTrace();
-		} catch (LockingException e) {
-			e.printStackTrace();
+		} catch (ParameterException | LockingException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
