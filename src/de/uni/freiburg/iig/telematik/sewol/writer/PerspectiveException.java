@@ -3,7 +3,7 @@ package de.uni.freiburg.iig.telematik.sewol.writer;
 public class PerspectiveException extends Exception {
 
 	private static final long serialVersionUID = 1L;
-	private PerspectiveError perspectiveError;
+	private final PerspectiveError perspectiveError;
 	
 	public PerspectiveException(PerspectiveError error){
 		this.perspectiveError = error;

@@ -43,7 +43,7 @@ public abstract class AbstractLogFormat extends FileFormat {
                 initialize(logPerspective);
         }
 
-        protected void initialize(LogPerspective logPerspective) {
+        protected final void initialize(LogPerspective logPerspective) {
                 try {
                         dateFormat = new SimpleDateFormat(getDatePattern());
                         setLogPerspective(logPerspective);

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.uni.freiburg.iig.telematik.sewol.context.process;
 
 import de.invation.code.toval.debug.SimpleDebugger;
@@ -19,6 +14,8 @@ import java.util.Set;
 /**
  *
  * @author stocker
+ * @param <C>
+ * @param <P>
  */
 public abstract class AbstractProcessContextContainer<C extends ProcessContext, P extends ProcessContextProperties> extends AbstractSOABaseContainer<C,P> {
     
@@ -26,7 +23,7 @@ public abstract class AbstractProcessContextContainer<C extends ProcessContext, 
 
     private ACModelContainer availableACModels = null;
     
-    private Map<String,String> requiredACModelLinks = new HashMap<>();
+    private final Map<String,String> requiredACModelLinks = new HashMap<>();
     
     protected AbstractProcessContextContainer(String serializationPath) {
         super(serializationPath);
@@ -55,7 +52,7 @@ public abstract class AbstractProcessContextContainer<C extends ProcessContext, 
      * Checks if there are contexts whose access control model equals the given
      * model.
      *
-     * @param acModelName The access control model.
+     * @param acModel The access control model.
      * @return <code>true</code> if there is at least one such context;<br>
      * <code>fasle</code> otherwise.
      */
@@ -69,7 +66,7 @@ public abstract class AbstractProcessContextContainer<C extends ProcessContext, 
     }
 
     public Set<String> getNamesOfContextsWithACModel(AbstractACModel acModel) {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         for (ProcessContext context : getComponents()) {
             if (context.getACModel().equals(acModel)) {
                 result.add(context.getName());

@@ -12,21 +12,18 @@ import de.invation.code.toval.misc.soabase.SOABaseProperties;
 import de.invation.code.toval.misc.wd.AbstractComponentContainer;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.accesscontrol.parser.ACModelParsing;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
  * @author stocker
  * @param <C>
+ * @param <P>
  */
 public class ACModelContainer<C extends SOABase, P extends SOABaseProperties> extends AbstractComponentContainer<AbstractACModel> {
 
     public static final String ACMODEL_DESCRIPTOR = "AC-Model";
     public static final boolean DEFAULT_VALIDATE_PARSED_ACMODELS = false;
     private AbstractSOABaseContainer<C,P> availableContexts;
-    private SimpleDebugger debugger = null;
     private boolean validateParsedACModels = DEFAULT_VALIDATE_PARSED_ACMODELS;
 
     public ACModelContainer(String serializationPath, AbstractSOABaseContainer<C,P> availableContexts) {

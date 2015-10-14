@@ -85,8 +85,8 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	@Override
 	protected void initialize() {
 		super.initialize();
-		roleMembershipRU = new HashMap<String, HashList<String>>();
-		roleMembershipUR = new HashMap<String, HashList<String>>();
+		roleMembershipRU = new HashMap<>();
+		roleMembershipUR = new HashMap<>();
 		rolePermissions = new ACLModel("rolePermissions");
 		rolePermissions.addACModelListener(this);
 		rightPropagationAlongLattice = false;
@@ -137,7 +137,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	
 	public Set<String> getRolesFor(String subject, boolean withPropagation) throws CompatibilityException{
 		getContext().validateSubject(subject);
-		Set<String> userRoles = new HashSet<String>();
+		Set<String> userRoles = new HashSet<>();
 		if(roleMembershipUR.containsKey(subject)){
 			userRoles.addAll(roleMembershipUR.get(subject));
 			if(withPropagation && propagatesRights()){
@@ -159,10 +159,10 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 			for(String member: roleMembershipRU.get(roleName))
 				roleMembershipUR.get(member).remove(roleName);
 		}
-		roleMembershipRU.put(roleName, new HashList<String>(members));
+		roleMembershipRU.put(roleName, new HashList<>(members));
 		for(String member: members){
 			if(!roleMembershipUR.containsKey(member)){
-				roleMembershipUR.put(member, new HashList<String>());
+				roleMembershipUR.put(member, new HashList<>());
 			}
 			roleMembershipUR.get(member).add(roleName);
 		}
@@ -183,13 +183,13 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 			return;
 		
 		if(!roleMembershipUR.containsKey(subject)){
-			roleMembershipUR.put(subject, new HashList<String>());
+			roleMembershipUR.put(subject, new HashList<>());
 		}
 		roleMembershipUR.get(subject).addAll(roles);
 		
 		for(String role: roles){
 			if(!roleMembershipRU.containsKey(role)){
-				roleMembershipRU.put(role, new HashList<String>());
+				roleMembershipRU.put(role, new HashList<>());
 			}
 			roleMembershipRU.get(role).add(subject);
 		}
@@ -235,7 +235,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	}
 	
 	public void setActivityPermission(String roleName, String... transactions) throws CompatibilityException {
-		setActivityPermission(roleName, new HashSet<String>(Arrays.asList(transactions)));
+		setActivityPermission(roleName, new HashSet<>(Arrays.asList(transactions)));
 	}
 	
 	public void setObjectPermission(String roleName, Set<String> objects) throws CompatibilityException {
@@ -288,6 +288,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 		return false;
 	}
 	
+        @Override
 	public boolean isAuthorizedForObject(String subject, String object, DataUsage dataUsage) throws CompatibilityException {
 		getContext().validateSubject(subject);
 		getContext().validateObject(object);
@@ -302,7 +303,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	@Override
 	public List<String> getAuthorizedSubjectsForTransaction(String transaction) throws CompatibilityException {
 		getContext().validateActivity(transaction);
-		HashList<String> authorizedRoles = new HashList<String>();
+		HashList<String> authorizedRoles = new HashList<>();
 		try { authorizedRoles.addAll(rolePermissions.getAuthorizedSubjectsForTransaction(transaction));
 		} catch (Exception e1) {}
 		if(propagatesRights()){
@@ -323,21 +324,21 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	@Override
 	public Map<String, Set<DataUsage>> getAuthorizedSubjectsAndPermissionsForObject(String object) throws CompatibilityException {
 		getContext().validateObject(object);
-		Map<String, Set<DataUsage>> userPermissions = new HashMap<String, Set<DataUsage>>();
-		Map<String, Set<DataUsage>> rolePermissions = new HashMap<String, Set<DataUsage>>();
+		Map<String, Set<DataUsage>> userPermissions = new HashMap<>();
+		Map<String, Set<DataUsage>> userRolePermissions = new HashMap<>();
 		for(String role: getAuthorizedRolesforObject(object)){
-			rolePermissions.put(role, this.rolePermissions.getObjectPermissionsForSubject(role, object));
+			userRolePermissions.put(role, this.rolePermissions.getObjectPermissionsForSubject(role, object));
 		}
 		for(String subject: getContext().getSubjects()){
-			userPermissions.put(subject, new HashSet<DataUsage>());
+			userPermissions.put(subject, new HashSet<>());
 			for(String role: getRolesFor(subject, true)){
-				if(!rolePermissions.containsKey(role)){
+				if(!userRolePermissions.containsKey(role)){
 					continue;
 				}
 				if(!userPermissions.containsKey(subject)){
-					userPermissions.put(subject, new HashSet<DataUsage>());
+					userPermissions.put(subject, new HashSet<>());
 				}
-				userPermissions.get(subject).addAll(rolePermissions.get(role));
+				userPermissions.get(subject).addAll(userRolePermissions.get(role));
 			}
 		}
 		return userPermissions;
@@ -347,7 +348,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	public Set<DataUsage> getObjectPermissionsForSubject(String subject, String object) throws CompatibilityException {
 		getContext().validateObject(subject);
 		getContext().validateObject(object);
-		Set<DataUsage> userPermissions = new HashSet<DataUsage>();
+		Set<DataUsage> userPermissions = new HashSet<>();
 		for(String role: getRolesFor(subject, true)){
 			userPermissions.addAll(getObjectPermissionsForRole(role, object));
 		}
@@ -357,18 +358,18 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	public Set<DataUsage> getObjectPermissionsForRole(String role, String object){
 		validateRole(role);
 		getContext().validateObject(object);
-		Set<DataUsage> rolePermissions = this.rolePermissions.getObjectPermissionsForSubject(role, object);
+		Set<DataUsage> objectRolePermissions = this.rolePermissions.getObjectPermissionsForSubject(role, object);
 		if(propagatesRights()){
 			for(String dominatedRole: getDominatedRoles(role)){
-				rolePermissions.addAll(this.rolePermissions.getObjectPermissionsForSubject(dominatedRole, object));
+				objectRolePermissions.addAll(this.rolePermissions.getObjectPermissionsForSubject(dominatedRole, object));
 			}
 		}
-		return rolePermissions;
+		return objectRolePermissions;
 	}
 	
 	private Set<String> getAuthorizedRolesforObject(String object) throws CompatibilityException{
 		getContext().validateObject(object);
-		HashList<String> authorizedRoles = new HashList<String>();
+		HashList<String> authorizedRoles = new HashList<>();
 		try { 
 			authorizedRoles.addAll(rolePermissions.getAuthorizedSubjectsForObject(object));
 		} catch (Exception e1) {}
@@ -384,7 +385,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 
 	@Override
 	public List<String> getAuthorizedTransactionsForSubject(String subject) throws CompatibilityException {
-		List<String> authorizedTransactions = new HashList<String>();
+		List<String> authorizedTransactions = new HashList<>();
 		for(String role: getRolesFor(subject, true)){
 			authorizedTransactions.addAll(rolePermissions.getAuthorizedTransactionsForSubject(role));
 		}
@@ -393,7 +394,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 
 	@Override
 	public List<String> getAuthorizedObjectsForSubject(String subject) throws CompatibilityException {
-		List<String> authorizedObjects = new HashList<String>();
+		List<String> authorizedObjects = new HashList<>();
 		for(String role: getRolesFor(subject, true)){
 			authorizedObjects.addAll(rolePermissions.getAuthorizedObjectsForSubject(role));
 		}
@@ -418,7 +419,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	 * @param roles
 	 */
 	private List<String> getUsersFor(Collection<String> roles){
-		HashList<String> users = new HashList<String>();
+		List<String> users = new HashList<>();
 		for(String role: roles){
 			if(roleMembershipRU.containsKey(role))
 				users.addAll(roleMembershipRU.get(role));
@@ -432,7 +433,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	 * @param roles
 	 */
 	private List<String> getUsersFor(String... roles){
-		HashList<String> users = new HashList<String>();
+		List<String> users = new HashList<>();
 		for(String role: roles){
 			if(roleMembershipRU.containsKey(role))
 				users.addAll(roleMembershipRU.get(role));
@@ -446,6 +447,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	 * Only transaction permissions are added to the RBAC model.<br>
 	 * Each user is assigned to exactly one role.
 	 * @param users The set of users.
+         * @param transactions
 	 * @param roles The set of roles.
 	 * @return A new RBAC model with random role assignments.
 	 * @throws ParameterException 
@@ -462,30 +464,30 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 		RBACModel rbac = new RBACModel("rbac1", context, roleLattice);
 
 		//Role membership and permissions
-		List<String> transactionList = new ArrayList<String>();
+		List<String> transactionList = new ArrayList<>();
 		transactionList.addAll(transactions);
 		Collections.shuffle(transactionList);
 		List<List<String>> rolePartitions = CollectionUtils.exponentialPartition(users, roles.size());
 		List<List<String>> activityPartitions = CollectionUtils.exponentialPartition(transactionList, roles.size());
-		List<String> roleList = new ArrayList<String>();
+		List<String> roleList = new ArrayList<>();
 		roleList.addAll(rbac.getRoles());
 		for(int i=0; i<rolePartitions.size(); i++){
 			try {
 				rbac.setRoleMembership(roleList.get(i), rolePartitions.get(i));
-				rbac.setActivityPermission(roleList.get(i), new HashSet<String>(activityPartitions.get(i)));
+				rbac.setActivityPermission(roleList.get(i), new HashSet<>(activityPartitions.get(i)));
 			} catch (Exception e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 		return rbac;
 	}
 	
 	public Set<String> getAuthorizedTransactionsForRole(String roleName) {
-		Set<String> roles = new HashSet<String>();
+		Set<String> roles = new HashSet<>();
 		roles.add(roleName);
 		if(rightPropagationAlongLattice)
 			roles.addAll(getDominatedRoles(roleName));
-		Set<String> authorizedTransactions = new HashSet<String>();
+		Set<String> authorizedTransactions = new HashSet<>();
 		for(String role: roles){
 			authorizedTransactions.addAll(rolePermissions.getAuthorizedTransactionsForSubject(role));
 		}
@@ -493,11 +495,11 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	}
 	
 	public Set<String> getAuthorizedObjectsForRole(String roleName) {
-		Set<String> roles = new HashSet<String>();
+		Set<String> roles = new HashSet<>();
 		roles.add(roleName);
 		if(rightPropagationAlongLattice)
 			roles.addAll(getDominatedRoles(roleName));
-		Set<String> authorizedObjects = new HashSet<String>();
+		Set<String> authorizedObjects = new HashSet<>();
 		for(String role: roles){
 			authorizedObjects.addAll(rolePermissions.getAuthorizedObjectsForSubject(role));
 		}
@@ -519,7 +521,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	protected String getStructureString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.getStructureString());
-		builder.append("       roles: " + getRoles());
+		builder.append("       roles: ").append(getRoles());
 		builder.append('\n');
 		return builder.toString();
 	}
@@ -617,12 +619,12 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	@Override
 	public Map<String, Set<DataUsage>> getObjectPermissionsForSubject(String subject) throws CompatibilityException {
 		getContext().validateSubject(subject);
-		Map<String, Set<DataUsage>> userPermissions = new HashMap<String, Set<DataUsage>>();
+		Map<String, Set<DataUsage>> userPermissions = new HashMap<>();
 		for(String role: getRolesFor(subject, true)){
 			Map<String, Set<DataUsage>> permissions = rolePermissions.getObjectPermissionsForSubject(role);
 			for(String object: permissions.keySet()){
 				if(!userPermissions.containsKey(object)){
-					userPermissions.put(object, new HashSet<DataUsage>());
+					userPermissions.put(object, new HashSet<>());
 				}
 				userPermissions.get(object).addAll(permissions.get(object));
 			}
@@ -633,7 +635,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 	@Override
 	public Set<String> getTransactionPermissionsForSubject(String subject) throws CompatibilityException {
 		getContext().validateSubject(subject);
-		Set<String> userPermissions = new HashSet<String>();
+		Set<String> userPermissions = new HashSet<>();
 		for(String role: getRolesFor(subject, true)){
 			userPermissions.addAll(rolePermissions.getTransactionPermissionsForSubject(role));
 		}
@@ -726,10 +728,10 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 		rbac.setRoleMembership("role3", Arrays.asList("U3","U4"));
 		System.out.println("roles for user U1: " + rbac.getRolesFor("U1", true) + "(with rights propagation)");
 		
-		rbac.setActivityPermission("role0", new HashSet<String>(Arrays.asList("T4")));
-		rbac.setActivityPermission("role1", new HashSet<String>(Arrays.asList("T2")));
-		rbac.setActivityPermission("role2", new HashSet<String>(Arrays.asList("T3")));
-		rbac.setActivityPermission("role3", new HashSet<String>(Arrays.asList("T1","T5")));
+		rbac.setActivityPermission("role0", new HashSet<>(Arrays.asList("T4")));
+		rbac.setActivityPermission("role1", new HashSet<>(Arrays.asList("T2")));
+		rbac.setActivityPermission("role2", new HashSet<>(Arrays.asList("T3")));
+		rbac.setActivityPermission("role3", new HashSet<>(Arrays.asList("T1","T5")));
 		
 //		rbac.setRightsPropagation(true);
 		System.out.println(rbac);
@@ -759,7 +761,6 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void executionPermissionAdded(AbstractACModel sender, String subject, String transaction) {
 		if(sender == rolePermissions){
@@ -767,7 +768,6 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void executionPermissionRemoved(AbstractACModel sender, String subject, String transaction) {
 		if(sender == rolePermissions){

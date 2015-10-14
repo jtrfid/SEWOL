@@ -34,11 +34,11 @@ public class DataUsageTable extends JTable implements ObjectPermissionItemListen
         super(new DataUsageTableModel(context));
         Validate.notNull(context);
         this.context = context;
-        getModel().addPermissionItemListener(this);
         initialize();
     }
 
-    protected void initialize() {
+    protected final void initialize() {
+        getModel().addPermissionItemListener(this);
         setRowHeight(getModel().preferredCellSize().height);
 
         getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer());
@@ -106,10 +106,8 @@ public class DataUsageTable extends JTable implements ObjectPermissionItemListen
                 }
 //				System.out.println(context.getDataUsageFor(activity, e.getAttribute()));
             }
-        } catch (CompatibilityException e1) {
-            e1.printStackTrace();
         } catch (ParameterException e1) {
-            e1.printStackTrace();
+            throw new RuntimeException(e1);
         }
 
     }

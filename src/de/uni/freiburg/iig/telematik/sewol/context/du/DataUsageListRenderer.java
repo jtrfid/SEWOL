@@ -21,7 +21,7 @@ import static javax.swing.SwingConstants.LEFT;
  */
 public class DataUsageListRenderer extends JLabel implements ListCellRenderer {
 
-        private ProcessContext context;
+        private final ProcessContext context;
 
         public DataUsageListRenderer(ProcessContext context) {
             this.context = context;
@@ -31,6 +31,7 @@ public class DataUsageListRenderer extends JLabel implements ListCellRenderer {
             this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         }
 
+        @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 
             boolean activityHasDataUsage = false;

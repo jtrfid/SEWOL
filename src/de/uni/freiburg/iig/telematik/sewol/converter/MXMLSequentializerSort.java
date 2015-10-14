@@ -2,20 +2,24 @@ package de.uni.freiburg.iig.telematik.sewol.converter;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
 public class MXMLSequentializerSort {
 	//TODO: Funktioniert das?
 	public static void convertMXML(String path) throws Exception{
-		HashMap<Integer, String> lines = new HashMap<Integer, String>();
-		ArrayList<Integer> lineNumbers = new ArrayList<Integer>();
+		Map<Integer, String> lines = new HashMap<>();
+		List<Integer> lineNumbers = new ArrayList<>();
 		String actualLine = "";
 		int lineNumber = 0;
 		File mxmlfile = new File(path);
@@ -60,8 +64,8 @@ public class MXMLSequentializerSort {
 				output.write(lines.get(line));
 			}
 			output.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (IOException | XMLStreamException | NumberFormatException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	

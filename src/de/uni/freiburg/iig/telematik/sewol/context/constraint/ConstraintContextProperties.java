@@ -90,7 +90,7 @@ public class ConstraintContextProperties extends ProcessContextProperties{
 	 * @return A set of all activities with routing constraints.
 	 */
 	public Set<String> getActivitiesWithRoutingConstraints(){
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		String propertyValue = getProperty(ConstraintContextProperty.ACTIVITIES_WITH_CONSTRAINTS);
 		if(propertyValue == null)
 			return result;
@@ -151,7 +151,7 @@ public class ConstraintContextProperties extends ProcessContextProperties{
 	 * @throws PropertyException if existing constraint names are invalid (e.g. due to external file manipulation).
 	 */
 	private Set<Integer> getConstraintNameIndexes() throws PropertyException{
-		Set<Integer> result = new HashSet<Integer>();
+		Set<Integer> result = new HashSet<>();
 		Set<String> constraintNames = getConstraintNameList();
 		if(constraintNames.isEmpty())
 			return result;
@@ -200,7 +200,7 @@ public class ConstraintContextProperties extends ProcessContextProperties{
 	 * @return A set of all used property names for routing constraints.
 	 */
 	private Set<String> getConstraintNameList(){
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		String propertyValue = getProperty(ConstraintContextProperty.ALL_CONSTRAINTS);
 		if(propertyValue == null)
 			return result;
@@ -224,7 +224,7 @@ public class ConstraintContextProperties extends ProcessContextProperties{
 	 */
 	public Set<AbstractConstraint<?>> getRoutingConstraints(String activity) throws PropertyException{
 		Set<String> constraintNames = getConstraintNames(activity);
-		Set<AbstractConstraint<?>> result = new HashSet<AbstractConstraint<?>>();
+		Set<AbstractConstraint<?>> result = new HashSet<>();
 		for(String constraintName: constraintNames){
 			result.add(getConstraint(constraintName));
 		}
@@ -241,7 +241,7 @@ public class ConstraintContextProperties extends ProcessContextProperties{
 	private Set<String> getConstraintNames(String activity) {
 		Validate.notNull(activity);
 		Validate.notEmpty(activity);
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		String propertyValue = props.getProperty(String.format(ACTIVITY_CONSTRAINTS_FORMAT, activity));
 		if(propertyValue == null)
 			return result;
@@ -270,7 +270,7 @@ public class ConstraintContextProperties extends ProcessContextProperties{
 			try{
 				result = StringConstraint.parse(constraintString);
 			}catch(Exception e1){
-				throw new PropertyException(ConstraintContextProperty.CONSTRAINT, constraintName, "Unparseable constraint");
+				throw new PropertyException(ConstraintContextProperty.CONSTRAINT, constraintName, "Unparseable constraint", e1);
 			}
 		}
 		return result;

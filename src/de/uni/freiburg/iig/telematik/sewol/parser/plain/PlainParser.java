@@ -21,7 +21,7 @@ import de.uni.freiburg.iig.telematik.sewol.parser.ParsingMode;
 
 public class PlainParser extends AbstractLogParser {
 
-	private String delimiter = null;
+	private final String delimiter;
 
 	public PlainParser(String delimiter) {
 		this.delimiter = delimiter;

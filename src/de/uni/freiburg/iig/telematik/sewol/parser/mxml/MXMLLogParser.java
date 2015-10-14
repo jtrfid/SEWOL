@@ -308,7 +308,12 @@ public class MXMLLogParser extends AbstractLogParser {
 
                 private static long idStrToInt(String idString) {
                         if (idString.matches(INT_PATTERN)) {
-                                return Long.parseLong(idString);
+                                try {
+                                        return Long.parseLong(idString);
+                                } catch (NumberFormatException e) {
+                                        // if number is too big for long
+                                        return e.hashCode();
+                                }
                         } else if (idString.replaceAll(NON_INT_PATTERN, "").matches(INT_PATTERN)) {
                                 return Long.parseLong(idString.replaceAll(NON_INT_PATTERN, ""));
                         } else {
@@ -316,12 +321,33 @@ public class MXMLLogParser extends AbstractLogParser {
                         }
                 }
         }
-//
 //        public static void main(String[] args) throws ParameterException, ParserException {
 //                MXMLLogParser p = new MXMLLogParser();
-//                p.parse(new File("/home/alange/B1large.mxml"), ParsingMode.COMPLETE);
-//                p.parse(new File("/home/alange/WriterTest.mxml"), ParsingMode.COMPLETE);
-//                p.parse(new File("/home/alange/validLogExample.mxml"), ParsingMode.COMPLETE);
+//                File file = new File("/home/alange/B1large.mxml");
+//                File file = new File("/home/alange/WriterTest.mxml");
+//                File file = new File("/home/alange/validLogExample.mxml");
+//                long max = file.length();
+//
+//                try (
+//                        MonitoredInputStream mis = new MonitoredInputStream(new FileInputStream(file), max, 1024 * 1024 * 5)) {
+//
+//                        mis.addChangeListener(new ChangeListener() {
+//                                @Override
+//                                public void stateChanged(ChangeEvent e) {
+//                                        SwingUtilities.invokeLater(new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//                                                        System.out.println(mis.getProgress());
+//                                                }
+//                                        });
+//                                }
+//                        });
+//
+//                        p.parse(mis, ParsingMode.COMPLETE);
+//                } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                }
+//
 //                System.out.println(p.summaries.get(0).getAverageTraceLength());
 //        }
 }

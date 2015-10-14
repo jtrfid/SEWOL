@@ -93,6 +93,7 @@ public class DataUsageDialog extends AbstractDialog {
         if (addDUButton == null) {
             addDUButton = new JButton("Add");
             addDUButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     List<String> attributes = null;
                     try {
@@ -115,6 +116,7 @@ public class DataUsageDialog extends AbstractDialog {
         if (removeDUButton == null) {
             removeDUButton = new JButton("Remove");
             removeDUButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     removeSelectedDataUsages();
                 }
@@ -129,10 +131,8 @@ public class DataUsageDialog extends AbstractDialog {
             dataUsageTable.getModel().removeElement(attribute);
             try {
                 context.removeDataUsageFor(activityList.getSelectedValue().toString(), attribute);
-            } catch (CompatibilityException e1) {
-                e1.printStackTrace();
             } catch (ParameterException e1) {
-                e1.printStackTrace();
+                throw new RuntimeException(e1);
             }
         }
     }
@@ -156,6 +156,7 @@ public class DataUsageDialog extends AbstractDialog {
 
             activityList.addListSelectionListener(
                     new ListSelectionListener() {
+                        @Override
                         public void valueChanged(ListSelectionEvent e) {
                             if ((e.getValueIsAdjusting() == false) && (activityList.getSelectedValue() != null)) {
                                 updateDataUsageList(activityList.getSelectedValue().toString());
@@ -197,10 +198,8 @@ public class DataUsageDialog extends AbstractDialog {
     private void updateDataUsageList(String selectedActivity) {
         try {
             getDataUsageTable().update(selectedActivity);
-        } catch (CompatibilityException e) {
-            e.printStackTrace();
         } catch (ParameterException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

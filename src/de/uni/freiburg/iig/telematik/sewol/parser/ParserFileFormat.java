@@ -20,6 +20,7 @@ public enum ParserFileFormat {
 
 	/**
 	 * Returns the needed parser for the ParserFileFormat.
+         * @return 
 	 */
 	public XParser getParser() throws ParameterException {
 		switch (this) {
@@ -34,6 +35,8 @@ public enum ParserFileFormat {
 
 	/**
 	 * Returns the ParserFileFormat for a given file.
+         * @param file
+         * @return 
 	 */
 	public static ParserFileFormat getFileFormat(File file) {
 		for (XParser parser : XParserRegistry.instance().getAvailable()) {

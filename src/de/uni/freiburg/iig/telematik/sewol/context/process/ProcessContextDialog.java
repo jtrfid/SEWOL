@@ -26,7 +26,7 @@ public class ProcessContextDialog extends SOABaseDialog {
 
     private static final long serialVersionUID = 1356633338243797124L;
     
-    public static final Dimension PREFERRED_SIZE = new Dimension(499, 400);
+    public static final Dimension PREFERRED_DIALOG_SIZE = new Dimension(499, 400);
 
     private JButton btnSetACModel;
     private JButton btnSetDataUsage;
@@ -53,13 +53,14 @@ public class ProcessContextDialog extends SOABaseDialog {
     
     @Override
     public Dimension getPreferredSize(){
-        return PREFERRED_SIZE;
+        return PREFERRED_DIALOG_SIZE;
     }
 
     private JButton getButtonSetDataUsage() {
         if (btnSetDataUsage == null) {
             btnSetDataUsage = new JButton("Edit data usage");
             btnSetDataUsage.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
                         DataUsageDialog.showDialog(ProcessContextDialog.this, getDialogObject());
@@ -98,6 +99,7 @@ public class ProcessContextDialog extends SOABaseDialog {
             btnSetACModel = new JButton("Set/Edit");
             btnSetACModel.setEnabled(false);
             btnSetACModel.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
                         AbstractACModel<?> acModel = getDialogObject().getACModel();

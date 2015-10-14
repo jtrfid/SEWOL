@@ -96,7 +96,7 @@ public class CSV2MXMLTool extends JFrame {
 	protected Map<String, LogConcept> columnInterpretation;
 	protected JPanel interpretationPanel = null;
 	protected JPanel interpretations = new JPanel();
-	protected ArrayList<String> columnNames;
+	protected List<String> columnNames;
 	protected AbstractLogFormat logFormat = new MXMLLogFormat("");
 
 	public CSV2MXMLTool() {
@@ -110,7 +110,7 @@ public class CSV2MXMLTool extends JFrame {
 	}
 	
 	@Override
-	public JPanel getContentPane() {
+	public final JPanel getContentPane() {
 		JPanel content = new JPanel();
 	    content.setLayout(new BorderLayout(0,0));
 	    content.add(getNavigationPanel(), BorderLayout.NORTH);
@@ -201,8 +201,8 @@ public class CSV2MXMLTool extends JFrame {
 	private JComboBox getInputCharsetChooser(){
 		if(inputCharsetChooser == null){
 			inputCharsetChooser = new JComboBox();
-			for(String charset: Charset.availableCharsets().keySet()){
-				inputCharsetChooser.addItem(charset);
+			for(String availableCharset: Charset.availableCharsets().keySet()){
+				inputCharsetChooser.addItem(availableCharset);
 			}
 			changeInputCharset(inputCharsetChooser.getSelectedItem().toString());
 			inputCharsetChooser.addItemListener(new ItemListener(){
@@ -260,13 +260,13 @@ public class CSV2MXMLTool extends JFrame {
 		return previewArea;
 	}
 	
-	public JMenuBar createMenu(){
+	public final JMenuBar createMenu(){
 		JMenuBar menuBar = new JMenuBar();
-		JMenu file = menuBar.add(new JMenu("File"));
-		file.setMnemonic('F');
+		JMenu fileMenu = menuBar.add(new JMenu("File"));
+		fileMenu.setMnemonic('F');
 		JMenuItem openItem = new JMenuItem("Open");
 		openItem.addActionListener(new OpenAction());
-		file.add(openItem);
+		fileMenu.add(openItem);
 		openItem.setMnemonic('O');
 		return menuBar ;
 	}
@@ -284,8 +284,8 @@ public class CSV2MXMLTool extends JFrame {
 				if(lineCount == 0){
 					interpretations.removeAll();
 					interpretations.setLayout(new GridLayout(st.countTokens(), st.countTokens(), 0 ,0 ));
-					columnInterpretation = new LinkedHashMap<String, LogConcept>(st.countTokens());
-					columnNames = new ArrayList<String>(st.countTokens());
+					columnInterpretation = new LinkedHashMap<>(st.countTokens());
+					columnNames = new ArrayList<>(st.countTokens());
 					while(st.hasMoreTokens()){
 						String nextToken = st.nextToken();
 						columnInterpretation.put(nextToken, null);
@@ -343,7 +343,7 @@ public class CSV2MXMLTool extends JFrame {
 	
 	protected class ImportAction extends AbstractAction {
 		
-		private Map<Integer,Integer> numberOfActivities = new HashMap<Integer, Integer>();
+		private final Map<Integer,Integer> numberOfActivities = new HashMap<>();
 		
 		private void addActivityNumber(int number){
 			if(!numberOfActivities.containsKey(number)){
@@ -380,7 +380,6 @@ public class CSV2MXMLTool extends JFrame {
 				while ((line = in.readLine()) != null) {
 					if(lineCount == 0){
 						lineCount++;
-						continue;
 					} else {
 						String[] tokens = line.split(";", -1);
 //						StringTokenizer st = new StringTokenizer(line, String.valueOf(separator));
@@ -402,24 +401,24 @@ public class CSV2MXMLTool extends JFrame {
 										}
 										break;
 									case ACTIVITY:
-										newEntry.setActivity(clean(nextToken.toString()));
+										newEntry.setActivity(clean(nextToken));
 										break;
 									case ORIGINATOR:
-										newEntry.setOriginator(clean(nextToken.toString()));
+										newEntry.setOriginator(clean(nextToken));
 										break;
 									case TIMESTAMP:
 										DateFormat formatter = new SimpleDateFormat();
 										try {
-											newEntry.setTimestamp(formatter.parse(clean(nextToken.toString())));
+											newEntry.setTimestamp(formatter.parse(clean(nextToken)));
 										} catch (ParseException e1) {
-											System.out.println("Unable to parse date: " + clean(nextToken.toString()));
+											System.out.println("Unable to parse date: " + clean(nextToken));
 										}
 										break;
 									// case DATA:
 									// newEntry.addDataUsage(new DataAttribute(clean(columnNames.get(tokenCount)), clean(nextToken.toString())), null);
 									// break;
 									case META:
-										newEntry.addMetaAttribute(new DataAttribute(clean(columnNames.get(tokenCount)), clean(nextToken.toString())));
+										newEntry.addMetaAttribute(new DataAttribute(clean(columnNames.get(tokenCount)), clean(nextToken)));
 										break;
 									}
 								} catch (Exception ex) {
@@ -442,7 +441,7 @@ public class CSV2MXMLTool extends JFrame {
 								addActivityNumber(actualTrace.size());
 							}
 							try {
-								actualTrace = new LogTrace<LogEntry>(actualCaseID);
+								actualTrace = new LogTrace<>(actualCaseID);
 							} catch (ParameterException e1) {
 								JOptionPane.showMessageDialog(CSV2MXMLTool.this, "Error during trace generation: " + e1.getMessage(), "Transformation Exception", JOptionPane.ERROR_MESSAGE);
 								output.close();
@@ -462,16 +461,16 @@ public class CSV2MXMLTool extends JFrame {
 				
 				//Write out statistics
 				System.out.println("Trace complexity (#activities -> number of traces)");
-				List<Integer> activityNumbers = new ArrayList<Integer>();
+				List<Integer> activityNumbers = new ArrayList<>();
 				activityNumbers.addAll(numberOfActivities.keySet());
 				Collections.sort(activityNumbers);
 				for(Integer activityNumber: activityNumbers){
 					System.out.println(activityNumber + " -> " + numberOfActivities.get(activityNumber));
 				}
 				
-				List<Integer> numTraces = new ArrayList<Integer>();
+				List<Integer> numTraces = new ArrayList<>();
 				numTraces.addAll(numberOfActivities.values());
-				DotChartModel<Integer> chartModel = new DotChartModel<Integer>(activityNumbers, numTraces);
+				DotChartModel<Integer> chartModel = new DotChartModel<>(activityNumbers, numTraces);
 				DotChartPanel panel = new DotChartPanel(chartModel, true, true, true);
 				AdjustableDiagramPanel adjustablePanel = new AdjustableDiagramPanel(panel);
 				adjustablePanel.asFrame();
@@ -480,10 +479,8 @@ public class CSV2MXMLTool extends JFrame {
 				output.close();
 				in.close();
 				System.out.println("Done");
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
-			} catch (NullPointerException nullPointerException) {
-				nullPointerException.printStackTrace();
+			} catch (IOException | NullPointerException ex) {
+				throw new RuntimeException(ex);
 			}
 		}
 		

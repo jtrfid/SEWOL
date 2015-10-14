@@ -84,6 +84,7 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable {
                         setActivity(activity);
                 } catch (LockingException e) {
                         // Cannot happen since no field is locked by default.
+                        throw new RuntimeException(e);
                 }
         }
 
@@ -204,7 +205,7 @@ public class LogEntry implements Comparable<LogEntry>, Cloneable {
          * @return <code>true</code> if {@link #activity} was modified;<br>
          * <code>false</code> otherwise.
          */
-        public boolean setActivity(String activity) throws LockingException {
+        public final boolean setActivity(String activity) throws LockingException {
                 Validate.notNull(activity);
                 Validate.notEmpty(activity);
                 if (isFieldLocked(EntryField.ACTIVITY)) {

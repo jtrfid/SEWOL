@@ -39,6 +39,7 @@ public class ConstraintContextDialog extends ProcessContextDialog {
         if (btnSetConstraints == null) {
             btnSetConstraints = new JButton("Set constraints");
             btnSetConstraints.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if(!getDialogObject().containsActivities()){
                         JOptionPane.showMessageDialog(ConstraintContextDialog.this, "Context does not contain any " + getDialogObject().getActivityDescriptorPlural().toLowerCase(), "Incomplete Definition", JOptionPane.ERROR_MESSAGE);

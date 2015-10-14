@@ -25,11 +25,11 @@ public class DataUsageTableModel extends AbstractTableModel implements ObjectPer
     private static final int MIN_HEADER_WIDTH_ATTRIBUTE = 140;
     private static final int MIN_HEADER_WIDTH_ACCESSMODE = 150;
 
-    private List<ObjectPermissionPanel> dataUsagePanels = new ArrayList<ObjectPermissionPanel>();
-    private List<String> attributes = new ArrayList<String>();
-    private ObjectPermissionListenerSupport permissionListenerSupport = new ObjectPermissionListenerSupport();
+    private final List<ObjectPermissionPanel> dataUsagePanels = new ArrayList<>();
+    private final List<String> attributes = new ArrayList<>();
+    private final ObjectPermissionListenerSupport permissionListenerSupport = new ObjectPermissionListenerSupport();
     private ProcessContext context = null;
-    private String[] columnNames = {"Attribute", "Access Mode (R,W,C,D)"};
+    private final String[] columnNames = {"Attribute", "Access Mode (R,W,C,D)"};
 
     public DataUsageTableModel(ProcessContext context) {
         Validate.notNull(context);
@@ -89,7 +89,7 @@ public class DataUsageTableModel extends AbstractTableModel implements ObjectPer
     }
 
     public void clear() {
-        List<String> attributesToRemove = new ArrayList<String>();
+        List<String> attributesToRemove = new ArrayList<>();
         attributesToRemove.addAll(attributes);
         for (String attribute : attributesToRemove) {
             removeElement(attribute);
@@ -142,7 +142,7 @@ public class DataUsageTableModel extends AbstractTableModel implements ObjectPer
         return null;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
     public Class getColumnClass(int c) {
         return getValueAt(0, c).getClass();
     }

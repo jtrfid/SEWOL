@@ -3,7 +3,6 @@ package de.uni.freiburg.iig.telematik.sewol.util;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
 
 import org.deckfour.xes.extension.XExtensionManager;
 import org.deckfour.xes.in.XesXmlParser;
@@ -11,6 +10,7 @@ import org.deckfour.xes.model.XLog;
 
 import de.uni.freiburg.iig.telematik.sewol.parser.TraceWiseXesIterator;
 import de.uni.freiburg.iig.telematik.sewol.parser.xes.DataUsageExtension;
+import java.util.ArrayList;
 
 public class TraceWiseXesIteratorMemoryMonitoring {
 
@@ -29,7 +29,7 @@ public class TraceWiseXesIteratorMemoryMonitoring {
 
 	private static Timer timer;
 	private static boolean stop = false;
-	private static List<Integer> memoryUsages = new Vector<Integer>();
+	private static final List<Integer> memoryUsages = new ArrayList<>();
 
 	public static void main(String[] args) throws Exception {
 
@@ -55,7 +55,7 @@ public class TraceWiseXesIteratorMemoryMonitoring {
 						}
 						Thread.sleep(TIMER_INTERVAL);
 					} catch (InterruptedException ex) {
-						ex.printStackTrace();
+						throw new RuntimeException(ex);
 					}
 				}
 			}

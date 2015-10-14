@@ -41,7 +41,7 @@ public class CommonLogEntries<E extends LogEntry> {
 		}
 	}
 	
-	public Map<String, List<E>> getEntryActivityMap(LogTrace<E> trace) throws ParameterException{
+	public final Map<String, List<E>> getEntryActivityMap(LogTrace<E> trace) throws ParameterException{
 		Map<String, List<E>> result = new HashMap<>();
 		for(String activity: trace.getDistinctActivities()){
 			result.put(activity, trace.getEntriesForActivity(activity));

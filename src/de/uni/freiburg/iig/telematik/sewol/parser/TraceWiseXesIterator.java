@@ -38,6 +38,7 @@ public class TraceWiseXesIterator implements Iterator<LogFragment> {
 	 * 
 	 * @param logFile
 	 *            Path to the log file to read
+         * @throws IOException
 	 */
 	public TraceWiseXesIterator(String logFile) throws ParameterException, IOException {
 		this(logFile, DEFAULT_FRAGMENT_SIZE);
@@ -50,6 +51,7 @@ public class TraceWiseXesIterator implements Iterator<LogFragment> {
 	 *            Path to the log file to read
 	 * @param fragmentSize
 	 *            The number of traces for the iterator
+         * @throws IOException
 	 */
 	public TraceWiseXesIterator(String logFile, int fragmentSize) throws ParameterException, IOException {
 		Validate.exists(logFile);
@@ -63,7 +65,7 @@ public class TraceWiseXesIterator implements Iterator<LogFragment> {
 		if (hasNextTrace != null && !hasNextTrace)
 			return null;
 
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		if (lastTraceStart != null) {
 			buffer.append(lastTraceStart);
 			buffer.append(System.getProperty("line.separator"));
@@ -105,8 +107,8 @@ public class TraceWiseXesIterator implements Iterator<LogFragment> {
 				newFragment.addLine(LOG_END);
 				newFragment.close();
 				return newFragment;
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
 		return null;

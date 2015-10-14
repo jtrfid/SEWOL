@@ -58,7 +58,7 @@ public class ProcessContextProperties extends SOABaseProperties {
 
 		//1. Add data usages
         //   This also adds the data usages to the list of data usages
-        List<String> propertyNamesForDataUsages = new ArrayList<String>();
+        List<String> propertyNamesForDataUsages = new ArrayList<>();
         for (String attribute : dataUsage.keySet()) {
             propertyNamesForDataUsages.add(addDataUsage(attribute, dataUsage.get(attribute)));
         }
@@ -73,7 +73,7 @@ public class ProcessContextProperties extends SOABaseProperties {
         Validate.notEmpty(activity);
 
         Set<String> dataUsageNames = getDataUsageNames(activity);
-        Map<String, Set<DataUsage>> result = new HashMap<String, Set<DataUsage>>();
+        Map<String, Set<DataUsage>> result = new HashMap<>();
         for (String dataUsageName : dataUsageNames) {
             Map<String, Set<DataUsage>> dataUsage = getDataUsage(dataUsageName);
             String attribute = dataUsage.keySet().iterator().next();
@@ -125,7 +125,7 @@ public class ProcessContextProperties extends SOABaseProperties {
         if (dataUsageString == null) {
             throw new PropertyException(ProcessContextProperty.DATA_USAGE, dataUsageName, "No data usage with name \"" + dataUsageName + "\"");
         }
-        Map<String, Set<DataUsage>> result = new HashMap<String, Set<DataUsage>>();
+        Map<String, Set<DataUsage>> result = new HashMap<>();
         int delimiterIndex = dataUsageString.indexOf(" ");
         if (delimiterIndex == -1) {
             throw new PropertyException(ProcessContextProperty.DATA_USAGE, dataUsageName, "Invalid property value for data usage with name \"" + dataUsageName + "\"");
@@ -138,16 +138,16 @@ public class ProcessContextProperties extends SOABaseProperties {
 
             attributeString = attributeString.substring(1, attributeString.length() - 1);
         } catch (Exception e) {
-            throw new PropertyException(ProcessContextProperty.DATA_USAGE, dataUsageName, "Invalid property value for data usage with name \"" + dataUsageName + "\"");
+            throw new PropertyException(ProcessContextProperty.DATA_USAGE, dataUsageName, "Invalid property value for data usage with name \"" + dataUsageName + "\"", e);
         }
 
-        Set<DataUsage> usageModes = new HashSet<DataUsage>();
+        Set<DataUsage> usageModes = new HashSet<>();
         StringTokenizer usageModeTokens = StringUtils.splitArrayString(dataUsagesString, " ");
         while (usageModeTokens.hasMoreTokens()) {
             try {
                 usageModes.add(DataUsage.parse(usageModeTokens.nextToken()));
             } catch (ParameterException e) {
-                throw new PropertyException(ProcessContextProperty.DATA_USAGE, dataUsageName, "Invalid property value for data usage with name \"" + dataUsageName + "\"");
+                throw new PropertyException(ProcessContextProperty.DATA_USAGE, dataUsageName, "Invalid property value for data usage with name \"" + dataUsageName + "\"", e);
             }
         }
         result.put(attributeString, usageModes);
@@ -175,7 +175,7 @@ public class ProcessContextProperties extends SOABaseProperties {
      * @return A set of all activities with data usage.
      */
     public Set<String> getActivitiesWithDataUsage() {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         String propertyValue = getProperty(ProcessContextProperty.ACTIVITIES_WITH_DATA_USAGE);
         if (propertyValue == null) {
             return result;
@@ -232,7 +232,7 @@ public class ProcessContextProperties extends SOABaseProperties {
      * due to external file manipulation).
      */
     private Set<Integer> getDataUsageNameIndexes() throws PropertyException {
-        Set<Integer> result = new HashSet<Integer>();
+        Set<Integer> result = new HashSet<>();
         Set<String> dataUsageNames = getDataUsageNameList();
         if (dataUsageNames.isEmpty()) {
             return result;
@@ -265,7 +265,7 @@ public class ProcessContextProperties extends SOABaseProperties {
     private Set<String> getDataUsageNames(String activity) {
         Validate.notNull(activity);
         Validate.notEmpty(activity);
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         String propertyValue = props.getProperty(String.format(ACTIVITY_DATA_USAGES_FORMAT, activity));
         if (propertyValue == null) {
             return result;
@@ -285,7 +285,7 @@ public class ProcessContextProperties extends SOABaseProperties {
      * @return A set of all used property names for data usages.
      */
     private Set<String> getDataUsageNameList() {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         String propertyValue = getProperty(ProcessContextProperty.ALL_DATA_USAGES);
         if (propertyValue == null) {
             return result;
@@ -305,7 +305,7 @@ public class ProcessContextProperties extends SOABaseProperties {
             return;
         }
         Validate.noNullElements(validUsageModes);
-        Set<DataUsage> usageSet = new HashSet<DataUsage>(validUsageModes);
+        Set<DataUsage> usageSet = new HashSet<>(validUsageModes);
         setProperty(ProcessContextProperty.VALID_USAGE_MODES, ArrayUtils.toString(encapsulateValues(usageSet)));
     }
 
@@ -315,7 +315,7 @@ public class ProcessContextProperties extends SOABaseProperties {
             throw new PropertyException(ACModelProperty.VALID_USAGE_MODES, propertyValue);
         }
         StringTokenizer tokens = StringUtils.splitArrayString(propertyValue, String.valueOf(ArrayUtils.VALUE_SEPARATION));
-        Set<DataUsage> result = new HashSet<DataUsage>();
+        Set<DataUsage> result = new HashSet<>();
         while (tokens.hasMoreTokens()) {
             String nextToken = tokens.nextToken();
             if (nextToken.length() < 3) {
@@ -326,7 +326,7 @@ public class ProcessContextProperties extends SOABaseProperties {
             try {
                 nextUsage = DataUsage.parse(nextToken);
             } catch (Exception e) {
-                throw new PropertyException(ACModelProperty.VALID_USAGE_MODES, nextToken);
+                throw new PropertyException(ACModelProperty.VALID_USAGE_MODES, nextToken, e);
             }
             result.add(nextUsage);
         }

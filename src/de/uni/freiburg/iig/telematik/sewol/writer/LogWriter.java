@@ -9,8 +9,6 @@ import de.invation.code.toval.validate.CompatibilityException;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.sewol.format.AbstractLogFormat;
 import de.uni.freiburg.iig.telematik.sewol.format.LogPerspective;
-import de.uni.freiburg.iig.telematik.sewol.format.MXMLLogFormat;
-import de.uni.freiburg.iig.telematik.sewol.log.DataAttribute;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
 import de.uni.freiburg.iig.telematik.sewol.writer.PerspectiveException.PerspectiveError;
@@ -209,7 +207,7 @@ public class LogWriter extends FileWriter{
 	 * @throws CompatibilityException if the charset of the log writer is not supported by the log format.
 	 * @throws PerspectiveException if the log format does not support the writers' log perspective.
 	 */
-	protected void initialize(AbstractLogFormat logFormat) throws PerspectiveException, IOException, CompatibilityException {
+	protected final void initialize(AbstractLogFormat logFormat) throws PerspectiveException, IOException, CompatibilityException {
 		setLogFormat(logFormat);
 		try {
 			setEOLString(EOLType.LF);

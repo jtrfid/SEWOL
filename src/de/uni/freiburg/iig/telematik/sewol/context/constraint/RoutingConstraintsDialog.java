@@ -14,10 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -47,14 +44,14 @@ public class RoutingConstraintsDialog extends AbstractDialog<ConstraintContext> 
     private JList listActivities = null;
     private JList listConstraints = null;
 
-    private DefaultListModel modelListActivities = new DefaultListModel();
-    private DefaultListModel modelListConstraints = new DefaultListModel();
+    private final DefaultListModel modelListActivities = new DefaultListModel();
+    private final DefaultListModel modelListConstraints = new DefaultListModel();
 
     private JButton btnAddConstraint = null;
     private JButton btnEditConstraint = null;
     private JButton btnRemoveConstraint = null;
 
-    private List<AbstractConstraint<?>> constraints = new ArrayList<AbstractConstraint<?>>();
+    private final List<AbstractConstraint<?>> constraints = new ArrayList<>();
 
     public RoutingConstraintsDialog(Window owner, ConstraintContext context) {
         super(owner, ButtonPanelLayout.CENTERED);
@@ -109,6 +106,7 @@ public class RoutingConstraintsDialog extends AbstractDialog<ConstraintContext> 
         if(btnRemoveConstraint == null){
             btnRemoveConstraint = new JButton("Remove");
             btnRemoveConstraint.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     String activity = listActivities.getSelectedValue().toString();
                     if (listConstraints.getSelectedValue() != null) {
@@ -130,6 +128,7 @@ public class RoutingConstraintsDialog extends AbstractDialog<ConstraintContext> 
         if(btnEditConstraint == null){
             btnEditConstraint = new JButton("Edit");
             btnEditConstraint.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (listConstraints.getSelectedValue() != null) {
                         try{
@@ -149,6 +148,7 @@ public class RoutingConstraintsDialog extends AbstractDialog<ConstraintContext> 
         if(btnAddConstraint == null){
             btnAddConstraint = new JButton("Add");
             btnAddConstraint.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     String activity = listActivities.getSelectedValue().toString();
                     Set<String> activityAttributes = null;
@@ -211,6 +211,7 @@ public class RoutingConstraintsDialog extends AbstractDialog<ConstraintContext> 
             listActivities.setSelectedIndex(0);
 
             listActivities.addListSelectionListener(new ListSelectionListener() {
+                @Override
                 public void valueChanged(ListSelectionEvent e) {
                     if ((e.getValueIsAdjusting() == false) && (listActivities.getSelectedValue() != null)) {
                         updateListConstraints();
