@@ -78,6 +78,7 @@ public class XESLogParser extends AbstractLogParser {
 	 * @throws ParserException
 	 *             Gets thrown if the file under the given path can't be read, is a directory, or doesn't exist.
 	 */
+        @Override
 	public List<List<LogTrace<LogEntry>>> parse(String filePath, ParsingMode parsingMode) throws ParameterException, ParserException {
 		Validate.notNull(filePath);
 		return parse(new File(filePath), parsingMode);
@@ -89,15 +90,14 @@ public class XESLogParser extends AbstractLogParser {
 	 * @param inputStream
 	 *            {@link InputStream} to parse
          * @param parsingMode
-	 * @param fileFormat
-	 *            Format of the {@link InputStream} as it can't be determined automatically
 	 * @return Collection of processes, which consist of a collection of instances, which again consist of a collection of {@link LogTrace} objects.
 	 * @throws ParameterException
 	 *             Gets thrown if there's a discrepancy in how the file should be interpreted.
 	 * @throws ParserException
 	 *             Gets thrown if the given file can't be read, is a directory, or doesn't exist.
 	 */
-	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode, ParserFileFormat fileFormat) throws ParameterException, ParserException {
+        @Override
+	public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode) throws ParameterException, ParserException {
 		try {
 			inputStream.available();
 		} catch (IOException e) {
@@ -105,7 +105,7 @@ public class XESLogParser extends AbstractLogParser {
 		}
 
 		Collection<XLog> logs = null;
-		XParser parser = fileFormat.getParser();
+		XParser parser = ParserFileFormat.XES.getParser();
 		try {
 			logs = parser.parse(inputStream);
 		} catch (Exception e) {
@@ -204,7 +204,7 @@ public class XESLogParser extends AbstractLogParser {
 		try {
 			try {
 				InputStream is = new FileInputStream(file);
-				return parse(is, parsingMode, ParserFileFormat.getFileFormat(file));
+				return parse(is, parsingMode);
 			} catch (FileNotFoundException | ParameterException | ParserException e) {
 				throw new ParserException("Exception while parsing with OpenXES: " + e.getMessage());
 			}
@@ -440,6 +440,7 @@ public class XESLogParser extends AbstractLogParser {
 	}
 
 	public static void main(String[] args) throws ParameterException, ParserException {
-		new XESLogParser().parse("/Users/stocker/Desktop/XESTest2.xes", ParsingMode.COMPLETE);
+                XESLogParser p = new XESLogParser();
+		List<List<LogTrace<LogEntry>>> l = p.parse("/home/alange/P2P-log-v6-anonymized.xes", ParsingMode.COMPLETE);
 	}
 }

@@ -57,6 +57,7 @@ public class MXMLLogParser extends AbstractLogParser {
          * @throws ParserException Gets thrown if the file under the given path
          * can't be read, is a directory, or doesn't exist.
          */
+        @Override
         public List<List<LogTrace<LogEntry>>> parse(String filePath, ParsingMode parsingMode) throws ParameterException, ParserException {
                 Validate.notNull(filePath);
                 return parse(new File(filePath), parsingMode);
@@ -75,6 +76,7 @@ public class MXMLLogParser extends AbstractLogParser {
          * @throws ParserException Gets thrown if the given file can't be read,
          * is a directory, or doesn't exist.
          */
+        @Override
         public List<List<LogTrace<LogEntry>>> parse(InputStream inputStream, ParsingMode parsingMode) throws ParameterException, ParserException {
                 try {
                         inputStream.available();
