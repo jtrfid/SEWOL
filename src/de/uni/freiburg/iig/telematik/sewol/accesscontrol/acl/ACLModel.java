@@ -50,16 +50,16 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
     @Override
     protected void initialize() {
         super.initialize();
-        activityPermissionsUT = new HashMap<String, Set<String>>();
-        activityPermissionsTU = new HashMap<String, Set<String>>();
-        objectPermissionsUO = new HashMap<String, Map<String, Set<DataUsage>>>();
-        objectPermissionsOU = new HashMap<String, Map<String, Set<DataUsage>>>();
+        activityPermissionsUT = new HashMap<>();
+        activityPermissionsTU = new HashMap<>();
+        objectPermissionsUO = new HashMap<>();
+        objectPermissionsOU = new HashMap<>();
     }
 
     @Override
     public void setValidUsageModes(Collection<DataUsage> validUsageModes) {
         validateUsageModes(validUsageModes);
-        Set<DataUsage> oldModes = new HashSet<DataUsage>(getValidUsageModes());
+        Set<DataUsage> oldModes = new HashSet<>(getValidUsageModes());
         if (hasObjectPermissions()) {
             for (String subject : context.getSubjects()) {
                 for (String object : context.getObjects()) {
@@ -71,14 +71,14 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
         }
         this.validUsageModes.clear();
         this.validUsageModes.addAll(validUsageModes);
-        acModelListenerSupport.notifyValidUsageModesChanged(oldModes, new HashSet<DataUsage>(validUsageModes));
+        acModelListenerSupport.notifyValidUsageModesChanged(oldModes, new HashSet<>(validUsageModes));
     }
 
     public boolean addActivityPermission(String subject, String activity) throws CompatibilityException {
         context.validateSubject(subject);
         context.validateActivity(activity);
         if (!activityPermissionsUT.containsKey(subject)) {
-            activityPermissionsUT.put(subject, new HashList<String>());
+            activityPermissionsUT.put(subject, new HashList<>());
         }
         if (activityPermissionsUT.get(subject).add(activity)) {
             addActivityPermissionTU(activity, subject);
@@ -90,7 +90,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 
     private void addActivityPermissionTU(String activity, String subject) {
         if (!activityPermissionsTU.containsKey(activity)) {
-            activityPermissionsTU.put(activity, new HashList<String>());
+            activityPermissionsTU.put(activity, new HashList<>());
         }
         activityPermissionsTU.get(activity).add(subject);
     }
@@ -103,7 +103,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
         }
 
         if (activityPermissionsUT.containsKey(subject)) {
-            Set<String> activitiesToRemove = new HashSet<String>();
+            Set<String> activitiesToRemove = new HashSet<>();
             for (String storedActivity : activityPermissionsUT.get(subject)) {
                 if (!activities.contains(storedActivity)) {
                     activitiesToRemove.add(storedActivity);
@@ -161,12 +161,12 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
         context.validateSubject(subject);
         context.validateObject(object);
         if (!objectPermissionsUO.containsKey(subject)) {
-            objectPermissionsUO.put(subject, new HashMap<String, Set<DataUsage>>());
+            objectPermissionsUO.put(subject, new HashMap<>());
         }
         if (!objectPermissionsUO.get(subject).containsKey(object)) {
-            objectPermissionsUO.get(subject).put(object, new HashSet<DataUsage>());
+            objectPermissionsUO.get(subject).put(object, new HashSet<>());
         }
-        Set<DataUsage> addedUsageModes = new HashSet<DataUsage>();
+        Set<DataUsage> addedUsageModes = new HashSet<>();
         for (DataUsage dataUsage : dataUsageModes) {
             if (objectPermissionsUO.get(subject).get(object).add(dataUsage)) {
                 addedUsageModes.add(dataUsage);
@@ -183,10 +183,10 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 
     private void addObjectPermissionsOU(String object, String subject, Collection<DataUsage> dataUsageModes) {
         if (!objectPermissionsOU.containsKey(object)) {
-            objectPermissionsOU.put(object, new HashMap<String, Set<DataUsage>>());
+            objectPermissionsOU.put(object, new HashMap<>());
         }
         if (!objectPermissionsOU.get(object).containsKey(subject)) {
-            objectPermissionsOU.get(object).put(subject, new HashSet<DataUsage>());
+            objectPermissionsOU.get(object).put(subject, new HashSet<>());
         }
         objectPermissionsOU.get(object).get(subject).addAll(dataUsageModes);
     }
@@ -242,7 +242,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
     }
 
     private void removeObjectPermissionsOU(String subject) {
-        Set<String> objectsToRemove = new HashSet<String>();
+        Set<String> objectsToRemove = new HashSet<>();
         for (String object : objectPermissionsOU.keySet()) {
             objectPermissionsOU.get(object).remove(subject);
             if (objectPermissionsOU.get(object).isEmpty()) {
@@ -273,13 +273,13 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
         context.validateObject(object);
         validateUsageModes(dataUsageModes);
         if (!objectPermissionsUO.containsKey(subject)) {
-            objectPermissionsUO.put(subject, new HashMap<String, Set<DataUsage>>());
+            objectPermissionsUO.put(subject, new HashMap<>());
         }
 
         if (!objectPermissionsUO.get(subject).containsKey(object)) {
-            objectPermissionsUO.get(subject).put(object, new HashSet<DataUsage>());
+            objectPermissionsUO.get(subject).put(object, new HashSet<>());
         } else {
-            Set<DataUsage> modesToRemove = new HashSet<DataUsage>();
+            Set<DataUsage> modesToRemove = new HashSet<>();
             for (DataUsage storedUsage : objectPermissionsUO.get(subject).get(object)) {
                 if (!dataUsageModes.contains(storedUsage)) {
                     modesToRemove.add(storedUsage);
@@ -289,7 +289,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
         }
 
         
-        Set<DataUsage> modesToAdd = new HashSet<DataUsage>(dataUsageModes);
+        Set<DataUsage> modesToAdd = new HashSet<>(dataUsageModes);
         modesToAdd.removeAll(objectPermissionsUO.get(subject).get(object));
 
         addObjectPermission(subject, object, modesToAdd);
@@ -371,7 +371,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
         }
         Set<DataUsage> permissions = objectPermissionsUO.get(subject).get(object);
         permissions.removeAll(dataUsageModes);
-        Set<DataUsage> removedPermissions = new HashSet<DataUsage>(objectPermissionsUO.get(subject).get(object));
+        Set<DataUsage> removedPermissions = new HashSet<>(objectPermissionsUO.get(subject).get(object));
         removedPermissions.retainAll(dataUsageModes);
         acModelListenerSupport.notifyAccessPermissionRemoved(subject, object, removedPermissions);
         if (permissions.isEmpty()) {
@@ -415,7 +415,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
     @Override
     public List<String> getAuthorizedSubjectsForTransaction(String activity) throws CompatibilityException {
         context.validateActivity(activity);
-        List<String> authorizedSubjects = new HashList<String>();
+        List<String> authorizedSubjects = new HashList<>();
         if (activityPermissionsTU.containsKey(activity)) {
             authorizedSubjects.addAll(activityPermissionsTU.get(activity));
         }
@@ -425,7 +425,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
     @Override
     public List<String> getAuthorizedSubjectsForObject(String object) throws CompatibilityException {
         context.validateObject(object);
-        List<String> authorizedSubjects = new HashList<String>();
+        List<String> authorizedSubjects = new HashList<>();
         if (objectPermissionsOU.containsKey(object)) {
             authorizedSubjects.addAll(objectPermissionsOU.get(object).keySet());
         }
@@ -438,12 +438,12 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
         if (objectPermissionsOU.containsKey(object)) {
             return objectPermissionsOU.get(object);
         }
-        return new HashMap<String, Set<DataUsage>>();
+        return new HashMap<>();
     }
 
     @Override
     public Set<DataUsage> getObjectPermissionsForSubject(String subject, String object) throws CompatibilityException {
-        Set<DataUsage> result = new HashSet<DataUsage>();
+        Set<DataUsage> result = new HashSet<>();
         if (!isAuthorizedForObject(subject, object)) {
             return result;
         }
@@ -457,7 +457,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
             return result;
         }
 
-        return new HashMap<String, Set<DataUsage>>();
+        return new HashMap<>();
     }
 
     @Override
@@ -467,13 +467,13 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
             return result;
         }
 
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     @Override
     public List<String> getAuthorizedTransactionsForSubject(String subject) throws CompatibilityException {
         context.validateSubject(subject);
-        List<String> authorizedTransactions = new HashList<String>();
+        List<String> authorizedTransactions = new HashList<>();
         if (activityPermissionsUT.containsKey(subject)) {
             authorizedTransactions.addAll(activityPermissionsUT.get(subject));
         }
@@ -483,7 +483,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
     @Override
     public List<String> getAuthorizedObjectsForSubject(String subject) throws CompatibilityException {
         context.validateSubject(subject);
-        List<String> authorizedObjects = new HashList<String>();
+        List<String> authorizedObjects = new HashList<>();
         if (objectPermissionsUO.containsKey(subject)) {
             authorizedObjects.addAll(objectPermissionsUO.get(subject).keySet());
         }
@@ -543,7 +543,7 @@ public class ACLModel extends AbstractACModel<ACLModelProperties> {
 
     @Override
     public void validUsageModesChanged(AbstractACModel<?> sender, Set<DataUsage> oldModes, Set<DataUsage> newModes) {
-        Set<DataUsage> removedModes = new HashSet<DataUsage>(oldModes);
+        Set<DataUsage> removedModes = new HashSet<>(oldModes);
         removedModes.removeAll(newModes);
         for (String subject : context.getSubjects()) {
             for (String object : context.getObjects()) {

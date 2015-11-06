@@ -149,6 +149,7 @@ public class MXMLLogParser extends AbstractLogParser {
                 private static final String TIMESTAMP_ENDING_PATTERN = ":(\\d\\d)$";
 
                 private static final String INT_PATTERN = "^0*(\\d+)$";
+                private static final String DOUBLE_PATTERN = "^((?:\\d+\\.\\d+)|(?:\\d+\\.)|(?:\\.\\d+))$";
                 private static final String NON_INT_PATTERN = "(\\D+)";
 
                 @Override
@@ -236,7 +237,15 @@ public class MXMLLogParser extends AbstractLogParser {
                                                         break;
                                                 case MXMLLogFormat.ELEMENT_ATTRIBUTE:
                                                         if (currentAttribute != null) {
-                                                                currentAttribute.value = lastCharacters.toString().intern();
+                                                                String value = lastCharacters.toString().intern();
+
+                                                                if (value.matches(INT_PATTERN)) {
+                                                                        currentAttribute.value = Long.valueOf(value);
+                                                                } else if (value.matches(DOUBLE_PATTERN)) {
+                                                                        currentAttribute.value = Double.valueOf(value);
+                                                                } else {
+                                                                        currentAttribute.value = value;
+                                                                }
                                                                 currentEntry.addMetaAttribute(currentAttribute);
                                                                 currentAttribute = null;
                                                         }
