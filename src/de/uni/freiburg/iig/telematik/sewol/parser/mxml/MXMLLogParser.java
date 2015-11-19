@@ -186,11 +186,13 @@ public class MXMLLogParser extends AbstractLogParser {
                                         recordCharacters = true;
                                         break;
                                 case MXMLLogFormat.ELEMENT_ATTRIBUTE:
-                                        lastCharacters.setLength(0);
-                                        recordCharacters = true;
-                                        if (attributes.getIndex(MXMLLogFormat.ATTRIBUTE_NAME) >= 0) {
-                                                String nameString = attributes.getValue(attributes.getIndex(MXMLLogFormat.ATTRIBUTE_NAME)).intern();
-                                                currentAttribute = new DataAttribute(nameString);
+                                        if (currentEntry != null) {
+                                                lastCharacters.setLength(0);
+                                                recordCharacters = true;
+                                                if (attributes.getIndex(MXMLLogFormat.ATTRIBUTE_NAME) >= 0) {
+                                                        String nameString = attributes.getValue(attributes.getIndex(MXMLLogFormat.ATTRIBUTE_NAME)).intern();
+                                                        currentAttribute = new DataAttribute(nameString);
+                                                }
                                         }
                                         break;
                         }
@@ -198,63 +200,62 @@ public class MXMLLogParser extends AbstractLogParser {
 
                 @Override
                 public void endElement(String uri, String localName, String qName) throws SAXException {
-                        {
-                                try {
-                                        switch (qName) {
-                                                case MXMLLogFormat.ELEMENT_LOG:
-                                                        summaries.add(currentSummary);
-                                                        logs.add(currentLog);
-                                                        break;
-                                                case MXMLLogFormat.ELEMENT_TRACE:
-                                                        currentLog.add(currentTrace);
-                                                        currentSummary.addTrace(currentTrace);
-                                                        break;
-                                                case MXMLLogFormat.ELEMENT_ENTRY:
-                                                        currentTrace.addEntry(currentEntry);
-                                                        break;
-                                                case MXMLLogFormat.ELEMENT_ACTIVITY:
-                                                        currentEntry.setActivity(lastCharacters.toString().intern());
-                                                        recordCharacters = false;
-                                                        break;
-                                                case MXMLLogFormat.ELEMENT_TYPE:
-                                                        EventType type = EventType.parse(lastCharacters.toString().intern(), false);
-                                                        if (type != null) {
-                                                                currentEntry.setEventType(type);
-                                                        }
-                                                        recordCharacters = false;
-                                                        break;
-                                                case MXMLLogFormat.ELEMENT_TIME:
-                                                        String dateStr = lastCharacters.toString().intern();
-                                                        date = parseTimestamp(dateStr, true);
-                                                        if (date != null) {
-                                                                currentEntry.setTimestamp(date);
-                                                        }
-                                                        recordCharacters = false;
-                                                        break;
-                                                case MXMLLogFormat.ELEMENT_ORIGINATOR:
-                                                        currentEntry.setOriginator(lastCharacters.toString().intern());
-                                                        recordCharacters = false;
-                                                        break;
-                                                case MXMLLogFormat.ELEMENT_ATTRIBUTE:
-                                                        if (currentAttribute != null) {
-                                                                String value = lastCharacters.toString().intern();
+                        try {
+                                switch (qName) {
+                                        case MXMLLogFormat.ELEMENT_LOG:
+                                                summaries.add(currentSummary);
+                                                logs.add(currentLog);
+                                                break;
+                                        case MXMLLogFormat.ELEMENT_TRACE:
+                                                currentLog.add(currentTrace);
+                                                currentSummary.addTrace(currentTrace);
+                                                break;
+                                        case MXMLLogFormat.ELEMENT_ENTRY:
+                                                currentTrace.addEntry(currentEntry);
+                                                currentEntry = null;
+                                                break;
+                                        case MXMLLogFormat.ELEMENT_ACTIVITY:
+                                                currentEntry.setActivity(lastCharacters.toString().intern());
+                                                recordCharacters = false;
+                                                break;
+                                        case MXMLLogFormat.ELEMENT_TYPE:
+                                                EventType type = EventType.parse(lastCharacters.toString().intern(), false);
+                                                if (type != null) {
+                                                        currentEntry.setEventType(type);
+                                                }
+                                                recordCharacters = false;
+                                                break;
+                                        case MXMLLogFormat.ELEMENT_TIME:
+                                                String dateStr = lastCharacters.toString().intern();
+                                                date = parseTimestamp(dateStr, true);
+                                                if (date != null) {
+                                                        currentEntry.setTimestamp(date);
+                                                }
+                                                recordCharacters = false;
+                                                break;
+                                        case MXMLLogFormat.ELEMENT_ORIGINATOR:
+                                                currentEntry.setOriginator(lastCharacters.toString().intern());
+                                                recordCharacters = false;
+                                                break;
+                                        case MXMLLogFormat.ELEMENT_ATTRIBUTE:
+                                                if (currentAttribute != null) {
+                                                        String value = lastCharacters.toString().intern();
 
-                                                                if (value.matches(INT_PATTERN)) {
-                                                                        currentAttribute.value = Long.valueOf(value);
-                                                                } else if (value.matches(DOUBLE_PATTERN)) {
-                                                                        currentAttribute.value = Double.valueOf(value);
-                                                                } else {
-                                                                        currentAttribute.value = value;
-                                                                }
-                                                                currentEntry.addMetaAttribute(currentAttribute);
-                                                                currentAttribute = null;
+                                                        if (value.matches(INT_PATTERN)) {
+                                                                currentAttribute.value = Long.valueOf(value);
+                                                        } else if (value.matches(DOUBLE_PATTERN)) {
+                                                                currentAttribute.value = Double.valueOf(value);
+                                                        } else {
+                                                                currentAttribute.value = value;
                                                         }
-                                                        recordCharacters = false;
-                                                        break;
-                                        }
-                                } catch (LockingException ex) {
-                                        throw new RuntimeException(ex);
+                                                        currentEntry.addMetaAttribute(currentAttribute);
+                                                        currentAttribute = null;
+                                                }
+                                                recordCharacters = false;
+                                                break;
                                 }
+                        } catch (LockingException ex) {
+                                throw new RuntimeException(ex);
                         }
                 }
 
