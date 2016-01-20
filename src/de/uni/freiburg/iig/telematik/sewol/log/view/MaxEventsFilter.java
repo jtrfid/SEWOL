@@ -40,11 +40,11 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  * @param <E>
  */
-public class MaxEvents<E extends LogEntry> implements Filterable<LogTrace<E>> {
+public class MaxEventsFilter<E extends LogEntry> implements Filterable<LogTrace<E>> {
 
         public final int max;
 
-        public MaxEvents(int max) {
+        public MaxEventsFilter(int max) {
                 this.max = max;
         }
 
