@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xesextension name="AttributeDataUsage" prefix="dataUsage" uri="http://xes.process-security.de/extensions/dataUsage.xesext">
+	<!-- This file defines the data usage extension for attributes. -->
+	<!-- This extension needs the feature "nested-attributes" to be enabled. -->
+
+	<!-- (c) 2014 by Business Process Security Group (http://bpsec.telematik.uni-freiburg.de/) -->
+
+	<!-- Date: April 1, 2014 -->
+	<!-- Version: 1.0 BETA -->
+
+	<!-- Author: Thomas Stocker (t.stocker@process-security.de) -->
+	<!-- Author: Adrian Lange (a.lange@process-security.de) -->
+
+	<!--
+		The data usage attribute brings the possibility to add usage modes (READ, WRITE, CREATE, DELETE) to all data
+		attributes (key, value).
+		
+		All attributes that have a dataUsage:usage subattribute are considered as data attribute.
+
+		Example:
+
+		<float key="creditAmount" value="50000.00">
+			<string key="dataUsage:usage" value="read,write"/>
+		</float>
+		<id key="customerID" value="d85d301d-d13c-4d7d-815d-90a3b1ec66d2">
+			<string key="dataUsage:usage" value="read"/>
+		</id>
+	-->
+	<meta>
+		<string key="usage">
+			<alias mapping="EN" name="Data usage (comma separated list of read, create, write, and delete)"/>
+			<alias mapping="DE" name="Datenzugriff (durch Kommata getrennte Liste aus read, create, write und delete)"/>
+		</string>
+	</meta>
+</xesextension>

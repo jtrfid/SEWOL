@@ -89,6 +89,7 @@
 						<configuration>
 							<sources>
 								<source>ext</source>
+								<source>res</source>
 							</sources>
 						</configuration>
 					</execution>

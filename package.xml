@@ -34,6 +34,7 @@
 	<!-- Source and destination directories -->
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="ext.dir" value="${basedir}/ext" />
+	<property name="res.dir" value="${basedir}/res" />
 	<property name="test.dir" value="${basedir}/test" />
 	<property name="target.dir" value="${basedir}/bin" />
 	<property name="target.dir.jar" value="${target.dir}/${artifact.name}-${version.name}" />
@@ -90,6 +91,7 @@
 				<include name="**/*.java" />
 			</fileset>
 			<fileset dir="${ext.dir}" />
+			<fileset dir="${res.dir}" />
 			<manifest>
 				<attribute name="X-Date" value="${touch.time}" />
 			</manifest>
@@ -111,6 +113,7 @@
 			<fileset dir="${classes.target.dir}" />
 			<fileset dir="${TOVAL.location}/bin/classes-ant" />
 			<fileset dir="${JAGAL.location}/bin/classes-ant" />
+			<fileset dir="${res.dir}" />
                         <zipfileset excludes="META-INF/*.SF" src="${JAGAL.location}/lib/jgraphx-3_1_2_1.jar" />
 			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/guava-16.0.1.jar" />
 			<zipfileset excludes="META-INF/*.SF" src="${libs.dir}/collections-generic-4.01.jar" />
@@ -127,6 +130,7 @@
 		<javac destdir="${classes.target.dir}" includeantruntime="false">
 			<src path="${src.dir}" />
 			<src path="${ext.dir}" />
+			<src path="${res.dir}" />
 			<classpath refid="SEWOL.classpath" />
 		</javac>
 		<echo>Compile tests...</echo>
@@ -145,6 +149,9 @@
 				<include name="**/*.java" />
 			</fileset>
 			<fileset dir="${ext.dir}">
+				<include name="**/*.java" />
+			</fileset>
+			<fileset dir="${res.dir}">
 				<include name="**/*.java" />
 			</fileset>
 			<fileset dir="${TOVAL.location}/src">
@@ -190,6 +197,9 @@
 				<exclude name="**/*.java" />
 			</fileset>
 			<fileset dir="${ext.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+			<fileset dir="${res.dir}">
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
