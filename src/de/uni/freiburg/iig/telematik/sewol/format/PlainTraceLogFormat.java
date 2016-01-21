@@ -72,4 +72,8 @@ public class PlainTraceLogFormat extends AbstractLogFormat {
 		return entry.getActivity();
 	}
 
+        @Override
+        public String formatComment(String comment) {
+                return ""; // TODO
+        }
 }

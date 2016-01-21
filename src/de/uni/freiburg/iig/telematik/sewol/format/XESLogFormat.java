@@ -7,6 +7,7 @@ import java.util.Set;
 
 import de.invation.code.toval.file.FileWriter;
 import de.invation.code.toval.types.DataUsage;
+import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.log.DULogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.DataAttribute;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
@@ -59,6 +60,8 @@ public class XESLogFormat extends AbstractLogFormat {
         private static final String ATTRIBUTE_BOOLEAN_FORMAT_C = "%s<boolean key=\"%s\" value=\"%b\" />%s";
 
         private static final String XES_DATEPATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+        
+        private static final String COMMENT_LINE_FORMAT = "<!-- %s -->\n";
 
         public XESLogFormat(String logName) {
                 super();
@@ -244,6 +247,23 @@ public class XESLogFormat extends AbstractLogFormat {
                 return LogFormatType.XES;
         }
 
+        @Override
+        public String formatComment(String comment) {
+                Validate.notNull(comment);
+                if (comment.replaceAll("\\s+", "").length() == 0)  {
+                        return "";
+                }
+                StringBuilder sb = new StringBuilder();
+                sb.append("\n");
+                String lines[] = comment.split("\\r?\\n");
+
+                for (String line : lines) {
+                        sb.append(String.format(COMMENT_LINE_FORMAT, line));
+                }
+
+                return sb.toString();
+        }
+
         /**
          * Represents all possible XES extensions.
          *
@@ -251,9 +271,12 @@ public class XESLogFormat extends AbstractLogFormat {
          */
         protected enum XESExtensions {
 
-                ATTRIBUTE_DATA_USAGE("AttributeDataUsage", "dataUsage", "http://xes.process-security.de/extensions/dataUsage.xesext"), CONCEPT("Concept", "concept", "http://www.xes-standard.org/concept.xesext"), LIFECYCLE("Lifecycle", "lifecycle",
-                        "http://www.xes-standard.org/lifecycle.xesext"), ORGANIZATIONAL("Organizational", "org", "http://www.xes-standard.org/org.xesext"), SEMANTIC("Semantic", "semantic", "http://www.xes-standard.org/semantic.xesext"), TIME(
-                                "Time", "time", "http://www.xes-standard.org/time.xesext");
+                ATTRIBUTE_DATA_USAGE("AttributeDataUsage", "dataUsage", "http://xes.process-security.de/extensions/dataUsage.xesext"),
+                CONCEPT("Concept", "concept", "http://www.xes-standard.org/concept.xesext"),
+                LIFECYCLE("Lifecycle", "lifecycle", "http://www.xes-standard.org/lifecycle.xesext"),
+                ORGANIZATIONAL("Organizational", "org", "http://www.xes-standard.org/org.xesext"),
+                SEMANTIC("Semantic", "semantic", "http://www.xes-standard.org/semantic.xesext"),
+                TIME("Time", "time", "http://www.xes-standard.org/time.xesext");
 
                 String name;
                 String prefix;

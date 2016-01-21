@@ -28,6 +28,7 @@ public class LogWriter extends FileWriter{
 	protected LogPerspective logPerspective = LogPerspective.TRACE_PERSPECTIVE;
 	private boolean headerWritten = false;
 	
+        private String comment = null;
 	
 	//------- Constructors -------------------------------------------------------------------
 	
@@ -167,20 +168,24 @@ public class LogWriter extends FileWriter{
 	public String getFileExtension(){
 		return logFormat.getFileExtension();
 	}
-	
+
 	@Override
 	public String getDefaultFileName() {
 		return DEFAULT_LOG_FILENAME;
 	}
-	
+
 	@Override
 	public String getDefaultPath() {
 		return DEFAULT_LOG_PATH;
 	}
-	
+
 	public AbstractLogFormat getLogFormat(){
 		return logFormat;
 	}
+
+        public String getComment() {
+                return comment;
+        }
 
 	/**
 	 * Sets the log format for writing process traces (e.g. MXML).
@@ -195,10 +200,17 @@ public class LogWriter extends FileWriter{
 			throw new PerspectiveException(PerspectiveError.INCOMPATIBLE_LOGFORMAT);
 		this.logFormat = logFormat;
 	}
-	
-	
+
+        /**
+         * Sets a comment to add to the log.
+         * @param comment 
+         */
+        public void setComment(String comment) {
+                this.comment = comment;
+        }
+
 	//------- Methods for setting up the log writer ------------------------------------------
-	
+
 	/**
 	 * Initializes the log writer on basis of the given log format.<br>
 	 * It ensures the proper creation of the output file and writes the file header.
@@ -261,11 +273,14 @@ public class LogWriter extends FileWriter{
 	
 	@Override
 	public void closeFile() throws IOException {
-		if(output != null){
-			output.write(logFormat.getFileFooter());
-			super.closeFile();
-		}
-	}
+                if (comment != null) {
+                        output.write(logFormat.formatComment(comment));
+                }
+                if (output != null) {
+                        output.write(logFormat.getFileFooter());
+                        super.closeFile();
+                }
+        }
 	
 //	
 //	//------- Test

@@ -104,6 +104,8 @@ public abstract class AbstractLogFormat extends FileFormat {
                 dateFormat.setDateFormatSymbols(DateFormatSymbols.getInstance(this.locale));
         }
 
+        public abstract String formatComment(String comment);
+
         public abstract boolean supportsLogPerspective(LogPerspective logPerspective);
 
         public abstract <E extends LogEntry> String getTraceAsString(LogTrace<E> trace);

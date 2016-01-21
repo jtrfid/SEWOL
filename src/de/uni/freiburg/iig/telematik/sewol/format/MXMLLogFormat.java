@@ -1,5 +1,6 @@
 package de.uni.freiburg.iig.telematik.sewol.format;
 
+import de.invation.code.toval.validate.Validate;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,6 +64,8 @@ public class MXMLLogFormat extends AbstractLogFormat {
         private final String MXML_DATEPATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
         protected String lineSeparator = DEFAULT_LINE_SEPARATOR;
+        
+        private static final String COMMENT_LINE_FORMAT = "<!-- %s -->\n";
 
 //	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         public MXMLLogFormat(String processName) {
@@ -189,5 +192,22 @@ public class MXMLLogFormat extends AbstractLogFormat {
         @Override
         public LogFormatType getLogFormatType() {
                 return LogFormatType.MXML;
+        }
+
+        @Override
+        public String formatComment(String comment) {
+                Validate.notNull(comment);
+                if (comment.replaceAll("\\s+", "").length() == 0)  {
+                        return "";
+                }
+                StringBuilder sb = new StringBuilder();
+                sb.append("\n");
+                String lines[] = comment.split("\\r?\\n");
+
+                for (String line : lines) {
+                        sb.append(String.format(COMMENT_LINE_FORMAT, line));
+                }
+
+                return sb.toString();
         }
 }
