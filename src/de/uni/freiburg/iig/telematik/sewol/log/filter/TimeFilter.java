@@ -28,7 +28,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package de.uni.freiburg.iig.telematik.sewol.log.view;
+package de.uni.freiburg.iig.telematik.sewol.log.filter;
 
 import de.invation.code.toval.misc.Filterable;
 import de.invation.code.toval.validate.ParameterException;

@@ -28,16 +28,11 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package de.uni.freiburg.iig.telematik.sewol.log.view;
+package de.uni.freiburg.iig.telematik.sewol.log;
 
 import de.invation.code.toval.misc.Filterable;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
-import de.uni.freiburg.iig.telematik.sewol.log.Log;
-import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
-import de.uni.freiburg.iig.telematik.sewol.log.LogSummary;
-import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -52,11 +47,7 @@ import java.util.Set;
  */
 public class LogView<E extends LogEntry> extends Log<E> {
 
-        private final List<Filterable<LogTrace<E>>> filters = new ArrayList<>();
-
-        private final LogSummary<E> summary = new LogSummary<>();
-        private final Set<LogTrace<E>> distinctTraces = new HashSet<>();
-        private final List<LogTrace<E>> traces = new ArrayList<>();
+        private final Set<Filterable<LogTrace<E>>> filters = new HashSet<>();
 
         private boolean uptodate = true;
 
@@ -72,12 +63,23 @@ public class LogView<E extends LogEntry> extends Log<E> {
         }
 
         /**
+         * Removes a filter to the view.
+         *
+         * @param filter
+         */
+        public void removeFilter(Filterable<LogTrace<E>> filter) {
+                Validate.notNull(filter);
+                filters.remove(filter);
+                uptodate = false;
+        }
+
+        /**
          * Returns an unmodifiable list of filters.
          *
          * @return
          */
-        public List<Filterable<LogTrace<E>>> getFilters() {
-                return Collections.unmodifiableList(filters);
+        public Set<Filterable<LogTrace<E>>> getFilters() {
+                return Collections.unmodifiableSet(filters);
         }
 
         @Override
@@ -116,6 +118,10 @@ public class LogView<E extends LogEntry> extends Log<E> {
                 return Collections.unmodifiableList(traces);
         }
 
+        /**
+         * Updates the summary, set of distinct traces and list of traces if the
+         * filter set has been changed.
+         */
         private void update() {
                 if (!uptodate) {
                         List<LogTrace<E>> oldTraces = traces;

@@ -28,10 +28,9 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package de.uni.freiburg.iig.telematik.sewol.log.view;
+package de.uni.freiburg.iig.telematik.sewol.log.filter;
 
 import de.invation.code.toval.misc.Filterable;
-import de.uni.freiburg.iig.telematik.sewol.log.EventType;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
 
@@ -41,47 +40,16 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  * @param <E>
  */
-public class ContainsFilter<E extends LogEntry> implements Filterable<LogTrace<E>> {
+public class MaxEventsFilter<E extends LogEntry> implements Filterable<LogTrace<E>> {
 
-        public final ContainsFilterParameter parameter;
-        public final String value;
+        public final int max;
 
-        public ContainsFilter(ContainsFilterParameter parameter, String value) {
-                this.parameter = parameter;
-                this.value = value;
+        public MaxEventsFilter(int max) {
+                this.max = max;
         }
 
         @Override
         public boolean accept(LogTrace<E> trace) {
-                for (E entry : trace.getEntries()) {
-                        switch (parameter) {
-                                case ACTIVITY:
-                                        if (entry.getActivity().equals(value)) {
-                                                return true;
-                                        }
-                                        break;
-                                case SUBJECT:
-                                        if (entry.getOriginator().equals(value)) {
-                                                return true;
-                                        }
-                                        break;
-                                case ROLE:
-                                        if (entry.getRole().equals(value)) {
-                                                return true;
-                                        }
-                                        break;
-                                case EVENTTYPE:
-                                        if (EventType.parse(value) == entry.getEventType()) {
-                                                return true;
-                                        }
-                        }
-                }
-
-                return false;
-        }
-
-        public enum ContainsFilterParameter {
-
-                ACTIVITY, SUBJECT, ROLE, EVENTTYPE;
+                return trace.size() <= max;
         }
 }

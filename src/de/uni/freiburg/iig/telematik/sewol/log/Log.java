@@ -11,9 +11,9 @@ import de.invation.code.toval.validate.Validate;
 
 public class Log<E extends LogEntry> {
 
-	private final LogSummary<E> summary = new LogSummary<>();
-	private final Set<LogTrace<E>> distinctTraces = new HashSet<>();
-	private final List<LogTrace<E>> traces = new ArrayList<>();
+	final LogSummary<E> summary = new LogSummary<>();
+	final Set<LogTrace<E>> distinctTraces = new HashSet<>();
+	final List<LogTrace<E>> traces = new ArrayList<>();
 
 	public LogSummary<E> getSummary() {
 		return summary;
