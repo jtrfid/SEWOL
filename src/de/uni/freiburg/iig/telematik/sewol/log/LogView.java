@@ -34,6 +34,7 @@ import de.invation.code.toval.misc.Filterable;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.log.filter.AbstractLogFilter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -50,6 +51,7 @@ import java.util.Set;
  */
 public class LogView<E extends LogEntry> extends Log<E> implements Observer {
 
+        private final List<LogTrace<E>> allTraces = new ArrayList<>();
         private final Set<AbstractLogFilter<E>> filters = new HashSet<>();
 
         private boolean uptodate = true;
@@ -141,6 +143,15 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer {
                                 }
                         }
                 }
+                allTraces.add(trace);
+        }
+
+        @Override
+        public void addTraces(List<LogTrace<E>> traces) throws ParameterException {
+                Validate.notNull(traces);
+                for (LogTrace<E> trace : traces) {
+                        addTrace(trace);
+                }
         }
 
         @Override
@@ -160,11 +171,10 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer {
          */
         private void update() {
                 if (!uptodate) {
-                        List<LogTrace<E>> oldTraces = traces;
                         summary.clear();
                         distinctTraces.clear();
                         traces.clear();
-                        addTraces(oldTraces);
+                        addTraces(allTraces);
                         uptodate = true;
                 }
         }
