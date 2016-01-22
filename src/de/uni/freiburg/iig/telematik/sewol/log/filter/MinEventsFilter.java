@@ -30,7 +30,6 @@
  */
 package de.uni.freiburg.iig.telematik.sewol.log.filter;
 
-import de.invation.code.toval.misc.Filterable;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
 
@@ -40,16 +39,34 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  * @param <E>
  */
-public class MinEventsFilter<E extends LogEntry> implements Filterable<LogTrace<E>> {
+public class MinEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
-        public final int min;
+        private int min;
 
         public MinEventsFilter(int min) {
+                super();
                 this.min = min;
+        }
+
+        public MinEventsFilter(int min, boolean invert) {
+                super(invert);
+                this.min = min;
+        }
+
+        public int getMin() {
+                return min;
+        }
+
+        public void setMin(int min) {
+                if (min != this.min) {
+                        this.min = min;
+                        setChanged();
+                        notifyObservers();
+                }
         }
 
         @Override
         public boolean accept(LogTrace<E> trace) {
-                return trace.size() >= min;
+                return isInverted() ^ (trace.size() >= min);
         }
 }

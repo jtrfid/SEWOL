@@ -30,7 +30,6 @@
  */
 package de.uni.freiburg.iig.telematik.sewol.log.filter;
 
-import de.invation.code.toval.misc.Filterable;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
@@ -42,15 +41,27 @@ import java.util.Date;
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  * @param <E>
  */
-public class TimeFilter<E extends LogEntry> implements Filterable<LogTrace<E>> {
+public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
         private Date startDate = null;
         private Date endDate = null;
 
         public TimeFilter() {
+                super();
+        }
+
+        public TimeFilter(boolean invert) {
+                super(invert);
         }
 
         public TimeFilter(Date startDate, Date endDate) {
+                super();
+                setStartDate(startDate);
+                setEndDate(endDate);
+        }
+
+        public TimeFilter(Date startDate, Date endDate, boolean invert) {
+                super(invert);
                 setStartDate(startDate);
                 setEndDate(endDate);
         }
@@ -79,10 +90,14 @@ public class TimeFilter<E extends LogEntry> implements Filterable<LogTrace<E>> {
          * @param startDate
          */
         public final void setStartDate(Date startDate) {
-                if (startDate != null && endDate != null && endDate.before(startDate)) {
-                        throw new ParameterException("The start date must be before the end date of the filter.");
+                if (!this.startDate.equals(startDate)) {
+                        if (startDate != null && endDate != null && endDate.before(startDate)) {
+                                throw new ParameterException("The start date must be before the end date of the filter.");
+                        }
+                        this.startDate = startDate;
+                        setChanged();
+                        notifyObservers();
                 }
-                this.startDate = startDate;
         }
 
         /**
@@ -91,23 +106,27 @@ public class TimeFilter<E extends LogEntry> implements Filterable<LogTrace<E>> {
          * @param endDate
          */
         public final void setEndDate(Date endDate) {
-                if (endDate != null && startDate != null && endDate.before(startDate)) {
-                        throw new ParameterException("The start date must be before the end date of the filter.");
+                if (!this.endDate.equals(endDate)) {
+                        if (endDate != null && startDate != null && endDate.before(startDate)) {
+                                throw new ParameterException("The start date must be before the end date of the filter.");
+                        }
+                        this.endDate = endDate;
+                        setChanged();
+                        notifyObservers();
                 }
-                this.endDate = endDate;
         }
 
         @Override
         public boolean accept(LogTrace<E> trace) {
                 for (E entry : trace.getEntries()) {
                         if (startDate != null && entry.getTimestamp().before(startDate)) {
-                                return false;
+                                return isInverted() ^ false;
                         }
                         if (endDate != null && entry.getTimestamp().after(endDate)) {
-                                return false;
+                                return isInverted() ^ false;
                         }
                 }
-                return true;
+                return isInverted() ^ true;
         }
 
         /**

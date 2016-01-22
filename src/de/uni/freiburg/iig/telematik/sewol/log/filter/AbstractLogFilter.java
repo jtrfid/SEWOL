@@ -30,43 +30,53 @@
  */
 package de.uni.freiburg.iig.telematik.sewol.log.filter;
 
+import de.invation.code.toval.misc.Filterable;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
+import java.util.Observable;
 
 /**
- * Filter for log traces to filter out traces with more than specified events.
  *
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  * @param <E>
  */
-public class MaxEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
+public abstract class AbstractLogFilter<E extends LogEntry> extends Observable implements Filterable<LogTrace<E>> {
 
-        private int max;
+        private boolean invert = false;
 
-        public MaxEventsFilter(int max) {
-                super();
-                this.max = max;
+        /**
+         * Creates a new log filter.
+         */
+        public AbstractLogFilter() {
         }
 
-        public MaxEventsFilter(int max, boolean invert) {
-                super(invert);
-                this.max = max;
+        /**
+         * Creates a new log filter.
+         *
+         * @param invert Specifies if the filter result should be inverted.
+         */
+        public AbstractLogFilter(boolean invert) {
+                this.invert = invert;
         }
 
-        public int getMax() {
-                return max;
+        /**
+         * @return Returns <code>true</code> if the filter result should be
+         * inverted.
+         */
+        public boolean isInverted() {
+                return invert;
         }
 
-        public void setMax(int max) {
-                if (max != this.max) {
-                        this.max = max;
+        /**
+         * Sets if the filter result should be inverted.
+         *
+         * @param invert
+         */
+        public void setInverted(boolean invert) {
+                if (invert != this.invert) {
+                        this.invert = invert;
                         setChanged();
                         notifyObservers();
                 }
-        }
-
-        @Override
-        public boolean accept(LogTrace<E> trace) {
-                return isInverted() ^ (trace.size() <= max);
         }
 }

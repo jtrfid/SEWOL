@@ -30,7 +30,6 @@
  */
 package de.uni.freiburg.iig.telematik.sewol.log.filter;
 
-import de.invation.code.toval.misc.Filterable;
 import de.uni.freiburg.iig.telematik.sewol.log.EventType;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
@@ -41,14 +40,45 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  * @param <E>
  */
-public class ContainsFilter<E extends LogEntry> implements Filterable<LogTrace<E>> {
+public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
-        public final ContainsFilterParameter parameter;
-        public final String value;
+        private ContainsFilterParameter parameter;
+        private String value;
 
         public ContainsFilter(ContainsFilterParameter parameter, String value) {
+                super();
                 this.parameter = parameter;
                 this.value = value;
+        }
+
+        public ContainsFilter(ContainsFilterParameter parameter, String value, boolean invert) {
+                super(invert);
+                this.parameter = parameter;
+                this.value = value;
+        }
+
+        public ContainsFilterParameter getParameter() {
+                return parameter;
+        }
+
+        public String getValue() {
+                return value;
+        }
+
+        public void setParameter(ContainsFilterParameter parameter) {
+                if (parameter.equals(this.parameter)) {
+                        this.parameter = parameter;
+                        setChanged();
+                        notifyObservers();
+                }
+        }
+
+        public void setValue(String value) {
+                if (!value.equals(this.value)) {
+                        this.value = value;
+                        setChanged();
+                        notifyObservers();
+                }
         }
 
         @Override
@@ -57,27 +87,27 @@ public class ContainsFilter<E extends LogEntry> implements Filterable<LogTrace<E
                         switch (parameter) {
                                 case ACTIVITY:
                                         if (entry.getActivity().equals(value)) {
-                                                return true;
+                                                return isInverted() ^ true;
                                         }
                                         break;
                                 case SUBJECT:
                                         if (entry.getOriginator().equals(value)) {
-                                                return true;
+                                                return isInverted() ^ true;
                                         }
                                         break;
                                 case ROLE:
                                         if (entry.getRole().equals(value)) {
-                                                return true;
+                                                return isInverted() ^ true;
                                         }
                                         break;
                                 case EVENTTYPE:
                                         if (EventType.parse(value) == entry.getEventType()) {
-                                                return true;
+                                                return isInverted() ^ true;
                                         }
                         }
                 }
 
-                return false;
+                return isInverted() ^ false;
         }
 
         public enum ContainsFilterParameter {

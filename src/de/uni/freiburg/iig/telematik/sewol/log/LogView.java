@@ -33,9 +33,12 @@ package de.uni.freiburg.iig.telematik.sewol.log;
 import de.invation.code.toval.misc.Filterable;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
+import de.uni.freiburg.iig.telematik.sewol.log.filter.AbstractLogFilter;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 
 /**
@@ -45,9 +48,9 @@ import java.util.Set;
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  * @param <E> LogEntry type
  */
-public class LogView<E extends LogEntry> extends Log<E> {
+public class LogView<E extends LogEntry> extends Log<E> implements Observer {
 
-        private final Set<Filterable<LogTrace<E>>> filters = new HashSet<>();
+        private final Set<AbstractLogFilter<E>> filters = new HashSet<>();
 
         private boolean uptodate = true;
 
@@ -56,10 +59,11 @@ public class LogView<E extends LogEntry> extends Log<E> {
          *
          * @param filter
          */
-        public void addFilter(Filterable<LogTrace<E>> filter) {
+        public void addFilter(AbstractLogFilter<E> filter) {
                 Validate.notNull(filter);
                 filters.add(filter);
                 uptodate = false;
+                filter.addObserver(this);
         }
 
         /**
@@ -67,7 +71,7 @@ public class LogView<E extends LogEntry> extends Log<E> {
          *
          * @param filter
          */
-        public void removeFilter(Filterable<LogTrace<E>> filter) {
+        public void removeFilter(AbstractLogFilter<E> filter) {
                 Validate.notNull(filter);
                 filters.remove(filter);
                 uptodate = false;
@@ -78,7 +82,7 @@ public class LogView<E extends LogEntry> extends Log<E> {
          *
          * @return
          */
-        public Set<Filterable<LogTrace<E>>> getFilters() {
+        public Set<AbstractLogFilter<E>> getFilters() {
                 return Collections.unmodifiableSet(filters);
         }
 
@@ -92,7 +96,7 @@ public class LogView<E extends LogEntry> extends Log<E> {
         public void addTrace(LogTrace<E> trace) throws ParameterException {
                 Validate.notNull(trace);
                 boolean accept = true;
-                for (Filterable<LogTrace<E>> filter : filters) {
+                for (AbstractLogFilter<E> filter : filters) {
                         if (!filter.accept(trace)) {
                                 accept = false;
                                 break;
@@ -116,6 +120,11 @@ public class LogView<E extends LogEntry> extends Log<E> {
         public List<LogTrace<E>> getTraces() {
                 update();
                 return Collections.unmodifiableList(traces);
+        }
+
+        @Override
+        public void update(Observable observable, Object object) {
+                uptodate = false;
         }
 
         /**
