@@ -5,10 +5,10 @@
 	Apache Ant build file for the SEWOL project
 	
 	This build file generates three JAR-files from the project:
-	- sewol-1.0.1.jar
-	- sewol-1.0.1-sources.jar
-	- sewol-1.0.1-javadoc.jar
-	- sewol-1.0.1-consistent.jar
+	- sewol-1.0.2.jar
+	- sewol-1.0.2-sources.jar
+	- sewol-1.0.2-javadoc.jar
+	- sewol-1.0.2-consistent.jar
 	
 	The building process starts with cleaning all target files including compiles
 	java classes, compiled tests, and test reports (see #clean). Afterwards a
@@ -24,7 +24,7 @@
 
 	<!-- Project details -->
 	<property name="artifact.name" value="sewol" />
-	<property name="version.name" value="1.0.1" />
+	<property name="version.name" value="1.0.2" />
 
 	<!-- Names for generated files -->
 	<property name="jar.file.name" value="${artifact.name}-${version.name}" />
