@@ -75,6 +75,7 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer {
                 Validate.notNull(filter);
                 filters.remove(filter);
                 uptodate = false;
+                filter.deleteObserver(this);
         }
 
         /**

@@ -66,7 +66,7 @@ public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         }
 
         public void setParameter(ContainsFilterParameter parameter) {
-                if (parameter.equals(this.parameter)) {
+                if (!parameter.equals(this.parameter)) {
                         this.parameter = parameter;
                         setChanged();
                         notifyObservers();
