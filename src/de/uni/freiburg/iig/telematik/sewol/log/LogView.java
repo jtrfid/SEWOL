@@ -53,6 +53,11 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer {
         private final Set<AbstractLogFilter<E>> filters = new HashSet<>();
 
         private boolean uptodate = true;
+        private String label;
+
+        public LogView(String label) {
+                setLabel(label);
+        }
 
         /**
          * Adds a new filter to the view.
@@ -85,6 +90,27 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer {
          */
         public Set<AbstractLogFilter<E>> getFilters() {
                 return Collections.unmodifiableSet(filters);
+        }
+
+        /**
+         * Returns the label of the view.
+         *
+         * @return
+         */
+        public final String getLabel() {
+                return label;
+        }
+
+        /**
+         * Sets the label of the view. It must have at least one character which
+         * is not a whitespace.
+         *
+         * @param label
+         */
+        public final void setLabel(String label) {
+                Validate.notEmpty(label.replaceAll("\\s+", ""));
+
+                this.label = label;
         }
 
         @Override
