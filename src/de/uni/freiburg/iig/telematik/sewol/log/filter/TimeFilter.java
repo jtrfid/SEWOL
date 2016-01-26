@@ -90,7 +90,7 @@ public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
          * @param startDate
          */
         public final void setStartDate(Date startDate) {
-                if (!this.startDate.equals(startDate)) {
+                if (this.startDate == null || !this.startDate.equals(startDate)) {
                         if (startDate != null && endDate != null && endDate.before(startDate)) {
                                 throw new ParameterException("The start date must be before the end date of the filter.");
                         }
@@ -106,7 +106,7 @@ public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
          * @param endDate
          */
         public final void setEndDate(Date endDate) {
-                if (!this.endDate.equals(endDate)) {
+                if (this.endDate == null || !this.endDate.equals(endDate)) {
                         if (endDate != null && startDate != null && endDate.before(startDate)) {
                                 throw new ParameterException("The start date must be before the end date of the filter.");
                         }
