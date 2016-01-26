@@ -31,6 +31,7 @@
 package de.uni.freiburg.iig.telematik.sewol.log;
 
 import de.invation.code.toval.misc.Filterable;
+import de.invation.code.toval.misc.NamedComponent;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.log.filter.AbstractLogFilter;
@@ -49,16 +50,16 @@ import java.util.Set;
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  * @param <E> LogEntry type
  */
-public class LogView<E extends LogEntry> extends Log<E> implements Observer {
+public class LogView<E extends LogEntry> extends Log<E> implements Observer, NamedComponent {
 
         private final List<LogTrace<E>> allTraces = new ArrayList<>();
         private final Set<AbstractLogFilter<E>> filters = new HashSet<>();
 
         private boolean uptodate = true;
-        private String label;
+        private String name;
 
-        public LogView(String label) {
-                setLabel(label);
+        public LogView(String name) {
+                setName(name);
         }
 
         /**
@@ -92,27 +93,6 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer {
          */
         public Set<AbstractLogFilter<E>> getFilters() {
                 return Collections.unmodifiableSet(filters);
-        }
-
-        /**
-         * Returns the label of the view.
-         *
-         * @return
-         */
-        public final String getLabel() {
-                return label;
-        }
-
-        /**
-         * Sets the label of the view. It must have at least one character which
-         * is not a whitespace.
-         *
-         * @param label
-         */
-        public final void setLabel(String label) {
-                Validate.notEmpty(label.replaceAll("\\s+", ""));
-
-                this.label = label;
         }
 
         @Override
@@ -177,5 +157,18 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer {
                         addTraces(allTraces);
                         uptodate = true;
                 }
+        }
+
+        @Override
+        public final String getName() {
+                return name;
+        }
+
+        @Override
+        public final void setName(String name) {
+                Validate.notNull(name);
+                Validate.notEmpty(name);
+
+                this.name = name;
         }
 }
