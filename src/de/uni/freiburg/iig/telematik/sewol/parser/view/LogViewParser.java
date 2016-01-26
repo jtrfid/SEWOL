@@ -28,7 +28,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package de.uni.freiburg.iig.telematik.sewol.writer.view;
+package de.uni.freiburg.iig.telematik.sewol.parser.view;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -43,17 +43,15 @@ import de.uni.freiburg.iig.telematik.sewol.log.filter.MaxEventsFilter;
 import de.uni.freiburg.iig.telematik.sewol.log.filter.MinEventsFilter;
 import de.uni.freiburg.iig.telematik.sewol.log.filter.TimeFilter;
 import de.uni.freiburg.iig.telematik.sewol.parser.LogParser;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /**
  *
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  */
-public class LogViewSerializer {
+public class LogViewParser {
 
         private static final XStream xstream;
 
@@ -66,18 +64,22 @@ public class LogViewSerializer {
                 xstream.alias("min", MinEventsFilter.class);
                 xstream.alias("max", MaxEventsFilter.class);
                 xstream.alias("time", TimeFilter.class);
-                xstream.omitField(LogView.class, "allTraces");
-                xstream.omitField(LogView.class, "uptodate");
-                xstream.omitField(Log.class, "summary");
-                xstream.omitField(Log.class, "traces");
-                xstream.omitField(Log.class, "distinctTraces");
+//                xstream.omitField(LogView.class, "allTraces");
+//                xstream.omitField(LogView.class, "uptodate");
+//                xstream.omitField(Log.class, "summary");
+//                xstream.omitField(Log.class, "traces");
+//                xstream.omitField(Log.class, "distinctTraces");
         }
 
-        public static void write(LogView logView, String path) throws IOException {
-                String xml = xstream.toXML(logView);
-                try (BufferedWriter out = new BufferedWriter(new FileWriter(path))) {
-                        out.write(xml);
-                }
+        public static LogView parse(String path, Log log) throws IOException {
+                return parse(new File(path), log);
+        }
+
+        public static LogView parse(File file, Log log) throws IOException {
+                LogView view = (LogView) xstream.fromXML(file);
+                view.reinitialize();
+                view.addTraces(log.getTraces());
+                return view;
         }
 
         public static void main(String[] args) throws IOException, ParserException {
@@ -87,12 +89,7 @@ public class LogViewSerializer {
                 if (logs.size() > 0) {
                         log.addTraces(logs.get(0));
                 }
-                LogView view = new LogView("view1");
-                view.addFilter(new TimeFilter(new Date(1419202800000L), new Date(1454281199000L), false));
-                view.addFilter(new ContainsFilter(ContainsFilter.ContainsFilterParameter.ACTIVITY, "P5 released", true));
-                view.addFilter(new MinEventsFilter(1));
-                view.addFilter(new MaxEventsFilter(10000));
-                view.addTraces(log.getTraces());
-                write(view, "/home/alange/view1.xml");
+                LogView view = parse("/home/alange/view1.xml", log);
+                System.out.println(view.getTraces().size());
         }
 }
