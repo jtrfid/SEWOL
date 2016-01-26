@@ -52,8 +52,8 @@ import java.util.Set;
  */
 public class LogView<E extends LogEntry> extends Log<E> implements Observer, NamedComponent {
 
-        private final List<LogTrace<E>> allTraces = new ArrayList<>();
-        private final Set<AbstractLogFilter<E>> filters = new HashSet<>();
+        private List<LogTrace<E>> allTraces = new ArrayList<>();
+        final private Set<AbstractLogFilter<E>> filters = new HashSet<>();
 
         private boolean uptodate = true;
         private String name;
@@ -85,6 +85,12 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
                 uptodate = false;
                 filter.deleteObserver(this);
         }
+        
+        @Override
+        public void reinitialize() {
+                super.reinitialize();
+                allTraces = new ArrayList<>();
+        }
 
         /**
          * Returns an unmodifiable list of filters.
@@ -103,6 +109,10 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
 
         @Override
         public void addTrace(LogTrace<E> trace) throws ParameterException {
+                addTrace(trace, true);
+        }
+
+        private void addTrace(LogTrace<E> trace, boolean addToAllTraces) throws ParameterException {
                 Validate.notNull(trace);
                 boolean accept = true;
                 for (AbstractLogFilter<E> filter : filters) {
@@ -123,14 +133,20 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
                                 }
                         }
                 }
-                allTraces.add(trace);
+                if (addToAllTraces) {
+                        allTraces.add(trace);
+                }
         }
 
         @Override
         public void addTraces(List<LogTrace<E>> traces) throws ParameterException {
+                addTraces(traces, true);
+        }
+
+        private void addTraces(List<LogTrace<E>> traces, boolean addToAllTraces) throws ParameterException {
                 Validate.notNull(traces);
                 for (LogTrace<E> trace : traces) {
-                        addTrace(trace);
+                        addTrace(trace, addToAllTraces);
                 }
         }
 
@@ -154,7 +170,7 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
                         summary.clear();
                         distinctTraces.clear();
                         traces.clear();
-                        addTraces(allTraces);
+                        addTraces(allTraces, false);
                         uptodate = true;
                 }
         }

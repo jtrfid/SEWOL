@@ -11,12 +11,18 @@ import de.invation.code.toval.validate.Validate;
 
 public class Log<E extends LogEntry> {
 
-        final LogSummary<E> summary = new LogSummary<>();
-        final Set<LogTrace<E>> distinctTraces = new HashSet<>();
-        final List<LogTrace<E>> traces = new ArrayList<>();
+        LogSummary<E> summary = new LogSummary<>();
+        Set<LogTrace<E>> distinctTraces = new HashSet<>();
+        List<LogTrace<E>> traces = new ArrayList<>();
 
         public LogSummary<E> getSummary() {
                 return summary;
+        }
+
+        void reinitialize() {
+                summary = new LogSummary<>();
+                distinctTraces = new HashSet<>();
+                traces = new ArrayList<>();
         }
 
         public void addTraces(List<LogTrace<E>> traces) throws ParameterException {
