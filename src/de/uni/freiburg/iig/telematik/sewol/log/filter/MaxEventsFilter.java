@@ -69,4 +69,23 @@ public class MaxEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         public boolean accept(LogTrace<E> trace) {
                 return isInverted() ^ (trace.size() <= max);
         }
+
+        @Override
+        public String toString() {
+                StringBuilder sb = new StringBuilder();
+
+                if (isInverted()) {
+                        sb.append("not(");
+                }
+
+                sb.append("MaxEventsFilter(");
+                sb.append(max);
+                sb.append(")");
+
+                if (isInverted()) {
+                        sb.append(")");
+                }
+
+                return sb.toString();
+        }
 }

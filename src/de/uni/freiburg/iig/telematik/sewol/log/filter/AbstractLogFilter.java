@@ -79,4 +79,7 @@ public abstract class AbstractLogFilter<E extends LogEntry> extends Observable i
                         notifyObservers();
                 }
         }
+
+        @Override
+        public abstract String toString();
 }

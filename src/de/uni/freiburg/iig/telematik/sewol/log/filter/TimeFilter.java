@@ -146,6 +146,46 @@ public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 }
         }
 
+        @Override
+        public String toString() {
+                StringBuilder sb = new StringBuilder();
+
+                if (isInverted()) {
+                        sb.append("not(");
+                }
+
+                sb.append("TimeFilter(");
+                sb.append(getType());
+                switch (getType()) {
+                        case MIN_DATE:
+                                sb.append(",");
+                                sb.append("t >= ");
+                                sb.append(getStartDate());
+                                break;
+                        case MAX_DATE:
+                                sb.append(",");
+                                sb.append("t <= ");
+                                sb.append(getEndDate());
+                                break;
+                        case TIMEFRAME:
+                                sb.append(",");
+                                sb.append(getStartDate());
+                                sb.append(" <= t <= ");
+                                sb.append(getEndDate());
+                                break;
+                        case INOPERATIVE:
+                                break;
+
+                }
+                sb.append(")");
+
+                if (isInverted()) {
+                        sb.append(")");
+                }
+
+                return sb.toString();
+        }
+
         public enum TimeFrameFilterType {
 
                 INOPERATIVE, MIN_DATE, MAX_DATE, TIMEFRAME

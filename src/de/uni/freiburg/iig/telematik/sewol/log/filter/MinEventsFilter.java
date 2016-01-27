@@ -69,4 +69,23 @@ public class MinEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         public boolean accept(LogTrace<E> trace) {
                 return isInverted() ^ (trace.size() >= min);
         }
+
+        @Override
+        public String toString() {
+                StringBuilder sb = new StringBuilder();
+
+                if (isInverted()) {
+                        sb.append("not(");
+                }
+
+                sb.append("MinEventsFilter(");
+                sb.append(min);
+                sb.append(")");
+
+                if (isInverted()) {
+                        sb.append(")");
+                }
+
+                return sb.toString();
+        }
 }

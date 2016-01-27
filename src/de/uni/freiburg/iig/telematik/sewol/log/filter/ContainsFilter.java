@@ -110,6 +110,27 @@ public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 return isInverted() ^ false;
         }
 
+        @Override
+        public String toString() {
+                StringBuilder sb = new StringBuilder();
+
+                if (isInverted()) {
+                        sb.append("not(");
+                }
+
+                sb.append("ContainsFilter(");
+                sb.append(getParameter());
+                sb.append(",");
+                sb.append(getValue());
+                sb.append(")");
+
+                if (isInverted()) {
+                        sb.append(")");
+                }
+
+                return sb.toString();
+        }
+
         public enum ContainsFilterParameter {
 
                 ACTIVITY, SUBJECT, ROLE, EVENTTYPE;
