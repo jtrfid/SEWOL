@@ -28,30 +28,28 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package de.uni.freiburg.iig.telematik.sewol.parser.view;
+package de.uni.freiburg.iig.telematik.sewol.log;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import de.invation.code.toval.parser.ParserException;
-import de.uni.freiburg.iig.telematik.sewol.log.DULogEntry;
-import de.uni.freiburg.iig.telematik.sewol.log.Log;
-import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
-import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
-import de.uni.freiburg.iig.telematik.sewol.log.LogView;
 import de.uni.freiburg.iig.telematik.sewol.log.filter.ContainsFilter;
 import de.uni.freiburg.iig.telematik.sewol.log.filter.MaxEventsFilter;
 import de.uni.freiburg.iig.telematik.sewol.log.filter.MinEventsFilter;
 import de.uni.freiburg.iig.telematik.sewol.log.filter.TimeFilter;
 import de.uni.freiburg.iig.telematik.sewol.parser.LogParser;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
  *
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  */
-public class LogViewParser {
+public class LogViewSerialization {
 
         private static final XStream xstream;
 
@@ -64,11 +62,11 @@ public class LogViewParser {
                 xstream.alias("min", MinEventsFilter.class);
                 xstream.alias("max", MaxEventsFilter.class);
                 xstream.alias("time", TimeFilter.class);
-//                xstream.omitField(LogView.class, "allTraces");
-//                xstream.omitField(LogView.class, "uptodate");
-//                xstream.omitField(Log.class, "summary");
-//                xstream.omitField(Log.class, "traces");
-//                xstream.omitField(Log.class, "distinctTraces");
+                xstream.omitField(LogView.class, "allTraces");
+                xstream.omitField(LogView.class, "uptodate");
+                xstream.omitField(Log.class, "summary");
+                xstream.omitField(Log.class, "traces");
+                xstream.omitField(Log.class, "distinctTraces");
         }
 
         public static LogView parse(String path, Log log) throws IOException {
@@ -82,14 +80,31 @@ public class LogViewParser {
                 return view;
         }
 
+        public static void write(LogView logView, String path) throws IOException {
+                String xml = xstream.toXML(logView);
+                try (BufferedWriter out = new BufferedWriter(new FileWriter(path))) {
+                        out.write(xml);
+                }
+        }
+
         public static void main(String[] args) throws IOException, ParserException {
+                // serializer
                 String logPath = "/home/alange/P2P-var1.mxml";
                 List<List<LogTrace<LogEntry>>> logs = LogParser.parse(logPath);
                 Log<LogEntry> log = new Log<>();
                 if (logs.size() > 0) {
                         log.addTraces(logs.get(0));
                 }
-                LogView view = parse("/home/alange/view1.xml", log);
+                LogView view = new LogView("view1");
+                view.addFilter(new TimeFilter(new Date(1419202800000L), new Date(1454281199000L), false));
+                view.addFilter(new ContainsFilter(ContainsFilter.ContainsFilterParameter.ACTIVITY, "P5 released", true));
+                view.addFilter(new MinEventsFilter(1));
+                view.addFilter(new MaxEventsFilter(10000));
+                view.addTraces(log.getTraces());
+                write(view, "/home/alange/view1.xml");
+
+                // parser
+                view = parse("/home/alange/view1.xml", log);
                 System.out.println(view.getTraces().size());
         }
 }

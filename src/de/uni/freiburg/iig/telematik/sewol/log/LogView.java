@@ -85,9 +85,9 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
                 uptodate = false;
                 filter.deleteObserver(this);
         }
-        
+
         @Override
-        public void reinitialize() {
+        void reinitialize() {
                 super.reinitialize();
                 allTraces = new ArrayList<>();
         }
