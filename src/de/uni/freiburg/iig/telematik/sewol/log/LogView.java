@@ -59,7 +59,7 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
         private boolean uptodate = true;
         private String name;
 
-        private String parentLogPath = null;
+        private String parentLogName = null;
 
         private File fileReference;
 
@@ -201,11 +201,11 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
                 this.fileReference = fileReference;
         }
 
-        public String getParentLogPath() {
-                return parentLogPath;
+        public String getParentLogName() {
+                return parentLogName;
         }
 
-        public void setParentLog(String parentLogPath) {
-                this.parentLogPath = parentLogPath;
+        public void setParentLogName(String parentLogName) {
+                this.parentLogName = parentLogName;
         }
 }

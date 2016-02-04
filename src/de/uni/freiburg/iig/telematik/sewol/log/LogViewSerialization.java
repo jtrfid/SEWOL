@@ -71,8 +71,8 @@ public class LogViewSerialization {
                 xstream.aliasField("end", TimeFilter.class, "endDate");
                 // attribute alias
                 xstream.useAttributeFor(LogView.class, "name");
-                xstream.useAttributeFor(LogView.class, "parentLogPath");
-                xstream.aliasField("parent", LogView.class, "parentLogPath");
+                xstream.useAttributeFor(LogView.class, "parentLogName");
+                xstream.aliasField("parent", LogView.class, "parentLogName");
                 xstream.useAttributeFor(AbstractLogFilter.class, "invert");
                 xstream.useAttributeFor(AbstractLogFilter.class, "changed");
                 xstream.useAttributeFor(ContainsFilter.class, "parameter");
