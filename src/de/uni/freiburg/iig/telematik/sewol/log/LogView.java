@@ -35,6 +35,7 @@ import de.invation.code.toval.misc.NamedComponent;
 import de.invation.code.toval.validate.ParameterException;
 import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.log.filter.AbstractLogFilter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -57,6 +58,10 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
 
         private boolean uptodate = true;
         private String name;
+
+        private String parentLogPath = null;
+
+        private File fileReference;
 
         public LogView(String name) {
                 setName(name);
@@ -186,5 +191,21 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
                 Validate.notEmpty(name);
 
                 this.name = name;
+        }
+
+        public File getFileReference() {
+                return fileReference;
+        }
+
+        public final void setFileReference(File fileReference) {
+                this.fileReference = fileReference;
+        }
+
+        public String getParentLogPath() {
+                return parentLogPath;
+        }
+
+        public void setParentLog(String parentLogPath) {
+                this.parentLogPath = parentLogPath;
         }
 }

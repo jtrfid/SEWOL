@@ -71,6 +71,8 @@ public class LogViewSerialization {
                 xstream.aliasField("end", TimeFilter.class, "endDate");
                 // attribute alias
                 xstream.useAttributeFor(LogView.class, "name");
+                xstream.useAttributeFor(LogView.class, "parentLogPath");
+                xstream.aliasField("parent", LogView.class, "parentLogPath");
                 xstream.useAttributeFor(AbstractLogFilter.class, "invert");
                 xstream.useAttributeFor(AbstractLogFilter.class, "changed");
                 xstream.useAttributeFor(ContainsFilter.class, "parameter");
@@ -97,6 +99,19 @@ public class LogViewSerialization {
          * {@link Log}.
          *
          * @param path Path to the log view.
+         * @return The parsed log view.
+         * @throws IOException If the log view can't be read under the given
+         * path.
+         */
+        public static LogView parse(String path) throws IOException {
+                return parse(new File(path));
+        }
+
+        /**
+         * Parses a {@link LogView} under a given path and using the given
+         * {@link Log}.
+         *
+         * @param path Path to the log view.
          * @param log Log for the view.
          * @return The parsed log view.
          * @throws IOException If the log view can't be read under the given
@@ -104,6 +119,20 @@ public class LogViewSerialization {
          */
         public static LogView parse(String path, Log log) throws IOException {
                 return parse(new File(path), log);
+        }
+
+        /**
+         * Parses a {@link LogView} file and using the given {@link Log}.
+         *
+         * @param file Log view file.
+         * @return The parsed log view.
+         * @throws IOException If the log view can't be read under the given
+         * path.
+         */
+        public static LogView parse(File file) throws IOException {
+                LogView view = (LogView) xstream.fromXML(file);
+                view.reinitialize();
+                return view;
         }
 
         /**
@@ -151,10 +180,10 @@ public class LogViewSerialization {
                 view.addFilter(new MinEventsFilter(1));
                 view.addFilter(new MaxEventsFilter(10000));
                 view.addTraces(log.getTraces());
-                write(view, "/home/alange/view1.xml");
+                write(view, "/home/alange/view1.view");
 
                 // parser
-                view = parse("/home/alange/view1.xml", log);
+                view = parse("/home/alange/view1.view", log);
                 Iterator iter = view.getFilters().iterator();
                 while (iter.hasNext()) {
                         System.out.println(iter.next());
