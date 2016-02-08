@@ -38,8 +38,10 @@ import de.uni.freiburg.iig.telematik.sewol.log.filter.AbstractLogFilter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -51,7 +53,7 @@ import java.util.Set;
  * @author Adrian Lange <lange@iig.uni-freiburg.de>
  * @param <E> LogEntry type
  */
-public class LogView<E extends LogEntry> extends Log<E> implements Observer, NamedComponent {
+public class LogView<E extends LogEntry> extends Log<E> implements Observer, NamedComponent, Comparator<LogView> {
 
         private List<LogTrace<E>> allTraces = new ArrayList<>();
         final private Set<AbstractLogFilter<E>> filters = new HashSet<>();
@@ -207,5 +209,41 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
 
         public void setParentLogName(String parentLogName) {
                 this.parentLogName = parentLogName;
+        }
+
+        @Override
+        public int compare(LogView view1, LogView view2) {
+                return view1.getName().compareTo(view2.getName());
+        }
+
+        @Override
+        public int hashCode() {
+                int hash = 3;
+                hash = 97 * hash + Objects.hashCode(this.filters);
+                hash = 97 * hash + Objects.hashCode(this.name);
+                hash = 97 * hash + Objects.hashCode(this.parentLogName);
+                hash = 97 * hash + Objects.hashCode(this.fileReference);
+                return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj == null) {
+                        return false;
+                }
+                if (getClass() != obj.getClass()) {
+                        return false;
+                }
+                final LogView<?> other = (LogView<?>) obj;
+                if (!Objects.equals(this.filters, other.filters)) {
+                        return false;
+                }
+                if (!Objects.equals(this.name, other.name)) {
+                        return false;
+                }
+                if (!Objects.equals(this.parentLogName, other.parentLogName)) {
+                        return false;
+                }
+                return Objects.equals(this.fileReference, other.fileReference);
         }
 }
