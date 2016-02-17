@@ -74,18 +74,31 @@ public class MinEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         public String toString() {
                 StringBuilder sb = new StringBuilder();
 
-                if (isInverted()) {
-                        sb.append("not(");
-                }
+                sb.append(super.toString());
 
                 sb.append("MinEventsFilter(");
                 sb.append(min);
                 sb.append(")");
 
-                if (isInverted()) {
-                        sb.append(")");
-                }
-
                 return sb.toString();
+        }
+
+        @Override
+        public int hashCode() {
+                int hash = 3;
+                hash = 41 * hash + this.min;
+                return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj == null) {
+                        return false;
+                }
+                if (getClass() != obj.getClass()) {
+                        return false;
+                }
+                final MinEventsFilter<?> other = (MinEventsFilter<?>) obj;
+                return this.min == other.min;
         }
 }

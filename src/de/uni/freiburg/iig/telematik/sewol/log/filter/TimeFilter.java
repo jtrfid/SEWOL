@@ -33,7 +33,9 @@ package de.uni.freiburg.iig.telematik.sewol.log.filter;
 import de.invation.code.toval.validate.ParameterException;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Filter for log traces to restrict the allowed time interval for a trace.
@@ -42,6 +44,8 @@ import java.util.Date;
  * @param <E>
  */
 public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
+        
+        private static final DateFormat SHORT_DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
         private Date startDate = null;
         private Date endDate = null;
@@ -150,28 +154,26 @@ public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         public String toString() {
                 StringBuilder sb = new StringBuilder();
 
-                if (isInverted()) {
-                        sb.append("not(");
-                }
+                sb.append(super.toString());
 
                 sb.append("TimeFilter(");
-                sb.append(getType());
+//                sb.append(getType());
                 switch (getType()) {
                         case MIN_DATE:
-                                sb.append(",");
+//                                sb.append(",");
                                 sb.append("t >= ");
-                                sb.append(getStartDate());
+                                sb.append(SHORT_DATE_FORMAT.format(getStartDate()));
                                 break;
                         case MAX_DATE:
-                                sb.append(",");
+//                                sb.append(",");
                                 sb.append("t <= ");
-                                sb.append(getEndDate());
+                                sb.append(SHORT_DATE_FORMAT.format(getEndDate()));
                                 break;
                         case TIMEFRAME:
-                                sb.append(",");
-                                sb.append(getStartDate());
+//                                sb.append(",");
+                                sb.append(SHORT_DATE_FORMAT.format(getStartDate()));
                                 sb.append(" <= t <= ");
-                                sb.append(getEndDate());
+                                sb.append(SHORT_DATE_FORMAT.format(getEndDate()));
                                 break;
                         case INOPERATIVE:
                                 break;
@@ -179,11 +181,30 @@ public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 }
                 sb.append(")");
 
-                if (isInverted()) {
-                        sb.append(")");
-                }
-
                 return sb.toString();
+        }
+
+        @Override
+        public int hashCode() {
+                int hash = 7;
+                hash = 97 * hash + Objects.hashCode(this.startDate);
+                hash = 97 * hash + Objects.hashCode(this.endDate);
+                return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj == null) {
+                        return false;
+                }
+                if (getClass() != obj.getClass()) {
+                        return false;
+                }
+                final TimeFilter<?> other = (TimeFilter<?>) obj;
+                if (!Objects.equals(this.startDate, other.startDate)) {
+                        return false;
+                }
+                return Objects.equals(this.endDate, other.endDate);
         }
 
         public enum TimeFrameFilterType {

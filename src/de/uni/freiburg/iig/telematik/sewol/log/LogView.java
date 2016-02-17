@@ -100,7 +100,7 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
         }
 
         /**
-         * Returns an unmodifiable list of filters.
+         * Returns an unmodifiable set of filters.
          *
          * @return
          */

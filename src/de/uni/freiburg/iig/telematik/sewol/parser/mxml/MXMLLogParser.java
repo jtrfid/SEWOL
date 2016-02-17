@@ -312,10 +312,10 @@ public class MXMLLogParser extends AbstractLogParser {
 
                         try {
                                 return ParserDateFormat.getDateFormat(PARSER_DATE_FORMAT).parse(value);
-                        } catch (ParseException ex) {
+                        } catch (ParseException | ParameterException ex) {
                                 // is allowed to happen
+                                return null;
                         }
-                        return null;
                 }
 
                 private static long idStrToInt(String idString) {

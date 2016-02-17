@@ -33,6 +33,7 @@ package de.uni.freiburg.iig.telematik.sewol.log.filter;
 import de.uni.freiburg.iig.telematik.sewol.log.EventType;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
+import java.util.Objects;
 
 /**
  * Filter for log traces to filter out traces with more than specified events.
@@ -114,25 +115,48 @@ public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         public String toString() {
                 StringBuilder sb = new StringBuilder();
 
-                if (isInverted()) {
-                        sb.append("not(");
-                }
+                sb.append(super.toString());
 
                 sb.append("ContainsFilter(");
-                sb.append(getParameter());
+                sb.append(getParameter().name);
                 sb.append(",");
                 sb.append(getValue());
                 sb.append(")");
 
-                if (isInverted()) {
-                        sb.append(")");
-                }
-
                 return sb.toString();
+        }
+
+        @Override
+        public int hashCode() {
+                int hash = 7;
+                hash = 37 * hash + Objects.hashCode(this.parameter);
+                hash = 37 * hash + Objects.hashCode(this.value);
+                return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj == null) {
+                        return false;
+                }
+                if (getClass() != obj.getClass()) {
+                        return false;
+                }
+                final ContainsFilter<?> other = (ContainsFilter<?>) obj;
+                if (this.parameter != other.parameter) {
+                        return false;
+                }
+                return Objects.equals(this.value, other.value);
         }
 
         public enum ContainsFilterParameter {
 
-                ACTIVITY, SUBJECT, ROLE, EVENTTYPE;
+                ACTIVITY("A"), SUBJECT("S"), ROLE("R"), EVENTTYPE("T");
+
+                public final String name;
+
+                private ContainsFilterParameter(String name) {
+                        this.name = name;
+                }
         }
 }

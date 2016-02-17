@@ -74,18 +74,31 @@ public class MaxEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         public String toString() {
                 StringBuilder sb = new StringBuilder();
 
-                if (isInverted()) {
-                        sb.append("not(");
-                }
+                sb.append(super.toString());
 
                 sb.append("MaxEventsFilter(");
                 sb.append(max);
                 sb.append(")");
 
-                if (isInverted()) {
-                        sb.append(")");
-                }
-
                 return sb.toString();
+        }
+
+        @Override
+        public int hashCode() {
+                int hash = 7;
+                hash = 19 * hash + this.max;
+                return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj == null) {
+                        return false;
+                }
+                if (getClass() != obj.getClass()) {
+                        return false;
+                }
+                final MaxEventsFilter<?> other = (MaxEventsFilter<?>) obj;
+                return this.max == other.max;
         }
 }

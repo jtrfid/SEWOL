@@ -81,5 +81,29 @@ public abstract class AbstractLogFilter<E extends LogEntry> extends Observable i
         }
 
         @Override
-        public abstract String toString();
+        public String toString() {
+                if (isInverted()) {
+                        return "\u00ac";
+                }
+                return "";
+        }
+
+        @Override
+        public int hashCode() {
+                int hash = 5;
+                hash = 97 * hash + (this.invert ? 1 : 0);
+                return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj == null) {
+                        return false;
+                }
+                if (getClass() != obj.getClass()) {
+                        return false;
+                }
+                final AbstractLogFilter<?> other = (AbstractLogFilter<?>) obj;
+                return this.invert == other.invert;
+        }
 }
