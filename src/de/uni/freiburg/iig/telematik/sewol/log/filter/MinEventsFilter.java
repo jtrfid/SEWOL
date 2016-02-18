@@ -76,7 +76,7 @@ public class MinEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
                 sb.append(super.toString());
 
-                sb.append("MinEventsFilter(");
+                sb.append("MinEvents(");
                 sb.append(min);
                 sb.append(")");
 

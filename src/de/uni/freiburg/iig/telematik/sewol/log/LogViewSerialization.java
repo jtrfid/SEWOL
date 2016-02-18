@@ -90,8 +90,8 @@ public class LogViewSerialization {
                 xstream.omitField(Log.class, "traces");
                 xstream.omitField(Log.class, "distinctTraces");
                 // implicit collection
-                xstream.addImplicitCollection(LogView.class, "filters");
-                xstream.addImplicitCollection(AbstractLogFilter.class, "obs");
+//                xstream.addImplicitCollection(LogView.class, "filters");
+//                xstream.addImplicitCollection(AbstractLogFilter.class, "obs");
         }
 
         /**

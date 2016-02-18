@@ -117,7 +117,7 @@ public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
                 sb.append(super.toString());
 
-                sb.append("ContainsFilter(");
+                sb.append("Contains(");
                 sb.append(getParameter().name);
                 sb.append(",");
                 sb.append(getValue());

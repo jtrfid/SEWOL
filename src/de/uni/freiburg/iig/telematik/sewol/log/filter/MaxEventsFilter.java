@@ -76,7 +76,7 @@ public class MaxEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
                 sb.append(super.toString());
 
-                sb.append("MaxEventsFilter(");
+                sb.append("MaxEvents(");
                 sb.append(max);
                 sb.append(")");
 

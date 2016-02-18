@@ -156,7 +156,7 @@ public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
                 sb.append(super.toString());
 
-                sb.append("TimeFilter(");
+                sb.append("Time(");
 //                sb.append(getType());
                 switch (getType()) {
                         case MIN_DATE:
