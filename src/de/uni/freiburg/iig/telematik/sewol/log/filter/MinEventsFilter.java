@@ -53,6 +53,15 @@ public class MinEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 this.min = min;
         }
 
+        /**
+         * Copy constructor.
+         *
+         * @param filter
+         */
+        public MinEventsFilter(MinEventsFilter filter) {
+                this(filter.getMin(), filter.isInverted());
+        }
+
         public int getMin() {
                 return min;
         }
@@ -100,5 +109,10 @@ public class MinEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 }
                 final MinEventsFilter<?> other = (MinEventsFilter<?>) obj;
                 return this.min == other.min;
+        }
+
+        @Override
+        public MinEventsFilter copy() {
+                return new MinEventsFilter(this);
         }
 }

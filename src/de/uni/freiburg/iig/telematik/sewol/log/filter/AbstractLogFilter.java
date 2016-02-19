@@ -106,4 +106,6 @@ public abstract class AbstractLogFilter<E extends LogEntry> extends Observable i
                 final AbstractLogFilter<?> other = (AbstractLogFilter<?>) obj;
                 return this.invert == other.invert;
         }
+
+        public abstract AbstractLogFilter copy();
 }

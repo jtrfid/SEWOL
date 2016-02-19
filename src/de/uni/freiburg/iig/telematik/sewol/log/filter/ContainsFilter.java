@@ -58,6 +58,15 @@ public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 this.value = value;
         }
 
+        /**
+         * Copy constructor.
+         *
+         * @param filter
+         */
+        public ContainsFilter(ContainsFilter filter) {
+                this(filter.getParameter(), filter.getValue(), filter.isInverted());
+        }
+
         public ContainsFilterParameter getParameter() {
                 return parameter;
         }
@@ -147,6 +156,11 @@ public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                         return false;
                 }
                 return Objects.equals(this.value, other.value);
+        }
+
+        @Override
+        public ContainsFilter copy() {
+                return new ContainsFilter(this);
         }
 
         public enum ContainsFilterParameter {

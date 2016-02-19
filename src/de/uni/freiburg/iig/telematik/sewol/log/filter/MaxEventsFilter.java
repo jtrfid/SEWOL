@@ -53,6 +53,15 @@ public class MaxEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 this.max = max;
         }
 
+        /**
+         * Copy constructor.
+         *
+         * @param filter
+         */
+        public MaxEventsFilter(MaxEventsFilter filter) {
+                this(filter.getMax(), filter.isInverted());
+        }
+
         public int getMax() {
                 return max;
         }
@@ -100,5 +109,10 @@ public class MaxEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 }
                 final MaxEventsFilter<?> other = (MaxEventsFilter<?>) obj;
                 return this.max == other.max;
+        }
+
+        @Override
+        public MaxEventsFilter copy() {
+                return new MaxEventsFilter(this);
         }
 }

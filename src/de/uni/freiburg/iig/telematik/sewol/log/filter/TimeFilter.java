@@ -44,7 +44,7 @@ import java.util.Objects;
  * @param <E>
  */
 public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
-        
+
         private static final DateFormat SHORT_DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
         private Date startDate = null;
@@ -68,6 +68,15 @@ public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 super(invert);
                 setStartDate(startDate);
                 setEndDate(endDate);
+        }
+
+        /**
+         * Copy constructor.
+         *
+         * @param filter
+         */
+        public TimeFilter(TimeFilter filter) {
+                this(filter.getStartDate(), filter.getEndDate(), filter.isInverted());
         }
 
         /**
@@ -205,6 +214,11 @@ public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                         return false;
                 }
                 return Objects.equals(this.endDate, other.endDate);
+        }
+
+        @Override
+        public TimeFilter copy() {
+                return new TimeFilter(this);
         }
 
         public enum TimeFrameFilterType {
