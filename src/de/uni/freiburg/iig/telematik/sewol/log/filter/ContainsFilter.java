@@ -43,8 +43,15 @@ import java.util.Objects;
  */
 public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
+        public static final ContainsFilterParameter DEFAULT_PARAMETER = ContainsFilterParameter.ACTIVITY;
+        public static final String DEFAULT_VALUE = "";
+
         private ContainsFilterParameter parameter;
         private String value;
+
+        public ContainsFilter() {
+                this(DEFAULT_PARAMETER, DEFAULT_VALUE);
+        }
 
         public ContainsFilter(ContainsFilterParameter parameter, String value) {
                 super();

@@ -41,11 +41,17 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
  */
 public class MaxEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
+        public static final int MAX_EVENTS_DEFAULT = Integer.MAX_VALUE;
+
         private int max;
 
         public MaxEventsFilter(int max) {
                 super();
                 this.max = max;
+        }
+
+        public MaxEventsFilter() {
+                this(MAX_EVENTS_DEFAULT);
         }
 
         public MaxEventsFilter(int max, boolean invert) {

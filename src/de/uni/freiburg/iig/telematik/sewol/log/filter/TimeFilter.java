@@ -45,13 +45,16 @@ import java.util.Objects;
  */
 public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
+        public static final Date DEFAULT_START_DATE = null;
+        public static final Date DEFAULT_END_DATE = null;
+
         private static final DateFormat SHORT_DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
         private Date startDate = null;
         private Date endDate = null;
 
         public TimeFilter() {
-                super();
+                this(DEFAULT_START_DATE, DEFAULT_END_DATE);
         }
 
         public TimeFilter(boolean invert) {

@@ -41,7 +41,13 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
  */
 public class MinEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
+        public static final int MIN_EVENTS_DEFAULT = 0;
+
         private int min;
+
+        public MinEventsFilter() {
+                this(MIN_EVENTS_DEFAULT);
+        }
 
         public MinEventsFilter(int min) {
                 super();
