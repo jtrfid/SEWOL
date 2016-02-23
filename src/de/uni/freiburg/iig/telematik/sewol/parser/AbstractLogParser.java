@@ -1,6 +1,5 @@
 package de.uni.freiburg.iig.telematik.sewol.parser;
 
-import de.invation.code.toval.parser.ParserException;
 import java.util.List;
 
 import de.invation.code.toval.validate.ParameterException;
@@ -9,7 +8,6 @@ import de.invation.code.toval.validate.Validate;
 import de.uni.freiburg.iig.telematik.sewol.log.LogEntry;
 import de.uni.freiburg.iig.telematik.sewol.log.LogSummary;
 import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
-import java.io.File;
 import java.util.ArrayList;
 
 public abstract class AbstractLogParser implements LogParserInterface {

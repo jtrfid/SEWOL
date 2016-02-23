@@ -94,7 +94,7 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
         }
 
         @Override
-        void reinitialize() {
+        public void reinitialize() {
                 super.reinitialize();
                 allTraces = new ArrayList<>();
         }
