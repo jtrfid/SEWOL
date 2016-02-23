@@ -59,6 +59,8 @@ public abstract class AbstractLogFilter<E extends LogEntry> extends Observable i
                 this.invert = invert;
         }
 
+        public abstract String getName();
+
         /**
          * @return Returns <code>true</code> if the filter result should be
          * inverted.

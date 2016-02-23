@@ -45,6 +45,8 @@ import java.util.Objects;
  */
 public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
+        public static final String TIME_FILTER_NAME = "time";
+
         public static final Date DEFAULT_START_DATE = null;
         public static final Date DEFAULT_END_DATE = null;
 
@@ -222,6 +224,11 @@ public class TimeFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         @Override
         public TimeFilter copy() {
                 return new TimeFilter(this);
+        }
+
+        @Override
+        public String getName() {
+                return TIME_FILTER_NAME;
         }
 
         public enum TimeFrameFilterType {

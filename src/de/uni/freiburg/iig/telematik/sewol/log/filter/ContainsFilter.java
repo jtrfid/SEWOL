@@ -43,6 +43,8 @@ import java.util.Objects;
  */
 public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
+        public static final String CONTAINS_FILTER_NAME = "contains";
+
         public static final ContainsFilterParameter DEFAULT_PARAMETER = ContainsFilterParameter.ACTIVITY;
         public static final String DEFAULT_VALUE = "";
 
@@ -168,6 +170,11 @@ public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         @Override
         public ContainsFilter copy() {
                 return new ContainsFilter(this);
+        }
+
+        @Override
+        public String getName() {
+                return CONTAINS_FILTER_NAME;
         }
 
         public enum ContainsFilterParameter {

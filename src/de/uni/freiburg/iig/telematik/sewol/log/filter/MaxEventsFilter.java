@@ -41,6 +41,8 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
  */
 public class MaxEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
+        public static final String MAX_EVENTS_FILTER_NAME = "max events";
+
         public static final int MAX_EVENTS_DEFAULT = Integer.MAX_VALUE;
 
         private int max;
@@ -120,5 +122,10 @@ public class MaxEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         @Override
         public MaxEventsFilter copy() {
                 return new MaxEventsFilter(this);
+        }
+
+        @Override
+        public String getName() {
+                return MAX_EVENTS_FILTER_NAME;
         }
 }

@@ -41,6 +41,8 @@ import de.uni.freiburg.iig.telematik.sewol.log.LogTrace;
  */
 public class MinEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
 
+        public static final String MIN_EVENTS_FILTER_NAME = "min events";
+
         public static final int MIN_EVENTS_DEFAULT = 0;
 
         private int min;
@@ -120,5 +122,10 @@ public class MinEventsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
         @Override
         public MinEventsFilter copy() {
                 return new MinEventsFilter(this);
+        }
+
+        @Override
+        public String getName() {
+                return MIN_EVENTS_FILTER_NAME;
         }
 }
