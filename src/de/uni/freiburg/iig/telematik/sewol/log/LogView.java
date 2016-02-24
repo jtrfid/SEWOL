@@ -246,4 +246,18 @@ public class LogView<E extends LogEntry> extends Log<E> implements Observer, Nam
                 }
                 return Objects.equals(this.fileReference, other.fileReference);
         }
+
+        @Override
+        public String toString() {
+                StringBuilder sb = new StringBuilder();
+                sb.append("LogView{name=").append(name).append(", parentLogName=").append(parentLogName).append(", filters:");
+                for (AbstractLogFilter filter : filters) {
+                        sb.append("\n \u2022").append(filter);
+                }
+                if (filters.size() > 0) {
+                        sb.append("\n");
+                }
+                sb.append("}");
+                return sb.toString();
+        }
 }

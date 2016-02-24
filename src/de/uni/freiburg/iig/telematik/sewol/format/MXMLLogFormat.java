@@ -64,7 +64,7 @@ public class MXMLLogFormat extends AbstractLogFormat {
         private final String MXML_DATEPATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
         protected String lineSeparator = DEFAULT_LINE_SEPARATOR;
-        
+
         private static final String COMMENT_LINE_FORMAT = "<!-- %s -->\n";
 
 //	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -197,7 +197,7 @@ public class MXMLLogFormat extends AbstractLogFormat {
         @Override
         public String formatComment(String comment) {
                 Validate.notNull(comment);
-                if (comment.replaceAll("\\s+", "").length() == 0)  {
+                if (comment.replaceAll("\\s+", "").length() == 0) {
                         return "";
                 }
                 StringBuilder sb = new StringBuilder();
@@ -207,6 +207,8 @@ public class MXMLLogFormat extends AbstractLogFormat {
                 for (String line : lines) {
                         sb.append(String.format(COMMENT_LINE_FORMAT, line));
                 }
+
+                sb.append("\n");
 
                 return sb.toString();
         }

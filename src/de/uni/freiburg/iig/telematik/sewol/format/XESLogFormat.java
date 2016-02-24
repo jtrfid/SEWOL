@@ -60,7 +60,7 @@ public class XESLogFormat extends AbstractLogFormat {
         private static final String ATTRIBUTE_BOOLEAN_FORMAT_C = "%s<boolean key=\"%s\" value=\"%b\" />%s";
 
         private static final String XES_DATEPATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-        
+
         private static final String COMMENT_LINE_FORMAT = "<!-- %s -->\n";
 
         public XESLogFormat(String logName) {
@@ -125,13 +125,13 @@ public class XESLogFormat extends AbstractLogFormat {
                 // Header
                 builder.append(String.format(FILE_HEADER, charset.name()));
 
-		// Extensions =>
+                // Extensions =>
                 // "%s<extension name=\"%s\" prefix=\"%s\" uri=\"%s\" />%s"
                 for (XESExtensions e : XESExtensions.values()) {
                         builder.append(String.format(EXTENSION_FORMAT, INDENT1, e.name, e.prefix, e.uri, DEFAULT_LINE_SEPARATOR));
                 }
 
-		// log name =>
+                // log name =>
                 // "%s<string key=\"%s\" value=\"%s\">%s</string>%s"
                 builder.append(String.format(ATTRIBUTE_STRING_FORMAT_C, INDENT1, XESExtensions.CONCEPT.prefix + ":name", logName, DEFAULT_LINE_SEPARATOR));
                 // lifecycle model
@@ -250,7 +250,7 @@ public class XESLogFormat extends AbstractLogFormat {
         @Override
         public String formatComment(String comment) {
                 Validate.notNull(comment);
-                if (comment.replaceAll("\\s+", "").length() == 0)  {
+                if (comment.replaceAll("\\s+", "").length() == 0) {
                         return "";
                 }
                 StringBuilder sb = new StringBuilder();
@@ -260,6 +260,8 @@ public class XESLogFormat extends AbstractLogFormat {
                 for (String line : lines) {
                         sb.append(String.format(COMMENT_LINE_FORMAT, line));
                 }
+
+                sb.append("\n");
 
                 return sb.toString();
         }

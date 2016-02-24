@@ -105,17 +105,23 @@ public class ContainsFilter<E extends LogEntry> extends AbstractLogFilter<E> {
                 for (E entry : trace.getEntries()) {
                         switch (parameter) {
                                 case ACTIVITY:
-                                        if (entry.getActivity().equals(value)) {
+                                        if (entry.getActivity() == null) {
+                                                return isInverted() ^ (value == null);
+                                        } else if (entry.getActivity().equals(value)) {
                                                 return isInverted() ^ true;
                                         }
                                         break;
                                 case SUBJECT:
-                                        if (entry.getOriginator().equals(value)) {
+                                        if (entry.getOriginator() == null) {
+                                                return isInverted() ^ (value == null);
+                                        } else if (entry.getOriginator().equals(value)) {
                                                 return isInverted() ^ true;
                                         }
                                         break;
                                 case ROLE:
-                                        if (entry.getRole().equals(value)) {
+                                        if (entry.getRole() == null) {
+                                                return isInverted() ^ (value == null);
+                                        } else if (entry.getRole().equals(value)) {
                                                 return isInverted() ^ true;
                                         }
                                         break;
