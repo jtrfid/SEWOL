@@ -264,6 +264,13 @@ public class ACModelDialog<P extends ACModelProperties> extends AbstractEditCrea
             comboContext.setSelectedItem(getDialogObject().getContext());
             comboContext.setPreferredSize(FIELD_DIMENSION);
             comboContext.setMinimumSize(FIELD_DIMENSION);
+            comboContext.addActionListener (new ActionListener () {
+                public void actionPerformed(ActionEvent e) {
+                	SOABaseComboBox cb = (SOABaseComboBox)e.getSource();
+                    getDialogObject().setContext(cb.getSelectedItem());
+                    updateTextArea();
+                }
+            });
         }
         return comboContext;
     }

@@ -14,7 +14,9 @@ import de.uni.freiburg.iig.telematik.sewol.accesscontrol.ACModelContainer;
  */
 public class ProcessContextContainer extends AbstractProcessContextContainer<ProcessContext,ProcessContextProperties>{
 
-    public ProcessContextContainer(String serializationPath) {
+    private static final String PROCESS_CONTEXT_EXTENSION = "context";
+
+	public ProcessContextContainer(String serializationPath) {
         super(serializationPath);
     }
 
@@ -39,5 +41,11 @@ public class ProcessContextContainer extends AbstractProcessContextContainer<Pro
     protected ProcessContext createSOABaseFromProperties(ProcessContextProperties properties) throws Exception {
         return new ProcessContext(properties);
     }
+
+	@Override
+	protected String getFileEndingForComponent(ProcessContext component) {
+	            return PROCESS_CONTEXT_EXTENSION;
+	   
+	}
 
 }

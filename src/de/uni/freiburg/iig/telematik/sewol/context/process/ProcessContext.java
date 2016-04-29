@@ -1288,14 +1288,15 @@ public class ProcessContext extends SOABase implements SOABaseListener {
 //        acModel.setActivityPermission("s1", activities);
 //        c.setACModel(acModel);
                 System.out.println(c);
-                c.getProperties().store("/Users/stocker/Desktop/processContext");
+                c.getProperties().store("/Users/holderer/Desktop/processContext/pco");
 
                 ProcessContextProperties properties = new ProcessContextProperties();
-                properties.load("/Users/stocker/Desktop/processContext");
+                properties.load("/Users/holderer/Desktop/processContext/pco");
                 ProcessContext c1 = new ProcessContext(properties);
                 System.out.println(c1);
                 System.out.println(c1.equals(c));
                 System.out.println(properties.getBaseClass());
                 System.out.println(c1.getClass());
         }
+
 }

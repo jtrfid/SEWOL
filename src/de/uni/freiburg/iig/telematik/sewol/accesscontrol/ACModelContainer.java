@@ -5,6 +5,8 @@
  */
 package de.uni.freiburg.iig.telematik.sewol.accesscontrol;
 
+import java.io.File;
+
 import de.invation.code.toval.debug.SimpleDebugger;
 import de.invation.code.toval.misc.soabase.AbstractSOABaseContainer;
 import de.invation.code.toval.misc.soabase.SOABase;
@@ -23,6 +25,7 @@ public class ACModelContainer<C extends SOABase, P extends SOABaseProperties> ex
 
     public static final String ACMODEL_DESCRIPTOR = "AC-Model";
     public static final boolean DEFAULT_VALIDATE_PARSED_ACMODELS = false;
+	private static final String ACMODEL_EXTENSION = "acmodel";
     private AbstractSOABaseContainer<C,P> availableContexts;
     private boolean validateParsedACModels = DEFAULT_VALIDATE_PARSED_ACMODELS;
 
@@ -43,7 +46,8 @@ public class ACModelContainer<C extends SOABase, P extends SOABaseProperties> ex
     @Override
     protected void serializeComponent(AbstractACModel component, String serializationPath, String fileName) throws Exception {
         Validate.notNull(component);
-        component.getProperties().store(serializationPath + fileName);
+        File pathToStore = new File(serializationPath, fileName);
+        component.getProperties().store(pathToStore.getAbsolutePath());
     }
 
     @Override
@@ -55,5 +59,11 @@ public class ACModelContainer<C extends SOABase, P extends SOABaseProperties> ex
     public String getComponentDescriptor() {
         return ACMODEL_DESCRIPTOR;
     }
+    
+	@Override
+	protected String getFileEndingForComponent(AbstractACModel component) {
+	            return ACMODEL_EXTENSION;
+	   
+	}
 
 }

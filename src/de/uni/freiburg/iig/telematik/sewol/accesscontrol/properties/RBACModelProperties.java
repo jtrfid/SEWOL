@@ -239,9 +239,8 @@ public class RBACModelProperties extends ACLModelProperties{
 		p.addRoleRelation("r1", "r2");
 		p.addRoleRelation("r2", "r3");
 		
-		p.store("/Users/stocker/Desktop/rbac");
+		p.store("/Users/holderer/Documents/SwatWorkingDirectory/acModels/smallrbac");
 		p.setRoleMembership("subj1", roles);
-		
 		
 	}
 	

@@ -70,8 +70,7 @@ public class RBACModel extends AbstractACModel<RBACModelProperties> implements R
 		for(RoleRelation relation: properties.getRoleRelations()){
 			lattice.addRelation(relation);
 		}
-		this.roleLattice = lattice;
-		this.roleLattice.addRoleLatticeListener(this);
+		setRoleLattice(lattice);
 		setRightsPropagation(properties.getRightsPropagation());
 		for(String subject: getContext().getSubjects()){
 			addRoleMembership(subject, properties.getRoleMembership(subject));
